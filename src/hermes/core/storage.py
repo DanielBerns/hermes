@@ -1,15 +1,9 @@
 import logging
-
 from pathlib import Path
 from typing import Any
 
-from unpsjb_fce_obsecon.utils.helpers import get_container, classname
-
-from unpsjb_fce_obsecon.utils.constants import (
-    PROJECT,
-    INSTANCE,
-    INSTANCE_BASE
-)
+from hermes.core.constants import INSTANCE, INSTANCE_BASE, PROJECT
+from hermes.core.helpers import get_container
 
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
@@ -26,7 +20,7 @@ class Storage:
         if instance_base is None:
             project = config.get(PROJECT, "Horror")
             instance = config.get(INSTANCE, "Hell")
-            message = f"{classname(self)}.__init__: {project}, {instance} - null instance_base"
+            message = f"{self.__class__.__name__}.__init__: {project}, {instance} - null instance_base"
             raise StorageException(message)
         self._base = instance_base
 

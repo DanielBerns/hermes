@@ -1,9 +1,8 @@
-from typing import Dict, Callable
-from pathlib import Path
-import subprocess
 import logging
+import subprocess
+from pathlib import Path
 
-from unpsjb_fce_obsecon.utils.helpers import classname, create_text_file
+from hermes.core.helpers import create_text_file
 
 # https://www.adminschoice.com/crontab-quick-reference
 
@@ -40,7 +39,7 @@ def check_minute(minute: str) -> str:
             explanation = f"crontab.check_minute: invalid minute value: {minute:s}"
             raise CrontabException(explanation)
     else:
-        explanation = f"crontab.check_minute: invalid minute length"
+        explanation = "crontab.check_minute: invalid minute length"
         raise CrontabException(explanation)
 
 
@@ -58,7 +57,7 @@ def check_hour(hour: str) -> str:
             explanation = f"crontab.check_hour: invalid hour value: {hour:s}"
             raise CrontabException(explanation)
     else:
-        explanation = f"crontab.check_hour: invalid hour length"
+        explanation = "crontab.check_hour: invalid hour length"
         raise CrontabException(explanation)
 
 
@@ -76,7 +75,7 @@ def check_day_of_month(day_of_month: str) -> str:
             explanation = f"crontab.check_day_of_month: invalid day_of_month value: {day_of_month:s}"
             raise CrontabException(explanation)
     else:
-        explanation = f"crontab.check_day_of_month: invalid day_of_month length"
+        explanation = "crontab.check_day_of_month: invalid day_of_month length"
         raise CrontabException(explanation)
 
 
@@ -94,7 +93,7 @@ def check_month(month: str) -> str:
             explanation = f"crontab.check_hour: invalid month value: {month:s}"
             raise CrontabException(explanation)
     else:
-        explanation = f"crontab.check_hour: invalid month length"
+        explanation = "crontab.check_hour: invalid month length"
         raise CrontabException(explanation)
 
 
@@ -112,7 +111,7 @@ def check_day_of_week(day_of_week: str) -> str:
             explanation = f"crontab.check_hour: invalid day_of_week value: {day_of_week:s}"
             raise CrontabException(explanation)
     else:
-        explanation = f"crontab.check_hour: invalid day_of_week length"
+        explanation = "crontab.check_hour: invalid day_of_week length"
         raise CrontabException(explanation)
 
 
@@ -132,7 +131,7 @@ class Crontab:
     ) -> None:
         parts = timing.split(' ')
         if len(parts) != 5:
-            explanation = f"{classname(self):s} Bad timing: {key:s} - {str(command):s} - {timing:s}"
+            explanation = f"{self.__class__.__name__} Bad timing: {key} - {command} - {timing}"
             raise CrontabException(explanation)
         minute: str = parts[0]
         hour: str = parts[1]
@@ -146,9 +145,9 @@ class Crontab:
             _day_of_month = check_day_of_month(day_of_month)
             _month = check_month(month)
             _day_of_week = check_day_of_week(day_of_week)
-        except CrontabException as message:
+        except CrontabException:
             explanation = " ".join(
-                    (   classname(self),
+                    (   self.__class__.__name__,
                         "erroneous parameters:",
                         command,
                         minute,

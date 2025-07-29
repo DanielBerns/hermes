@@ -1,16 +1,16 @@
 import logging
+import re
 from collections import defaultdict
 from pathlib import Path
-import re
 
-from unpsjb_fce_obsecon.utils.helpers import get_resource, read_text_file, create_text_file
+from hermes.core.helpers import create_text_file, read_text_file
 
 # Use logging.getLogger, which is the standard way to get a logger instance.
 logger = logging.getLogger(__name__)
 
 
-class ParametersException(Exception):
-    """Custom exception for errors during parameter processing."""
+class SwitchesException(Exception):
+    """Custom exception for errors during switch processing."""
     # No changes needed here, but it's good practice to have custom exceptions.
     def __init__(self, message: str) -> None:
         super().__init__(message)
@@ -19,7 +19,7 @@ class ParametersException(Exception):
 
 class Switches:
     """
-    Manages reading and writing switch-like configuration parameters
+    Manages reading and writing switch-like configuration switches
     from a structured text file.
 
     The file format is:
@@ -76,7 +76,7 @@ class Switches:
             container: The directory (as a Path object) where the file is located.
 
         Raises:
-            ParametersException: If the file format is invalid.
+            SwitchesException: If the file format is invalid.
         """
 
         # Updated regex for the new format (no leading '#').
@@ -86,7 +86,7 @@ class Switches:
         resource = self.get_resource(container, self.identifier, ".txt")
 
         if not resource.exists():
-            raise ParametersException(f"Resource file not found at: {resource}")
+            raise SwitchesException(f"Resource file not found at: {resource}")
 
         # self.table.clear() # Clear existing data before reading
         current_group = ""
@@ -100,15 +100,15 @@ class Switches:
                 if line.startswith("# "):
                     current_group = line[2:].strip()
                     if not current_group:
-                        raise ParametersException(f"Invalid group name at line {line_number}: '{line}'")
+                        raise SwitchesException(f"Invalid group name at line {line_number}: '{line}'")
                     # self.table[current_group] = {}
                 else: # Otherwise, it should be a component line.
                     if not current_group:
-                        raise ParametersException(f"Component found before any group definition at line {line_number}: '{line}'")
+                        raise SwitchesException(f"Component found before any group definition at line {line_number}: '{line}'")
 
                     match = line_regex.match(line)
                     if not match:
-                        raise ParametersException(f"Malformed component line at {line_number}: '{line}'")
+                        raise SwitchesException(f"Malformed component line at {line_number}: '{line}'")
 
                     key = match.group('key').strip()
                     value_str = match.group('value').strip()

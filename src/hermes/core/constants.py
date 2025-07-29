@@ -1,5 +1,5 @@
 INFO = "Info"
-PROJECT = "unpsjb_fce_obsecon"
+PROJECT = "hermes"
 VERSION = "VERSION"
 VERSION_DEFAULT = "0_1"
 INSTANCE = "instance"

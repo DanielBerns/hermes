@@ -1,7 +1,7 @@
-from typing import Any, Generator
 from pathlib import Path
+from typing import Any, Generator
 
-from unpsjb_fce_obsecon.utils.helpers import read_json_lines, get_resource
+from hermes.core.helpers import get_resource, read_json_lines
 
 
 class RowsReader:

@@ -1,6 +1,6 @@
-from typing import Protocol, Any
+from typing import Any, Protocol
 
-from unpsjb_fce_obsecon.utils.helpers import as_jsonl
+from hermes.core.helpers import as_jsonl
 
 
 class Formatter(Protocol):

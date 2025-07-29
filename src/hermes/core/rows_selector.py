@@ -1,8 +1,8 @@
 import logging
-from typing import Any, List, Generator, Tuple, Iterator
 from pathlib import Path
+from typing import Any, Generator, Iterator, List, Tuple
 
-from unpsjb_fce_obsecon.utils.helpers import get_resource, create_text_file, read_text_lines, classname
+from hermes.core.helpers import create_text_file, get_resource, read_text_lines
 
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
@@ -105,19 +105,19 @@ class RowsSelector:
         # We iterate through each selector yielded by get_selector() and apply apply_selector
         # to the row with that specific selector.
         if len(self._keys) == 0:
-            logger.warning(f"{classname(self)}.select: no keys")
+            logger.warning(f"{self.__class__.__name__}.select: no keys")
             return False
         if len(self._list_of_values) == 0:
-            logger.warning(f"{classname(self)}.select: no list_of_values")
+            logger.warning(f"{self.__class__.__name__}.select: no list_of_values")
             return False
         if len(row) == 0:
-            logger.warning(f"{classname(self)}.select: no row")
+            logger.warning(f"{self.__class__.__name__}.select: no row")
             return False
         if same_length():
             if all(row.get(key, None) for key in self._keys):
                 return any(apply_selector(row, selector_item) for selector_item in get_selector())
             else:
-                logger.warning(f"{classname(self)}.select: len(keys) != len(values)")
+                logger.warning(f"{self.__class__.__name__}.select: len(keys) != len(values)")
                 return False
         else:
             return False

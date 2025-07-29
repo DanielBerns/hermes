@@ -1,7 +1,9 @@
 # app/client.py
 # This file contains the Python client class for interacting with the message board server API.
-import requests
 import json
+
+import requests
+
 
 class MessageBoardClient:
     def __init__(self, base_url="http://127.0.0.1:5000"):
@@ -75,22 +77,26 @@ class MessageBoardClient:
 
     # --- Message Sending Methods ---
     def send_private_message(self, recipient_username, content):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/private"
         payload = {"recipient_username": recipient_username, "content": content}
         response = requests.post(url, json=payload, headers=self._make_headers())
         return self._handle_response(response)
 
     def send_group_message(self, recipient_usernames, content):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/group"
         payload = {"recipient_usernames": recipient_usernames, "content": content}
         response = requests.post(url, json=payload, headers=self._make_headers())
         return self._handle_response(response)
 
     def send_public_message(self, content, tags=None):
-        if not self.token: return {"error": "Not logged in"}
-        if tags is None: tags = []
+        if not self.token:
+            return {"error": "Not logged in"}
+        if tags is None:
+            tags = []
         url = f"{self.base_url}/api/messages/public"
         payload = {"content": content, "tags": tags}
         response = requests.post(url, json=payload, headers=self._make_headers())
@@ -98,19 +104,22 @@ class MessageBoardClient:
 
     # --- Message Retrieval Methods ---
     def get_private_messages(self):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/private"
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)
 
     def get_group_messages(self):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/group"
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)
 
     def get_public_messages(self, filter_tags=None): # filter_tags can be a list
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/public"
         params = {}
         if filter_tags and isinstance(filter_tags, list):
@@ -121,14 +130,16 @@ class MessageBoardClient:
 
     # --- Tag Subscription Methods ---
     def subscribe_to_tags(self, tags):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/tags/subscribe"
         payload = {"tags": tags}
         response = requests.post(url, json=payload, headers=self._make_headers())
         return self._handle_response(response)
 
     def unsubscribe_from_tags(self, tags):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/tags/unsubscribe"
         payload = {"tags": tags}
         response = requests.post(url, json=payload, headers=self._make_headers())
@@ -136,14 +147,16 @@ class MessageBoardClient:
 
     # --- Message Deletion Method ---
     def delete_message(self, message_id):
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/{message_id}"
         response = requests.delete(url, headers=self._make_headers())
         return self._handle_response(response)
 
     # --- Admin Method ---
     def get_server_status(self): # Assumes admin is logged in
-        if not self.token: return {"error": "Not logged in"}
+        if not self.token:
+            return {"error": "Not logged in"}
         url = f"{self.base_url}/api/admin/status"
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)

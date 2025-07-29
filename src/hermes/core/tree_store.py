@@ -1,21 +1,19 @@
+import json
 import logging
 from dataclasses import dataclass
-import json
 from pathlib import Path
-from typing import Tuple, Generator
-from unpsjb_fce_obsecon.utils.helpers import (
-    classname,
+from typing import Generator, Tuple
+
+from hermes.core.helpers import (
     get_container,
     get_directory,
     get_resource,
     get_timestamp
 )
-from unpsjb_fce_obsecon.utils.metadata import Metadata
-
+from hermes.core.metadata import Metadata
 
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
-
 
 class TreeStoreException(Exception):
     """Exception for the tree_store module."""
@@ -25,7 +23,7 @@ class TreeStoreException(Exception):
 
 
 @dataclass
-class Leaf:
+class Store:
     home: Path
     index: int
     key: str
@@ -76,7 +74,7 @@ def base_10(first_digit: int, second_digit: int, third_digit: int) -> int:
     return (((first_digit << 8) + second_digit) << 8) + third_digit
 
 
-def get_leaf_tuple(number: int) -> Tuple[str, str, str]:
+def get_store_tuple(number: int) -> Tuple[str, str, str]:
     """
     Generates a tuple of 3 digit base-256 number from an integer, represented as zero padded strings
 
@@ -96,7 +94,7 @@ class Index:
 
     This class provides methods to read, write, and increment an index value
     that is persisted in a JSON file.  It's used to keep track of the
-    current leaf number in the TreeStore.
+    current store number in the TreeStore.
     """
     def __init__(self, resource: Path) -> None:
         """
@@ -194,30 +192,30 @@ class Index:
 
 class TreeStore:
     """
-    Manages a hierarchical directory structure for storing leafs.
+    Manages a hierarchical directory structure for storing stores.
 
-    The TreeStore organizes leafs into directories named using a 9-digit
+    The TreeStore organizes stores into directories named using a 9-digit
     zero-padded identifier. It uses an Index object to keep track of the
-    next available leaf identifier.  The structure is as follows:
+    next available store identifier.  The structure is as follows:
 
     ```
     <base_path>/
         <identifier>/  (e.g., my_data)
             index.json
-            leafs/
+            stores/
                 000/
                     000/
                        000/
-                           ... (leaf data) ...
+                           ... (store data) ...
                        001/
-                           ... (leaf data) ...
+                           ... (store data) ...
                        ...
                        255/
                     001/
                        000/
-                           ... (leaf data) ...
+                           ... (store data) ...
                        001/
-                           ... (leaf data) ...
+                           ... (store data) ...
                        ...
                        255/
     ```
@@ -266,62 +264,62 @@ class TreeStore:
         """
         return self._index
 
-    def create_leaf(self) -> Leaf:
+    def create_store(self) -> Store:
         """
-        Creates a new leaf directory and increments the index.
+        Creates a new store directory and increments the index.
 
         Returns:
-            Path: The path to the newly created leaf directory.
+            Path: The path to the newly created store directory.
         """
-        leaf_index = self.index.value
-        (first_digit, second_digit, third_digit) = get_leaf_tuple(leaf_index)
-        leaf_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
+        store_index = self.index.value
+        (first_digit, second_digit, third_digit) = get_store_tuple(store_index)
+        store_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
         self.index.value += 1
-        leaf_key = f"{first_digit}{second_digit}{third_digit}"
-        leaf_timestamp = get_timestamp()
-        metadata = Metadata(leaf_home)
-        metadata.add("key", leaf_key)
-        metadata.add("timestamp", leaf_timestamp)
+        store_key = f"{first_digit}{second_digit}{third_digit}"
+        store_timestamp = get_timestamp()
+        metadata = Metadata(store_home)
+        metadata.add("key", store_key)
+        metadata.add("timestamp", store_timestamp)
         metadata.write()
-        return Leaf(leaf_home, leaf_index, leaf_key, leaf_timestamp)
+        return Store(store_home, store_index, store_key, store_timestamp)
 
-    def _get_leaf(self, leaf_index: int) -> Leaf:
-        (first_digit, second_digit, third_digit) = get_leaf_tuple(leaf_index)
-        leaf_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
-        leaf_key = f"{first_digit}{second_digit}{third_digit}"
-        metadata = Metadata(leaf_home)
+    def _get_store(self, store_index: int) -> Store:
+        (first_digit, second_digit, third_digit) = get_store_tuple(store_index)
+        store_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
+        store_key = f"{first_digit}{second_digit}{third_digit}"
+        metadata = Metadata(store_home)
         metadata.read()
-        leaf_timestamp = metadata.table.get("timestamp", False)
-        if not leaf_timestamp:
-            leaf_timestamp = metadata.table.get("sample_key", "00000000000000")
-        return Leaf(leaf_home, leaf_index, leaf_key, leaf_timestamp)
+        store_timestamp = metadata.table.get("timestamp", False)
+        if not store_timestamp:
+            store_timestamp = metadata.table.get("sample_key", "00000000000000")
+        return Store(store_home, store_index, store_key, store_timestamp)
 
-    def get_leaf(self, leaf_index: int) -> Leaf:
-        if 0 <= leaf_index < self.index.value:
-            return self._get_leaf(leaf_index)
+    def get_store(self, store_index: int) -> Store:
+        if 0 <= store_index < self.index.value:
+            return self._get_store(store_index)
         else:
             raise TreeStoreException(
-                f"{classname(self)}.get_leaf: out of range leaf_index {leaf_index} | {self.index.value}"
+                f"{self.__class__.__name__}.get_store: out of range store_index {store_index} | {self.index.value}"
             )
 
-    def iterate(self, first: int = 0, top: int = -1) -> Generator[Leaf, None, None]:
+    def iterate(self, first: int = 0, top: int = -1) -> Generator[Store, None, None]:
         """
-        get a sequence of leaf_index where first <= leaf_index < top
+        get a sequence of store_index where first <= store_index < top
 
         Args:
-            first: Determine the first leaf directory of the selection,
-            top: Determine the last leaf directories to select over.
-                 If -1 (default), includes the last leaf directory
+            first: Determine the first store directory of the selection,
+            top: Determine the last store directories to select over.
+                 If -1 (default), includes the last store directory
 
         Yields:
-            leaf: a Leaf instance containing all the leaf parameters.
+            store: a Store instance containing all the store parameters.
 
         Raises:
             TreeStoreException: If `first < 0` or `top < first` or  `top >= index.value`
         """
         if first < 0:
             explanation = (
-                f"{classname(self):s}.leafs:"
+                f"{self.__class__.__name__:s}.stores:"
                 f"first {first:d} must be non negative"
             )
             raise TreeStoreException(explanation)
@@ -331,10 +329,10 @@ class TreeStore:
             pass  # Valid top value
         else:
             explanation = (
-                f"{classname(self):s}.leafs: "
+                f"{self.__class__.__name__:s}.stores: "
                 f"bad range [first: {first:d} - top: {top:d} - index: {self.index.value:d})]"
             )
             raise TreeStoreException(explanation)
-        for leaf_index in range(first, top):
-            yield self._get_leaf(leaf_index)
+        for store_index in range(first, top):
+            yield self._get_store(store_index)
 

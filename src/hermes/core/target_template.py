@@ -1,6 +1,7 @@
-from jinja2 import Template
 from pathlib import Path
 from typing import Protocol
+
+from jinja2 import Template
 
 
 class TargetTemplate(Protocol):

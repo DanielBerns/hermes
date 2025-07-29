@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Any
-from unpsjb_fce_obsecon.utils.helpers import read_json, write_json, get_resource
+
+from hermes.core.helpers import get_resource, read_json, write_json
+
 
 class Metadata:
     def __init__(self, directory: Path, filename: str = "metadata") -> None:

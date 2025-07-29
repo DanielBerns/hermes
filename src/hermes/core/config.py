@@ -1,30 +1,20 @@
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
+from hermes.core.constants import (DATABASE, DATABASE_DEFAULT, DOTENV,
+                                   INSTANCE, INSTANCE_BASE, LOG_LEVEL,
+                                   LOG_LEVEL_DEFAULT, PROJECT, VERSION,
+                                   VERSION_DEFAULT)
+from hermes.core.helpers import (create_text_file, get_container,
+                                 get_directory, get_environment_variable)
+
 # No logging in this module
 # Logging will start after load_config invocation
 
-from dotenv import load_dotenv
 
-from unpsjb_fce_obsecon.utils.constants import (
-    PROJECT,
-    VERSION,
-    VERSION_DEFAULT,
-    INSTANCE,
-    INSTANCE_BASE,
-    DOTENV,
-    DATABASE,
-    DATABASE_DEFAULT,
-    LOG_LEVEL,
-    LOG_LEVEL_DEFAULT
-)
 
-from unpsjb_fce_obsecon.utils.helpers import (
-    create_text_file,
-    get_directory,
-    get_container,
-    get_environment_variable
-)
 
 
 def load_config(

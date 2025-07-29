@@ -1,21 +1,22 @@
 import logging
+import sys
 from pathlib import Path
 from typing import Any, Protocol
-import sys
 
-from unpsjb_fce_obsecon.utils.storage import Storage
-from unpsjb_fce_obsecon.utils.cli import CLI
-from unpsjb_fce_obsecon.utils.constants import (
+from hermes.core.bot import SendPublicMessage, initialize_bot
+
+from hermes.core.cli import CLI
+from hermes.core.config import load_config
+from hermes.core.constants import (
+    INFO,
     INSTANCE,
     INSTANCE_DEFAULT,
-    MESSAGE_BOARD,
     LOG_LEVEL,
-    INFO,
-    LOGS
+    LOGS,
+    MESSAGE_BOARD
 )
-from unpsjb_fce_obsecon.utils.config import load_config
-from unpsjb_fce_obsecon.utils.helpers import get_directory, get_resource, get_timestamp
-from unpsjb_fce_obsecon.tools.bot import create_bot, SendPublicMessage
+from hermes.core.helpers import get_directory, get_resource, get_timestamp
+from hermes.core.storage import Storage
 
 
 class Action(Protocol):
@@ -65,7 +66,7 @@ def configure_logging(
 
         # --- Add a File Handler ---
         file_handler = logging.FileHandler(logs_txt)
-        file_handler.setLevel(log_level) # Log ALL messages (DEBUG and above) to the file
+        file_handler.setLevel(log_level) # Configurable log_level
         file_handler.setFormatter(formatter) # Use the same formatter
         root_logger.addHandler(file_handler)
 
@@ -76,7 +77,7 @@ def execute(
     project_identifier: str,
     this_action: Action
 ) -> None:
-    info_path = get_directory(Path.home() / INFO)
+    info_directory = get_directory(Path.home() / INFO)
 
     my_cli = CLI(description="Download data from precios_claros@mecon for a given region.")
     my_cli.add_argument(
@@ -88,28 +89,26 @@ def execute(
     my_cli.add_argument(
         '--message_board',
         choices=["yes", "no"],             # Define the allowed choices
-        default='no',                                       # Set a default value (optional)
+        default='no',                      # Set a default value (optional)
         help="use message_board server (choices: %(choices)s)" # Use %(choices)s to list options in help
     )
     this_action.configure(my_cli)
     arguments = my_cli.arguments
-
     instance = arguments.get(INSTANCE, INSTANCE_DEFAULT)
-
     message_board = arguments.get(MESSAGE_BOARD, "no") == "yes"
-    config = load_config(info_path, project_identifier, instance)
+
+    config = load_config(info_directory, project_identifier, instance)
     storage = Storage(config)
 
     configure_logging(script, arguments, config, storage)
-    # Get the logger for the main script itself
-    main_logger = logging.getLogger(__name__)
-    main_logger.info(f"{script} start.")
+    logger = logging.getLogger(__name__)
+    logger.info(f"{script} start.")
 
     secrets_container = storage.secrets_container
     identifier = this_action.__class__.__name__
     try:
         if message_board:
-            with create_bot(secrets_container, identifier) as bot:
+            with initialize_bot(secrets_container, identifier) as bot:
                 message = SendPublicMessage(
                     ["pipeline", "start"],
                     f"{identifier} start {get_timestamp()}"
@@ -117,21 +116,21 @@ def execute(
                 bot.add(message)
         this_action.run(script, arguments, config, storage)
         if message_board:
-            with create_bot(secrets_container, identifier) as bot:
+            with initialize_bot(secrets_container, identifier) as bot:
                 message = SendPublicMessage(
                     ["pipeline", "done"],
                     f"{identifier} done {get_timestamp()}"
                 )
                 bot.add(message)
     except Exception as message:
-        main_logger.error(f"{message}")
-        main_logger.error(f"{script} failed.")
+        logger.error(f"{message}")
+        logger.error(f"{script} failed.")
         if message_board:
-            with create_bot(secrets_container, identifier) as bot:
+            with initialize_bot(secrets_container, identifier) as bot:
                 message = SendPublicMessage(
                     ["pipeline", "error"],
                     f"{identifier} failed {get_timestamp()}"
                 )
                 bot.add(message)
     else:
-        main_logger.info(f"{script}  done.")
+        logger.info(f"{script}  done.")
