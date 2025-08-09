@@ -4,7 +4,7 @@ from typing import Any, List, Generator
 from collections import defaultdict
 
 from hermes.domain.sample import Sample
-from hermes.scrape.scraper import Scraper, ScraperStop
+from hermes.scrape_precios_claros.scraper import Scraper, ScraperStop
 from hermes.core.rows_processor import RowsProcessor
 from hermes.core.rows_selector import RowsSelector
 from hermes.core.helpers import (get_container, classname)
@@ -74,6 +74,6 @@ class SampleBuilder:
         parameters_home = get_container(home, Sample.PARAMETERS)
         RowsSelector.create(
             parameters_home,
-            Sample.POINTS_OF_SALE_SELECTOR,
+            Sample.STATES_AND_CITIES_SELECTOR,
             Sample.STATES_AND_CITIES
         )

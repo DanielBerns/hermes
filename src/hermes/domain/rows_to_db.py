@@ -104,3 +104,5 @@ def price_to_cents(price: str) -> int:
 def cents_to_price(cents: str) -> str:
     return f"{int(cents)/100:>12.2f}"
 
+def row_to_string(row: dict[str, Any], separator="|") -> str:
+    return "{" + separator.join(f"{key}:{value}" for key, value in row.items()) + "}"

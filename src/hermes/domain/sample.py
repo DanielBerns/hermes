@@ -50,18 +50,17 @@ class Sample:
 
     MECON = "mecon"
     PARAMETERS = "parameters"
-    TREESTORE = "tree_store"
+    TREE_STORE = "tree_store"
     DATABASE = "database" # directory name
-    DB_NAME = "DATABASE" # Environment variable
     PARAMETERS = "parameters"
     REPORTS = "reports"
-    INSPECT_THIS_SAMPLE = "inspect_this_sample"
-    POINTS_OF_SALE_SELECTOR = "points_of_sale_selector"
+    STATES_AND_CITIES_SELECTOR = "states_and_cities_selector"
     ARTICLES_SELECTOR = "articles_selector"
     POINT_OF_SALE_CODE = "point_of_sale_code"
     STATE = "state"
     CITY = "city"
     ADDRESS = "address"
+    PLACE = "place"
     FLAG = "flag"
     BUSINESS = "business"
     BRANCH = "branch"
@@ -72,7 +71,6 @@ class Sample:
     BRAND = "brand"
     DESCRIPTION = "description"
     PRICE = "price"
-
     POINTS_OF_SALE = "points_of_sale"
     ARTICLES = "articles"
 

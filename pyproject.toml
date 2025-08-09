@@ -1,10 +1,23 @@
 [project]
 name = "hermes"
 version = "0.1.0"
-description = "Add your description here"
+description = "System for downloading, processing, and analyzing supermarket prices from Argentina."
 readme = "README.md"
 requires-python = ">=3.13"
+
 dependencies = [
-    "isort>=6.0.1",
-    "ruff>=0.12.5",
+  "requests<=2.32.3", # Example dependency for web requests (adjust version as needed)
+  "sqlalchemy<=2.0.40", # Example dependency for database interactions
+  "pandas<=2.2.3", # Example dependency for data manipulation
+  "python-dotenv<=1.1.10", # To load environment variables from .env
+  "pydrive2<=1.21.3", # Dependency for Google Drive interaction
+  # Add other core dependencies your package needs
+  "isort>=6.0.1",
+  "ruff>=0.12.5",
+  "types-requests>=2.32.0.20250328",
+  "markdown>=3.8.2",
 ]
+
+[build-system]
+requires = ["setuptools>=79.0.1"] # Using setuptools for building
+build-backend = "setuptools.build_meta"

@@ -2,8 +2,8 @@ import logging
 from pathlib import Path
 from typing import Any, Generator
 
-from hermes.cores.metadata import Metadata
-from hermes.cores.rows_reader import RowsReader
+from hermes.core.metadata import Metadata
+from hermes.core.rows_reader import RowsReader
 
 from hermes.domain.sample import Sample
 

@@ -3,12 +3,13 @@ import sys
 from pathlib import Path
 from typing import Any, Protocol
 
-from hermes.core.bot import SendPublicMessage, initialize_bot
+from hermes.message_board.agent import initialize_agent, SendPublicMessage
 
 from hermes.core.cli import CLI
 from hermes.core.config import load_config
 from hermes.core.constants import (
     INFO,
+    INFO_BASE,
     INSTANCE,
     INSTANCE_DEFAULT,
     LOG_LEVEL,
@@ -77,8 +78,8 @@ def execute(
     project_identifier: str,
     this_action: Action
 ) -> None:
-    info_directory = get_directory(Path.home() / INFO)
-
+    info_root = get_directory(Path.home() / INFO)
+    secrets_root = get_directory(Path.home() / "Secrets")
     my_cli = CLI(description="Download data from precios_claros@mecon for a given region.")
     my_cli.add_argument(
         '--instance',
@@ -97,40 +98,40 @@ def execute(
     instance = arguments.get(INSTANCE, INSTANCE_DEFAULT)
     message_board = arguments.get(MESSAGE_BOARD, "no") == "yes"
 
-    config = load_config(info_directory, project_identifier, instance)
+    config = load_config(info_root, secrets_root, project_identifier, instance)
     storage = Storage(config)
 
     configure_logging(script, arguments, config, storage)
     logger = logging.getLogger(__name__)
     logger.info(f"{script} start.")
 
-    secrets_container = storage.secrets_container
+    secrets_base = storage.secrets_base
     identifier = this_action.__class__.__name__
     try:
         if message_board:
-            with initialize_bot(secrets_container, identifier) as bot:
+            with initialize_agent(secrets_base, "message_board") as agent:
                 message = SendPublicMessage(
                     ["pipeline", "start"],
                     f"{identifier} start {get_timestamp()}"
                 )
-                bot.add(message)
+                agent.add(message)
         this_action.run(script, arguments, config, storage)
         if message_board:
-            with initialize_bot(secrets_container, identifier) as bot:
+            with initialize_agent(secrets_base, "message_board") as agent:
                 message = SendPublicMessage(
                     ["pipeline", "done"],
                     f"{identifier} done {get_timestamp()}"
                 )
-                bot.add(message)
+                agent.add(message)
     except Exception as message:
         logger.error(f"{message}")
         logger.error(f"{script} failed.")
         if message_board:
-            with initialize_bot(secrets_container, identifier) as bot:
+            with initialize_agent(secrets_base, "message_board") as agent:
                 message = SendPublicMessage(
                     ["pipeline", "error"],
                     f"{identifier} failed {get_timestamp()}"
                 )
-                bot.add(message)
+                agent.add(message)
     else:
         logger.info(f"{script}  done.")

@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Generator, Optional
-from hermes.data_adquisition.web_client import WebClient
+from hermes.scrape_precios_claros.web_client import WebClient
 
 # Get a named logger for this module
 logger = logging.getLogger(__name__)

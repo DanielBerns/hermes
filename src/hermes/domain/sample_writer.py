@@ -1,7 +1,7 @@
 import logging
 
-from hermes.cores.formatter import Formatter
-from hermes.cores.rows_writer import RowsWriter
+from hermes.core.formatter import Formatter
+from hermes.core.rows_writer import RowsWriter
 
 from hermes.domain.sample import Sample
 from hermes.domain.sample_generator import SampleGenerator

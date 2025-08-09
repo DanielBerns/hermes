@@ -1,9 +1,9 @@
-# app/client.py
-# This file contains the Python client class for interacting with the message board server API.
+import logging
 import json
 
 import requests
 
+logger = logging.getLogger(__name__)
 
 class MessageBoardClient:
     def __init__(self, base_url="http://127.0.0.1:5000"):
@@ -47,19 +47,19 @@ class MessageBoardClient:
             data = self._handle_response(response)
             if data and data.get('access_token'):
                 self.token = data['access_token']
-                print("Login successful.")
+                logger.info("Login successful.")
                 return True, data
             else:
-                print(f"Login failed: {data.get('msg') or data.get('details', 'Unknown error')}")
+                logger.info(f"Login failed: {data.get('msg') or data.get('details', 'Unknown error')}")
                 return False, data
         except requests.exceptions.RequestException as e:
-            print(f"Login request failed: {e}")
+            logger.info(f"Login request failed: {e}")
             return False, {"error": str(e)}
 
     def logout(self):
         """Logs out the user (client-side token removal and server notification)."""
         if not self.token:
-            print("Not logged in.")
+            logger.info("Not logged in.")
             return False, {"msg": "Not logged in."}
         
         url = f"{self.base_url}/auth/logout"
@@ -67,10 +67,10 @@ class MessageBoardClient:
             response = requests.post(url, headers=self._make_headers())
             data = self._handle_response(response)
             self.token = None # Clear token regardless of server response for client-side logout
-            print(f"Logout attempt: {data.get('msg', data)}")
+            logger.info(f"Logout attempt: {data.get('msg', data)}")
             return True, data # Server might confirm or just acknowledge
         except requests.exceptions.RequestException as e:
-            print(f"Logout request failed: {e}")
+            logger.info(f"Logout request failed: {e}")
             # Still clear token client-side
             self.token = None
             return False, {"error": str(e)}

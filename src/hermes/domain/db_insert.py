@@ -65,7 +65,7 @@ def string_to_row(ts: str) -> dict[str, Any]:
     }
 
 
-class DBLookup:
+class DatabaseCRUD:
     def __init__(self, session: Session) -> None:
         self._session = session
 

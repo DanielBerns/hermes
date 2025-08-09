@@ -1,3 +1,4 @@
+# database.py
 import logging
 from datetime import datetime
 from typing import List
@@ -38,20 +39,6 @@ def get_int(string: str) -> int:
     except Exception as panic:
         message = f"models.get_int: int('{string}') fails."
         raise DatabaseException(message) from panic
-
-
-def timestamp_string_to_row (timestamp_string: str) -> dict[str, Any]:
-    return {
-        "year": get_int(timestamp_string[0:4]),
-        "month": get_int(timestamp_string[4:6]),
-        "day": get_int(timestamp_string[6:8]),
-        "hour": get_int(timestamp_string[8:10]),
-        "minute": get_int(timestamp_string[10:12]),
-        "second": get_int(timestamp_string[12:14])
-    }
-
-def timestamp_row_from_row(cls, row: dict[str, Any]) -> dict[str, Any]:
-    return timestamp_string_to_row(record.get("timestamp", "00000000000000"))
 
 
 class Base(DeclarativeBase):
@@ -116,13 +103,12 @@ class Timestamp(Base):
         )
 
 
-
 class State(Base):
     """Represents a state or province."""
     __tablename__ = "states"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    code: Mapped[str] = mapped_column(sa.String(16))
+    code: Mapped[str] = mapped_column(sa.String(32))
     # Indexing the 'name' column for faster searches.
     name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
@@ -133,21 +119,13 @@ class State(Base):
     )
 
 
-def state_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "code": row.get("code", "Error"),
-        "name": row.get("name", "Error")
-    }
-
-
 class City(Base):
     """Represents a city."""
     __tablename__ = "cities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Indexing the 'code' column for faster searches.
-    code: Mapped[str] = mapped_column(sa.String(64), index=True)
-    name: Mapped[str] = mapped_column(sa.String(32))
+    # Indexing the 'name' column for faster searches.
+    name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
         cascade="all, delete-orphan",
@@ -155,11 +133,6 @@ class City(Base):
         back_populates="city"
     )
 
-def city_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "code": row.get("code", "Error"),
-        "name": row.get("name", "Error")
-    }
 
 class Flag(Base):
     """Represents a brand or flag of a gas station (e.g., Shell, YPF)."""
@@ -175,10 +148,6 @@ class Flag(Base):
         back_populates="flag"
     )
 
-def flag_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
 
 class Business(Base):
     """Represents the business entity that owns a point of sale."""
@@ -194,11 +163,6 @@ class Business(Base):
         back_populates="business"
     )
 
-def business_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
-
 
 class Branch(Base):
     """Represents a specific branch of a business."""
@@ -207,11 +171,6 @@ class Branch(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(sa.String(32))
     point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="branch", uselist=False)
-
-def branch_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
 
 
 # Association table for the many-to-many relationship between PointOfSale and Place.
@@ -234,11 +193,6 @@ class Place(Base):
         secondary=points_of_sale_and_places, back_populates="places"
     )
 
-
-def place_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "address": row.get("address", "Error")
-    }
 
 class PointOfSale(Base):
     """The central model representing a single point of sale"""
@@ -282,15 +236,10 @@ class ArticleCode(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_code: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code")
     prices: WriteOnlyMapped[List["Price"]] = relationship(back_populates="article_code")
-
-def article_code_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_code": row.get("article_code", "Error")
-    }
 
 
 class ArticleBrand(Base):
@@ -299,18 +248,13 @@ class ArticleBrand(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_brand: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan",
         passive_deletes=True,
         back_populates="brand"
     )
-
-def article_brand_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_brand": row.get("article_brand", "Error")
-    }
 
 
 class ArticleDescription(Base):
@@ -319,18 +263,13 @@ class ArticleDescription(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_description: Mapped[str] = mapped_column(sa.String(128), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(sa.String(128), unique=True, nullable=False)
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan",
         passive_deletes=True,
         back_populates="description"
     )
-
-def article_description_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_description": row.get("article_description", "Error")
-    }
 
 
 class ArticlePackage(Base):
@@ -339,19 +278,13 @@ class ArticlePackage(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_package: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    value: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan",
         passive_deletes=True,
         back_populates="package"
     )
-
-
-def article_package_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_package": row.get("article_package", "Error")
-    }
 
 
 class ArticleCard(Base):
