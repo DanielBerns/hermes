@@ -44,7 +44,6 @@ class CLI:
         # Get the parsed arguments
         return vars(self.parser.parse_args())
 
-
     def add_argument(self, *args: Any, **kwargs: Any) -> None:
         """
         Adds an argument to the parser.
@@ -65,7 +64,9 @@ class CLI:
         """
         self.parser.add_argument(*args, **kwargs)
 
-    def add_arguments(self, arguments_to_add: List[Tuple[Tuple[Any, ...], Dict[str, Any]]]) -> None:
+    def add_arguments(
+        self, arguments_to_add: List[Tuple[Tuple[Any, ...], Dict[str, Any]]]
+    ) -> None:
         """
         Adds multiple arguments to the parser from a list of definitions.
 

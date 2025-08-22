@@ -5,11 +5,9 @@ from hermes.core.helpers import as_jsonl
 
 class Formatter(Protocol):
     @property
-    def extension(self) -> str:
-        ...
+    def extension(self) -> str: ...
 
-    def line(self, row: dict[str, Any]) -> str:
-        ...
+    def line(self, row: dict[str, Any]) -> str: ...
 
 
 class JSONFormatter:

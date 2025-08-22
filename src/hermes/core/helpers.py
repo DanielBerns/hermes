@@ -93,24 +93,27 @@ def get_timestamp(separator: str = "", offset: timedelta = DEFAULT_TIME_DELTA) -
     )
     return timestamp
 
+
 class HelpersException(Exception):
     def __init__(self, identifier: str, message: str) -> None:
         super().__init__(f"{__file__}: {message}")
+
 
 @contextmanager
 def create_text_file(resource: Path) -> Generator[TextIO, None, None]:
     try:
         with open(resource, "w", encoding="utf-8") as target_file:
-             yield target_file
+            yield target_file
     except Exception as e:
         message = f"Error with text file {str(resource):s}: {str(e):s}"
         raise HelpersException("create_text_file", message)
+
 
 @contextmanager
 def read_text_file(resource: Path) -> Generator[TextIO, None, None]:
     try:
         with open(resource, "r", encoding="utf-8") as text_file:
-             yield text_file
+            yield text_file
     except Exception as e:
         message = f"Error with text file {str(resource):s}: {str(e):s}"
         raise HelpersException("read_text_file", message)
@@ -324,8 +327,6 @@ def get_environment_variable(name: str, default_value: str = "") -> str:
     return os.environ.get(name) or default_value
 
 
-
-
 def erase_directory_contents(directory: Path) -> None:
     """Erases all files and subdirectories within the specified directory.
     Args:
@@ -348,7 +349,7 @@ def erase_directory_contents(directory: Path) -> None:
         elif item.is_dir():
             rmtree(item)  # Delete subdirectories and their contents recursively
         elif item.is_symlink():
-            item.unlink() # Delete symbolic links
+            item.unlink()  # Delete symbolic links
 
 
 def measure_execution_time(long_running_task: Callable[[], int]) -> Tuple[int, float]:
@@ -366,6 +367,3 @@ def measure_execution_time(long_running_task: Callable[[], int]) -> Tuple[int, f
     end_time = time.time()
     execution_time = end_time - start_time
     return result, execution_time
-
-
-

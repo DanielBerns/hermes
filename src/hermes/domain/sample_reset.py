@@ -19,14 +19,19 @@ class SampleResetException(Exception):
 
 
 class SampleReset:
-
     def __init__(self) -> None:
         pass
 
     def configure(self, this_cli: CLI) -> None:
         pass
 
-    def run(self, script: str, arguments: dict[str, Any], config: dict[str, Any], storage: Storage) -> None:
+    def run(
+        self,
+        script: str,
+        arguments: dict[str, Any],
+        config: dict[str, Any],
+        storage: Storage,
+    ) -> None:
         mecon_container = storage.container(Sample.MECON)
         tree_store = TreeStore(mecon_container, Sample.DBPreciosClarosInterface)
         db_container = storage.container(Sample.DATABASE, base=mecon_container)
@@ -43,6 +48,6 @@ class SampleReset:
                 reader.metadata.write()
             except Exception as an_exception:
                 logger.error(f"{str(an_exception)}")
-                logger.warning(f"{self.__class__.__name__}.update: check {store.key} - {store.timestamp}")
-
-
+                logger.warning(
+                    f"{self.__class__.__name__}.update: check {store.key} - {store.timestamp}"
+                )

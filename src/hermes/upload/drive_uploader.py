@@ -1,7 +1,6 @@
 # drive_uploader.py
 
 import os
-import shutil
 import tarfile
 import zipfile
 import logging
@@ -19,18 +18,19 @@ from googleapiclient.http import MediaFileUpload
 
 # --- Configuration ---
 # Set up basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # The scopes required for the Google Drive API.
 # If you modify these scopes, delete the file token.json.
-SCOPES: List[str] = ['https://www.googleapis.com/auth/drive.file']
+SCOPES: List[str] = ["https://www.googleapis.com/auth/drive.file"]
 
 # --- Core Functions ---
 
+
 def compress_directory(
-    source_dir: str,
-    output_path: str,
-    compress_format: Literal['zip', 'tar.gz']
+    source_dir: str, output_path: str, compress_format: Literal["zip", "tar.gz"]
 ) -> Optional[str]:
     """
     Compresses a directory into a .zip or .tar.gz file.
@@ -52,15 +52,15 @@ def compress_directory(
     logging.info(f"Starting compression of '{source_dir}' to '{archive_path}'...")
 
     try:
-        if compress_format == 'zip':
-            with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        if compress_format == "zip":
+            with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for root, _, files in os.walk(source_dir):
                     for file in files:
                         file_path = Path(root) / file
                         arcname = file_path.relative_to(source_path)
                         zipf.write(file_path, arcname)
-        elif compress_format == 'tar.gz':
-            with tarfile.open(archive_path, 'w:gz') as tar:
+        elif compress_format == "tar.gz":
+            with tarfile.open(archive_path, "w:gz") as tar:
                 tar.add(source_dir, arcname=source_path.name)
         else:
             logging.error(f"Unsupported compression format: {compress_format}")
@@ -72,7 +72,8 @@ def compress_directory(
         logging.error(f"Failed to compress directory: {e}")
         return None
 
-def get_gdrive_service(credentials_path: str = 'credentials.json') -> Optional[object]:
+
+def get_gdrive_service(credentials_path: str = "credentials.json") -> Optional[object]:
     """
     Authenticates with the Google Drive API and returns a service object.
 
@@ -85,7 +86,7 @@ def get_gdrive_service(credentials_path: str = 'credentials.json') -> Optional[o
         Optional[object]: An authenticated Google Drive API service object, or None.
     """
     creds = None
-    token_path = Path('token.json')
+    token_path = Path("token.json")
     credentials_path = Path(credentials_path)
 
     if token_path.exists():
@@ -97,21 +98,25 @@ def get_gdrive_service(credentials_path: str = 'credentials.json') -> Optional[o
                 creds.refresh(Request())
             except Exception as e:
                 logging.error(f"Could not refresh token: {e}. Please re-authenticate.")
-                token_path.unlink() # Delete bad token
-                return get_gdrive_service(str(credentials_path)) # Retry
+                token_path.unlink()  # Delete bad token
+                return get_gdrive_service(str(credentials_path))  # Retry
         else:
             if not credentials_path.exists():
                 logging.error(f"Credentials file not found at '{credentials_path}'.")
-                logging.error("Please download it from the Google Cloud Console and place it here.")
+                logging.error(
+                    "Please download it from the Google Cloud Console and place it here."
+                )
                 return None
-            flow = InstalledAppFlow.from_client_secrets_file(str(credentials_path), SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                str(credentials_path), SCOPES
+            )
             creds = flow.run_local_server(port=0)
 
-        with open(token_path, 'w') as token:
+        with open(token_path, "w") as token:
             token.write(creds.to_json())
 
     try:
-        service = build('drive', 'v3', credentials=creds)
+        service = build("drive", "v3", credentials=creds)
         logging.info("Google Drive service created successfully.")
         return service
     except Exception as e:
@@ -120,9 +125,7 @@ def get_gdrive_service(credentials_path: str = 'credentials.json') -> Optional[o
 
 
 def upload_to_drive(
-    service: object,
-    local_path: str,
-    folder_id: Optional[str] = None
+    service: object, local_path: str, folder_id: Optional[str] = None
 ) -> Optional[str]:
     """
     Uploads a local file to a specified Google Drive folder.
@@ -142,30 +145,33 @@ def upload_to_drive(
         return None
 
     logging.info(f"Uploading '{file_path.name}' to Google Drive...")
-    file_metadata = {'name': file_path.name}
+    file_metadata = {"name": file_path.name}
     if folder_id:
-        file_metadata['parents'] = [folder_id]
+        file_metadata["parents"] = [folder_id]
 
     media = MediaFileUpload(str(file_path), resumable=True)
 
     try:
-        file = service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id'
-        ).execute()
-        logging.info(f"File '{file_path.name}' uploaded successfully. File ID: {file.get('id')}")
-        return file.get('id')
+        file = (
+            service.files()
+            .create(body=file_metadata, media_body=media, fields="id")
+            .execute()
+        )
+        logging.info(
+            f"File '{file_path.name}' uploaded successfully. File ID: {file.get('id')}"
+        )
+        return file.get("id")
     except HttpError as error:
-        logging.error(f'An error occurred during upload: {error}')
+        logging.error(f"An error occurred during upload: {error}")
         return None
+
 
 def compress_and_upload(
     source_dir: str,
-    compress_format: Literal['zip', 'tar.gz'],
-    credentials_path: str = 'credentials.json',
+    compress_format: Literal["zip", "tar.gz"],
+    credentials_path: str = "credentials.json",
     drive_folder_id: Optional[str] = None,
-    cleanup: bool = True
+    cleanup: bool = True,
 ) -> None:
     """
     Orchestrates the compression and upload process.
@@ -200,7 +206,7 @@ def compress_and_upload(
 
 
 # --- Example Usage ---
-if __name__ == '__main__':
+if __name__ == "__main__":
     # --- PLEASE CONFIGURE THE VARIABLES BELOW ---
 
     # 1. The directory you want to back up.
@@ -218,28 +224,30 @@ if __name__ == '__main__':
     # To get the Folder ID, open the folder in Google Drive in your browser.
     # The URL will be like: https://drive.google.com/drive/folders/THIS_IS_THE_ID
     # Set to None to upload to the root "My Drive".
-    GDRIVE_FOLDER_ID = None  # <-- IMPORTANT: Change this to your folder ID or leave as None
+    GDRIVE_FOLDER_ID = (
+        None  # <-- IMPORTANT: Change this to your folder ID or leave as None
+    )
 
     # 3. Path to your credentials file.
-    CREDENTIALS_FILE = 'credentials.json'
+    CREDENTIALS_FILE = "credentials.json"
 
     # --- Run the backup process ---
     print("--- Starting ZIP backup example ---")
     compress_and_upload(
         source_dir=DIRECTORY_TO_BACKUP,
-        compress_format='zip',
+        compress_format="zip",
         credentials_path=CREDENTIALS_FILE,
         drive_folder_id=GDRIVE_FOLDER_ID,
-        cleanup=True
+        cleanup=True,
     )
 
     print("\n--- Starting TAR.GZ backup example ---")
     compress_and_upload(
         source_dir=DIRECTORY_TO_BACKUP,
-        compress_format='tar.gz',
+        compress_format="tar.gz",
         credentials_path=CREDENTIALS_FILE,
         drive_folder_id=GDRIVE_FOLDER_ID,
-        cleanup=True
+        cleanup=True,
     )
 
     # Clean up the dummy directory

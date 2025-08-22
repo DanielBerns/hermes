@@ -1,11 +1,18 @@
 import logging
 from datetime import datetime
-from typing import List
+from typing import Any, List
 
 import sqlalchemy as sa
 from sqlalchemy import Index
-from sqlalchemy.orm import (DeclarativeBase, Mapped, WriteOnlyMapped,
-                            mapped_column, relationship)
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    WriteOnlyMapped,
+    mapped_column,
+    relationship,
+)
+
+from hermes.domain.rows_ops import get_int
 
 # Set up a logger for this module.
 logger = logging.getLogger(__name__)
@@ -20,53 +27,19 @@ class DatabaseException(Exception):
         logger.error(message)
 
 
-def get_int(string: str) -> int:
-    """
-    Safely convert a string to an integer, raising a custom exception on failure.
-
-    Args:
-        string: The string to convert.
-
-    Returns:
-        The converted integer.
-
-    Raises:
-        DatabaseException: If the conversion to integer fails.
-    """
-    try:
-        return int(string)
-    except Exception as panic:
-        message = f"models.get_int: int('{string}') fails."
-        raise DatabaseException(message) from panic
-
-
-def timestamp_string_to_row (timestamp_string: str) -> dict[str, Any]:
-    return {
-        "year": get_int(timestamp_string[0:4]),
-        "month": get_int(timestamp_string[4:6]),
-        "day": get_int(timestamp_string[6:8]),
-        "hour": get_int(timestamp_string[8:10]),
-        "minute": get_int(timestamp_string[10:12]),
-        "second": get_int(timestamp_string[12:14])
-    }
-
-def timestamp_row_from_row(cls, row: dict[str, Any]) -> dict[str, Any]:
-    return timestamp_string_to_row(record.get("timestamp", "00000000000000"))
-
-
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy ORM models."""
+
     pass
 
 
 class Timestamp(Base):
     """Represents a specific point in time, broken down into its components."""
+
     __tablename__ = "timestamps"
 
     # Define a composite index for efficient date-range queries.
-    __table_args__ = (
-        Index('ix_timestamp_ymdh', 'year', 'month', 'day', 'hour'),
-    )
+    __table_args__ = (Index("ix_timestamp_ymdh", "year", "month", "day", "hour"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     year: Mapped[int] = mapped_column(nullable=False)
@@ -78,9 +51,7 @@ class Timestamp(Base):
 
     # One-to-many relationship with Price.
     prices: WriteOnlyMapped[List["Price"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="timestamp"
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="timestamp"
     )
 
     def __repr__(self) -> str:
@@ -89,13 +60,20 @@ class Timestamp(Base):
 
     def to_datetime(self) -> datetime:
         """Converts the Timestamp object to a standard datetime object."""
-        return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        return datetime(
+            self.year, self.month, self.day, self.hour, self.minute, self.second
+        )
 
     @classmethod
     def from_datetime(cls, dt: datetime) -> "Timestamp":
         """Creates a Timestamp object from a standard datetime object."""
         return cls(
-            year=dt.year, month=dt.month, day=dt.day, hour=dt.hour, minute=dt.minute, second=dt.second
+            year=dt.year,
+            month=dt.month,
+            day=dt.day,
+            hour=dt.hour,
+            minute=dt.minute,
+            second=dt.second,
         )
 
     def date_string(self) -> str:
@@ -112,57 +90,46 @@ class Timestamp(Base):
         _minute = get_int(string[10:12])
         _second = get_int(string[12:14])
         return cls(
-            year=_year, month=_month, day=_day, hour=_hour, minute=_minute, second=_second
+            year=_year,
+            month=_month,
+            day=_day,
+            hour=_hour,
+            minute=_minute,
+            second=_second,
         )
 
+    @classmethod
+    def from_row(cls, row: dict[str, Any]) -> "Timestamp":
+        timestamp_string = row.get("timestamp", "00000000000000")
+        return Timestamp.from_string(timestamp_string)
 
 
 class State(Base):
-    """Represents a state or province."""
     __tablename__ = "states"
-
     id: Mapped[int] = mapped_column(primary_key=True)
-    code: Mapped[str] = mapped_column(sa.String(16))
-    # Indexing the 'name' column for faster searches.
+    code: Mapped[str] = mapped_column(sa.String(8))
     name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
-    points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="state"
+    cities: WriteOnlyMapped[List["City"]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="state"
     )
-
-
-def state_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "code": row.get("code", "Error"),
-        "name": row.get("name", "Error")
-    }
 
 
 class City(Base):
-    """Represents a city."""
     __tablename__ = "cities"
-
     id: Mapped[int] = mapped_column(primary_key=True)
-    # Indexing the 'code' column for faster searches.
-    code: Mapped[str] = mapped_column(sa.String(64), index=True)
-    name: Mapped[str] = mapped_column(sa.String(32))
-
-    points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="city"
+    # Indexing the 'name' column for faster searches.
+    name: Mapped[str] = mapped_column(sa.String(32), index=True)
+    state_id: Mapped[int] = mapped_column(sa.ForeignKey("states.id"))
+    state: Mapped["State"] = relationship(back_populates="cities")
+    places: WriteOnlyMapped[List["Place"]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="city"
     )
 
-def city_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "code": row.get("code", "Error"),
-        "name": row.get("name", "Error")
-    }
 
 class Flag(Base):
-    """Represents a brand or flag of a gas station (e.g., Shell, YPF)."""
+    """Represents a brand or flag of a point of sale"""
+
     __tablename__ = "flags"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -170,18 +137,13 @@ class Flag(Base):
     name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="flag"
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="flag"
     )
 
-def flag_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
 
 class Business(Base):
     """Represents the business entity that owns a point of sale."""
+
     __tablename__ = "businesses"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -189,29 +151,20 @@ class Business(Base):
     name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="business"
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="business"
     )
-
-def business_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
 
 
 class Branch(Base):
     """Represents a specific branch of a business."""
+
     __tablename__ = "branches"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(sa.String(32))
-    point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="branch", uselist=False)
-
-def branch_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "name": row.get("name", "Error")
-    }
+    point_of_sale: Mapped["PointOfSale"] = relationship(
+        back_populates="branch", uselist=False
+    )
 
 
 # Association table for the many-to-many relationship between PointOfSale and Place.
@@ -224,150 +177,131 @@ points_of_sale_and_places = sa.Table(
 
 
 class Place(Base):
-    """Represents a physical address or location."""
     __tablename__ = "places"
-
     id: Mapped[int] = mapped_column(primary_key=True)
     address: Mapped[str] = mapped_column(sa.String(32))
+    city_id: Mapped[int] = mapped_column(sa.ForeignKey("cities.id"), index=True)
+    city: Mapped["City"] = relationship(back_populates="places")
 
     points_of_sale: Mapped[List["PointOfSale"]] = relationship(
         secondary=points_of_sale_and_places, back_populates="places"
     )
 
 
-def place_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "address": row.get("address", "Error")
-    }
-
 class PointOfSale(Base):
     """The central model representing a single point of sale"""
+
     __tablename__ = "points_of_sale"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    code_and_flag: Mapped[str] = mapped_column(unique=True, index=True)
+    code: Mapped[str] = mapped_column(unique=True, index=True)
 
     # Indexing foreign keys to speed up JOIN operations.
-    flag_id: Mapped[int] = mapped_column(sa.ForeignKey('flags.id'), nullable=False, index=True)
+    flag_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("flags.id"), nullable=False, index=True
+    )
     flag: Mapped["Flag"] = relationship(back_populates="points_of_sale")
 
-    business_id: Mapped[int] = mapped_column(sa.ForeignKey('businesses.id'), nullable=False, index=True)
+    business_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("businesses.id"), nullable=False, index=True
+    )
     business: Mapped["Business"] = relationship(back_populates="points_of_sale")
 
-    branch_id: Mapped[int] = mapped_column(sa.ForeignKey('branches.id'), nullable=False, index=True)
+    branch_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("branches.id"), nullable=False, index=True
+    )
     branch: Mapped["Branch"] = relationship(back_populates="point_of_sale")
 
-    state_id: Mapped[int] = mapped_column(sa.ForeignKey('states.id'), nullable=False, index=True)
-    state: Mapped["State"] = relationship(back_populates="points_of_sale")
-
-    city_id: Mapped[int] = mapped_column(sa.ForeignKey('cities.id'), nullable=False, index=True)
-    city: Mapped["City"] = relationship(back_populates="points_of_sale")
-
     places: Mapped[List["Place"]] = relationship(
-        secondary=points_of_sale_and_places,
-        back_populates="points_of_sale"
+        secondary=points_of_sale_and_places, back_populates="points_of_sale"
     )
 
     prices: WriteOnlyMapped[List["Price"]] = relationship(
         cascade="all, delete-orphan",
         passive_deletes=True,
-        back_populates="point_of_sale"
+        back_populates="point_of_sale",
     )
 
 
 class ArticleCode(Base):
     """Represents the unique code for an article or product."""
+
     __tablename__ = "article_codes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_code: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    code: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code")
     prices: WriteOnlyMapped[List["Price"]] = relationship(back_populates="article_code")
 
-def article_code_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_code": row.get("article_code", "Error")
-    }
-
 
 class ArticleBrand(Base):
     """Represents the brand of an article."""
+
     __tablename__ = "article_brands"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_brand: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    brand: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="brand"
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="brand"
     )
-
-def article_brand_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_brand": row.get("article_brand", "Error")
-    }
 
 
 class ArticleDescription(Base):
     """Represents the description of an article."""
+
     __tablename__ = "article_descriptions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_description: Mapped[str] = mapped_column(sa.String(128), unique=True, nullable=False)
-
-    cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="description"
+    description: Mapped[str] = mapped_column(
+        sa.String(128), unique=True, nullable=False
     )
 
-def article_description_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_description": row.get("article_description", "Error")
-    }
+    cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="description"
+    )
 
 
 class ArticlePackage(Base):
     """Represents the packaging information for an article (e.g., '1L bottle')."""
+
     __tablename__ = "article_packages"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # The unique constraint automatically creates an index.
-    article_package: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
+    package: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="package"
+        cascade="all, delete-orphan", passive_deletes=True, back_populates="package"
     )
-
-
-def article_package_row_from_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "article_package": row.get("article_package", "Error")
-    }
 
 
 class ArticleCard(Base):
     """Combines various attributes to define a unique article."""
+
     __tablename__ = "article_cards"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
     # Indexing foreign keys to speed up JOIN operations.
-    brand_id: Mapped[int] = mapped_column(sa.ForeignKey("article_brands.id"), index=True)
+    brand_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_brands.id"), index=True
+    )
     brand: Mapped["ArticleBrand"] = relationship(back_populates="cards")
 
-    description_id: Mapped[int] = mapped_column(sa.ForeignKey("article_descriptions.id"), index=True)
+    description_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_descriptions.id"), index=True
+    )
     description: Mapped["ArticleDescription"] = relationship(back_populates="cards")
 
-    package_id: Mapped[int] = mapped_column(sa.ForeignKey("article_packages.id"), index=True)
+    package_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_packages.id"), index=True
+    )
     package: Mapped["ArticlePackage"] = relationship(back_populates="cards")
 
     code_id: Mapped[int] = mapped_column(sa.ForeignKey("article_codes.id"), index=True)
@@ -376,6 +310,7 @@ class ArticleCard(Base):
 
 class Price(Base):
     """Represents the price of an article at a specific point of sale at a given time."""
+
     __tablename__ = "prices"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -384,11 +319,17 @@ class Price(Base):
     amount: Mapped[int] = mapped_column(nullable=False, index=True)
 
     # Indexing foreign keys to speed up JOIN operations.
-    timestamp_id: Mapped[int] = mapped_column(sa.ForeignKey("timestamps.id"), index=True)
+    timestamp_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("timestamps.id"), index=True
+    )
     timestamp: Mapped["Timestamp"] = relationship(back_populates="prices")
 
-    article_code_id: Mapped[int] = mapped_column(sa.ForeignKey("article_codes.id"), index=True)
+    article_code_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_codes.id"), index=True
+    )
     article_code: Mapped["ArticleCode"] = relationship(back_populates="prices")
 
-    point_of_sale_id: Mapped[int] = mapped_column(sa.ForeignKey("points_of_sale.id"), index=True)
+    point_of_sale_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("points_of_sale.id"), index=True
+    )
     point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="prices")

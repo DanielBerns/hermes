@@ -1,0 +1,68 @@
+src/hermes/domain/bulk_builders.py:9:5: F401 [*] `hermes.domain.database.Flag` imported but unused
+   |
+ 7 |     State,
+ 8 |     City,
+ 9 |     Flag,
+   |     ^^^^ F401
+10 |     Business,
+11 |     Branch,
+   |
+   = help: Remove unused import
+
+src/hermes/domain/bulk_builders.py:10:5: F401 [*] `hermes.domain.database.Business` imported but unused
+   |
+ 8 |     City,
+ 9 |     Flag,
+10 |     Business,
+   |     ^^^^^^^^ F401
+11 |     Branch,
+12 |     Place,
+   |
+   = help: Remove unused import
+
+src/hermes/domain/bulk_builders.py:11:5: F401 [*] `hermes.domain.database.Branch` imported but unused
+   |
+ 9 |     Flag,
+10 |     Business,
+11 |     Branch,
+   |     ^^^^^^ F401
+12 |     Place,
+13 |     PointOfSale,
+   |
+   = help: Remove unused import
+
+src/hermes/domain/bulk_builders.py:12:5: F401 [*] `hermes.domain.database.Place` imported but unused
+   |
+10 |     Business,
+11 |     Branch,
+12 |     Place,
+   |     ^^^^^ F401
+13 |     PointOfSale,
+14 |     ArticleCode,
+   |
+   = help: Remove unused import
+
+src/hermes/domain/bulk_builders.py:18:5: F401 [*] `hermes.domain.database.ArticleCard` imported but unused
+   |
+16 |     ArticleDescription,
+17 |     ArticlePackage,
+18 |     ArticleCard
+   |     ^^^^^^^^^^^ F401
+19 | )
+20 | from hermes.domain.rows_ops import timestamp_string_to_row, row_to_string, get_int
+   |
+   = help: Remove unused import
+
+src/hermes/domain/database.py:10:36: F401 [*] `hermes.domain.rows_ops.timestamp_string_to_row` imported but unused
+   |
+ 8 |                             mapped_column, relationship)
+ 9 |
+10 | from hermes.domain.rows_ops import timestamp_string_to_row, get_int
+   |                                    ^^^^^^^^^^^^^^^^^^^^^^^ F401
+11 |
+12 | # Set up a logger for this module.
+   |
+   = help: Remove unused import: `hermes.domain.rows_ops.timestamp_string_to_row`
+
+Found 6 errors.
+[*] 6 fixable with the `--fix` option.

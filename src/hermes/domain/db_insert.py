@@ -1,19 +1,18 @@
 import logging
 from collections.abc import Callable
-from typing import Any, Generator
+from typing import Any, Generator, TypeVar, List
 from sqlalchemy import select, insert
 from sqlalchemy.orm import Session
 
+from hermes.core.search_table import SearchTable
+
 from hermes.domain.database import (
-    get_int,
     Timestamp,
     State,
     City,
     Flag,
     Business,
     Branch,
-    POS,
-    points_of_sale_and_places,
     Place,
     PointOfSale,
     ArticleCode,
@@ -21,16 +20,11 @@ from hermes.domain.database import (
     ArticleDescription,
     ArticlePackage,
     ArticleCard,
-    Price
 )
 
-from hermes.domain.rows_to_db import (
-    get_city_key,
-    get_place_key,
-    get_article_card_key
-)
+from hermes.domain.rows_ops import get_city_key, get_place_key, get_article_card_key
 
-from hermes.core.search_table import SearchTable
+from hermes.domain.bulk_builders import timestamp_bulk_from_row
 
 
 logger = logging.getLogger(__name__)
@@ -43,26 +37,27 @@ class DBInsertException(Exception):
         logger.error(message)
 
 
-def log_error_record(
-    record: dict[str, Any]
-) -> None:
-    if record:
-        logger.error("***Bad record***")
-        for key, value in record.items():
-            logger.error(f"    {key}: {value}")
-    else:
-        logger.error("***record is None***")
+# def log_error_record(
+#     record: dict[str, Any]
+# ) -> None:
+#     if record:
+#         logger.error("***Bad record***")
+#         for key, value in record.items():
+#             logger.error(f"    {key}: {value}")
+#     else:
+#         logger.error("***record is None***")
+#
+#
+
+T = TypeVar("T")
 
 
-def string_to_row(ts: str) -> dict[str, Any]:
-    return {
-        "year": get_int(ts[0:4]),
-        "month": get_int(ts[4:6]),
-        "day": get_int(ts[6:8]),
-        "hour": get_int(ts[8:10]),
-        "minute": get_int(ts[10:12]),
-        "second": get_int(ts[12:14])
-    }
+def build_bulk(
+    bulk_from_row: Callable[[dict[str, Any], [dict[str, Any]]]],
+    rows_generator: Callable[[], Generator[dict[str, Any], None, None]],
+    table: SearchTable[T],
+) -> List[T]:
+    return [bulk_from_row(row) for row in rows_generator() if table.search(row) is None]
 
 
 class DatabaseCRUD:
@@ -79,9 +74,11 @@ class DatabaseCRUD:
         self._all_the_points_of_sale = SearchTable[PointOfSale]("point_of_sale_key")
         self._all_the_article_codes = SearchTable[ArticleCode]("article_code")
         self._all_the_article_brands = SearchTable[ArticleBrand]("brand")
-        self._all_the_article_descriptions = SearchTable[ArticleDescription]("description")
+        self._all_the_article_descriptions = SearchTable[ArticleDescription](
+            "description"
+        )
         self._all_the_article_packages = SearchTable[ArticlePackage]("package")
-        self._all_the_article_cards = SearchTable[ArticleCards]("article_card_key")
+        self._all_the_article_cards = SearchTable[ArticleCard]("article_card_key")
 
     @property
     def session(self) -> Session:
@@ -160,24 +157,30 @@ class DatabaseCRUD:
     def get_all_the_states(self) -> None:
         statement = select(State)
         _all_the_states = list(self.session.scalars(statement).all())
-        self.all_the_states.update({a_state.code: a_state for a_state in _all_the_states})
+        self.all_the_states.update(
+            {a_state.code: a_state for a_state in _all_the_states}
+        )
 
     def get_all_the_cities(self) -> None:
         statement = select(City)
         _all_the_cities = list(self.session.scalars(statement).all())
         self.all_the_cities.update(
-            {get_city_key(a_city.state.code, a_city.name): a_city for a_city in _all_the_cities}
+            {
+                get_city_key(a_city.state.code, a_city.name): a_city
+                for a_city in _all_the_cities
+            }
         )
 
     def get_all_the_places(self) -> None:
         statement = select(Place)
         _all_the_places = list(self.session.scalars(statement).all())
         self.all_the_places.update(
-            {get_place_key(
-                a_place.city.state.code,
-                a_place.city.name,
-                a_place.address
-             ): a_place for a_place in _all_the_places}
+            {
+                get_place_key(
+                    a_place.city.state.code, a_place.city.name, a_place.address
+                ): a_place
+                for a_place in _all_the_places
+            }
         )
 
     def get_all_the_points_of_sale(self) -> None:
@@ -190,9 +193,7 @@ class DatabaseCRUD:
     def get_all_the_timestamps(self) -> None:
         statement = select(Timestamp)
         _all_the_timestamps = list(self.session.scalars(statement).all())
-        self.all_the_timestamps.update(
-            {repr(ts): ts for ts in _all_the_timestamps}
-        )
+        self.all_the_timestamps.update({repr(ts): ts for ts in _all_the_timestamps})
 
     def get_all_the_article_codes(self) -> None:
         statement = select(ArticleCode)
@@ -205,31 +206,30 @@ class DatabaseCRUD:
         statement = select(ArticleCard)
         _all_the_article_cards = list(self.session.scalars(statement).all())
         self.all_the_article_cards.update(
-            {get_article_card_key(ac.article_code.code, ac.brand, ac.description, ac.package): ac
-             for ac in _all_the_article_cards}
+            {
+                get_article_card_key(
+                    ac.article_code.code, ac.brand, ac.description, ac.package
+                ): ac
+                for ac in _all_the_article_cards
+            }
         )
 
     def insert_timestamps(
-        self,
-        records_generator: Callable[[], Generator[dict[str, Any], None, None]]
+        self, rows_generator: Callable[[], Generator[dict[str, Any], None, None]]
     ) -> None:
         logger.info(f"{self.__class__.__name__}.insert_timestamps start")
         try:
-            bulk = [
-                string_to_row(record.get("timestamp", "00000000000000"))
-                for record in records_generator() if self.all_the_timestamps.search(record) == None
-            ]
+            bulk = build_bulk(
+                timestamp_bulk_from_row, rows_generator, self.all_the_timestamps
+            )
             if len(bulk):
                 self.session.execute(insert(Timestamp), bulk)
                 self.session.commit()
                 self.get_all_the_timestamps()
             else:
                 logger.info(f"{self.__class__.__name__}.insert_timestamps empty bulk")
-        except Exception as panic:
+        except Exception:
             self.session.rollback()
             message = f"{self.__class__.__name__}.insert_timestamps failure"
             raise DBInsertException(message)
         logger.info(f"{self.__class__.__name__}.insert_timestamps done")
-
-
-

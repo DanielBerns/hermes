@@ -5,10 +5,11 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 class MessageBoardClient:
     def __init__(self, base_url="http://127.0.0.1:5000"):
-        self.base_url = base_url.rstrip('/')
-        self.token = None # JWT token
+        self.base_url = base_url.rstrip("/")
+        self.token = None  # JWT token
 
     def _make_headers(self, include_auth=True):
         """Helper to create request headers."""
@@ -20,37 +21,44 @@ class MessageBoardClient:
     def _handle_response(self, response):
         """Helper to handle API responses."""
         try:
-            response.raise_for_status() # Raises HTTPError for bad responses (4xx or 5xx)
-            if response.content: # Check if there is content to decode
-                 # Handle cases where response might be empty but successful (e.g., 204 No Content)
-                if response.status_code == 204:
-                    return {"status": "success", "message": "Operation successful, no content returned."}
+            response.raise_for_status()  # Raises HTTPError for bad responses (4xx or 5xx)
+            # Handle cases where response might be empty but successful (e.g., 204 No Content)
+            if response.status_code == 204:
+                return {
+                    "status": "success",
+                    "message": "Operation successful, no content returned.",
+                }
+            if response.content:  # Check if there is content to decode
                 return response.json()
-            return {"status": "success", "message": "Operation successful, no content returned."}
+            else:
+                return {"status": "failure", "message": f"{response.status_code}"}
         except requests.exceptions.HTTPError as e:
             error_details = {"error": str(e)}
-            try: # Try to get more details from response body if available
+            try:  # Try to get more details from response body if available
                 error_details["details"] = response.json()
-            except json.JSONDecodeError: # If response body is not JSON
+            except json.JSONDecodeError:  # If response body is not JSON
                 error_details["details"] = response.text
             return error_details
-        except json.JSONDecodeError: # If response is not JSON but status was 2xx
+        except json.JSONDecodeError:  # If response is not JSON but status was 2xx
             return {"error": "Failed to decode JSON response", "content": response.text}
-
 
     def login(self, username, password):
         """Logs in the user and stores the JWT token."""
         url = f"{self.base_url}/auth/login"
         payload = {"username": username, "password": password}
         try:
-            response = requests.post(url, json=payload, headers=self._make_headers(include_auth=False))
+            response = requests.post(
+                url, json=payload, headers=self._make_headers(include_auth=False)
+            )
             data = self._handle_response(response)
-            if data and data.get('access_token'):
-                self.token = data['access_token']
+            if data and data.get("access_token"):
+                self.token = data["access_token"]
                 logger.info("Login successful.")
                 return True, data
             else:
-                logger.info(f"Login failed: {data.get('msg') or data.get('details', 'Unknown error')}")
+                logger.info(
+                    f"Login failed: {data.get('msg') or data.get('details', 'Unknown error')}"
+                )
                 return False, data
         except requests.exceptions.RequestException as e:
             logger.info(f"Login request failed: {e}")
@@ -61,14 +69,16 @@ class MessageBoardClient:
         if not self.token:
             logger.info("Not logged in.")
             return False, {"msg": "Not logged in."}
-        
+
         url = f"{self.base_url}/auth/logout"
         try:
             response = requests.post(url, headers=self._make_headers())
             data = self._handle_response(response)
-            self.token = None # Clear token regardless of server response for client-side logout
+            self.token = (
+                None  # Clear token regardless of server response for client-side logout
+            )
             logger.info(f"Logout attempt: {data.get('msg', data)}")
-            return True, data # Server might confirm or just acknowledge
+            return True, data  # Server might confirm or just acknowledge
         except requests.exceptions.RequestException as e:
             logger.info(f"Logout request failed: {e}")
             # Still clear token client-side
@@ -117,14 +127,16 @@ class MessageBoardClient:
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)
 
-    def get_public_messages(self, filter_tags=None): # filter_tags can be a list
+    def get_public_messages(self, filter_tags=None):  # filter_tags can be a list
         if not self.token:
             return {"error": "Not logged in"}
         url = f"{self.base_url}/api/messages/public"
         params = {}
         if filter_tags and isinstance(filter_tags, list):
-            params['tags'] = ','.join(filter_tags) # Server expects comma-separated string
-        
+            params["tags"] = ",".join(
+                filter_tags
+            )  # Server expects comma-separated string
+
         response = requests.get(url, headers=self._make_headers(), params=params)
         return self._handle_response(response)
 
@@ -154,11 +166,9 @@ class MessageBoardClient:
         return self._handle_response(response)
 
     # --- Admin Method ---
-    def get_server_status(self): # Assumes admin is logged in
+    def get_server_status(self):  # Assumes admin is logged in
         if not self.token:
             return {"error": "Not logged in"}
         url = f"{self.base_url}/api/admin/status"
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)
-
-

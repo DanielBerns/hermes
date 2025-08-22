@@ -1,5 +1,6 @@
 from typing import Any
 
+
 class SearchTable[T]:
     def __init__(self, identifier: str) -> None:
         self._identifier = identifier
@@ -18,5 +19,8 @@ class SearchTable[T]:
         value = self.table.get(str(key), None) if key else None
         return value
 
-    def update(self, table_update: dict[str, T]) -> None:
-        self._table.update(table_update)
+    def bulk_update(self, the_update: dict[str, T]) -> None:
+        self._table.update(the_update)
+
+    def update(self, key: str, value: T) -> None:
+        self._table[key] = value

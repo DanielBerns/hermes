@@ -15,16 +15,13 @@ class RowsSelectorException(Exception):
 
 
 class RowsSelector:
-
     @staticmethod
     def parameters_resource(container: Path, identifier: str) -> Path:
         return get_resource(container, identifier, ".csvl")
 
     @staticmethod
     def create(
-        container: Path,
-        identifier: str,
-        initial_content: dict[str, Any]
+        container: Path, identifier: str, initial_content: dict[str, Any]
     ) -> None:
         parameters_resource = RowsSelector.parameters_resource(container, identifier)
         with create_text_file(parameters_resource) as text_file:
@@ -35,7 +32,7 @@ class RowsSelector:
                 text_file.write(f"# {key}: {value}\n")
 
     @staticmethod
-    def read(container: Path, identifier: str) -> 'RowsSelector':
+    def read(container: Path, identifier: str) -> "RowsSelector":
         def get_item(this_part: str) -> Any:
             try:
                 return int(this_part)
@@ -44,7 +41,7 @@ class RowsSelector:
 
         def get_values(this_line: str) -> List[str]:
             try:
-                keep, discard = this_line.split(':')
+                keep, discard = this_line.split(":")
                 parts = keep.split(",")
                 return parts
             except Exception as e:
@@ -61,12 +58,7 @@ class RowsSelector:
             message = f"RowsSelector.read: bad content in {resource}"
             raise RowsSelectorException(message)
 
-    def __init__(
-        self,
-        keys: List[str],
-        list_of_values: List[List[Any]]
-    ) -> None:
-
+    def __init__(self, keys: List[str], list_of_values: List[List[Any]]) -> None:
         self._keys = keys
         self._list_of_values = list_of_values
 
@@ -79,10 +71,9 @@ class RowsSelector:
         return self._list_of_values
 
     def select(self, row: dict[str, Any]) -> bool:
-
         # Generator that yields each inner list of values
         def get_values() -> Generator[List[str], None, None]:
-            yield from self._list_of_values # Use self._list_of_values here
+            yield from self._list_of_values  # Use self._list_of_values here
 
         # Generator that yields zip iterators (key, value) for each value list.
         # Each yielded item is an iterator representing a single selector (e.g., [('a', '0'), ('b', '1')]).
@@ -92,11 +83,16 @@ class RowsSelector:
                 yield zip(self._keys, values)
 
         # Function to check if a single row matches a specific selector iterator
-        def apply_selector(this_row: dict[str, Any], selector: Iterator[Tuple[str, Any]]) -> bool:
+        def apply_selector(
+            this_row: dict[str, Any], selector: Iterator[Tuple[str, Any]]
+        ) -> bool:
             # This is the intended logic: Check if all key-value pairs in the *given* selector
             # match the corresponding values in the row (treating "*" as a wildcard).
             # Note: Iterating through the selector consumes it.
-            return all(this_row.get(key) == value if value != "*" else True for key, value in selector)
+            return all(
+                this_row.get(key) == value if value != "*" else True
+                for key, value in selector
+            )
 
         def same_length() -> bool:
             return all(len(self._keys) == len(values) for values in get_values())
@@ -115,10 +111,14 @@ class RowsSelector:
             return False
         if same_length():
             if all(row.get(key, None) for key in self._keys):
-                return any(apply_selector(row, selector_item) for selector_item in get_selector())
+                return any(
+                    apply_selector(row, selector_item)
+                    for selector_item in get_selector()
+                )
             else:
-                logger.warning(f"{self.__class__.__name__}.select: len(keys) != len(values)")
+                logger.warning(
+                    f"{self.__class__.__name__}.select: len(keys) != len(values)"
+                )
                 return False
         else:
             return False
-

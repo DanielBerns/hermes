@@ -18,11 +18,10 @@ class RowsWriter:
         self,
         identifier: str,
         generator: Callable[[], Generator[dict[str, Any], None, None]],
-        formatter: Formatter
+        formatter: Formatter,
     ) -> None:
         resource = get_resource(self.directory, identifier, formatter.extension)
         with create_text_file(resource) as text:
             for record in generator():
                 line = formatter.line(record)
                 text.write(line)
-

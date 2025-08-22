@@ -12,10 +12,9 @@ class RowsReader:
     def directory(self) -> Path:
         return self._directory
 
-    def execute(
-        self,
-        identifier: str
-    ) -> Generator[dict[str, Any], None, None]:
-        resource = get_resource(self.directory, identifier, ".jsonl") # TODO: refactor Rows, Samples, and so on...
+    def execute(self, identifier: str) -> Generator[dict[str, Any], None, None]:
+        resource = get_resource(
+            self.directory, identifier, ".jsonl"
+        )  # TODO: refactor Rows, Samples, and so on...
         for row in read_json_lines(resource):
             yield row

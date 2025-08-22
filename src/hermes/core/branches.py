@@ -11,7 +11,8 @@ This module provides two main components:
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Self # Use Self for fluent interface type hints
+from typing import Self  # Use Self for fluent interface type hints
+
 
 @dataclass(frozen=True)
 class Branches:
@@ -25,6 +26,7 @@ class Branches:
                                      titles (H2) and values are lists of
                                      items for that section.
     """
+
     identifier: str
     title: str
     table: dict[str, list[str]]
@@ -85,6 +87,7 @@ class BranchesBuilder:
                            .add("Section 1", "Item B")
                            .build())
     """
+
     def __init__(self) -> None:
         """Initializes the builder with empty attributes."""
         self._identifier: str | None = None
@@ -156,5 +159,5 @@ class BranchesBuilder:
         return Branches(
             identifier=self._identifier,
             title=self._title,
-            table=dict(self._table) # Convert defaultdict back to a regular dict
+            table=dict(self._table),  # Convert defaultdict back to a regular dict
         )

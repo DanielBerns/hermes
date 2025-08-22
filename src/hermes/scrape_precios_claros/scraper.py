@@ -6,15 +6,19 @@ from hermes.scrape_precios_claros.web_client import WebClient
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
 
+
 class ScraperError(Exception):
     """Custom exception for errors during the scraping process."""
+
     def __init__(self, message: str) -> None:
         super().__init__(message)
         logger.error(message)
 
+
 # TODO: Retry attempts where this error appears
 class ScraperStop(BaseException):
     """Custom exception for 'tolerable' errors"""
+
     def __init__(self) -> None:
         super().__init__()
         logger.warning("ScraperStop")
@@ -29,6 +33,7 @@ class QueryLimits:
     Calculates the number of full pages, queries per full page, and queries
     on the last page.
     """
+
     total_items: int
     max_queries_per_page: int
     full_pages: int = field(init=False)
@@ -52,7 +57,6 @@ class QueryLimits:
             f"    last_page_queries={self.last_page_queries}\n"
         )
 
-
     def offset(self, page: int) -> int:
         """
         Calculates the offset for a given page number.
@@ -71,6 +75,7 @@ class Scraper:
     A web scraper for the Precios Claros API to fetch data about
     points of sale (supermarkets) and articles (products) sold at each point of sale.
     """
+
     def __init__(self, webclient: WebClient) -> None:
         """
         Initializes the PreciosClarosScraper.
@@ -94,7 +99,13 @@ class Scraper:
         """Returns the base URL of the API."""
         return self._base_url
 
-    def _build_url(self, endpoint: str, offset: int, limit: int, params: Optional[dict[str, Any]] = None) -> str:
+    def _build_url(
+        self,
+        endpoint: str,
+        offset: int,
+        limit: int,
+        params: Optional[dict[str, Any]] = None,
+    ) -> str:
         """
         Builds a full API URL with pagination parameters and optional additional parameters.
 
@@ -111,7 +122,7 @@ class Scraper:
         if params:
             # Simple parameter appending; considers improving for complex cases
             for key, value in params.items():
-                 url += f"&{key}={value}"
+                url += f"&{key}={value}"
         return url
 
     def _get_query_limits(self, url: str) -> QueryLimits:
@@ -140,7 +151,9 @@ class Scraper:
                 total_items = response.get("total", 0)
                 max_queries_per_page = response.get("maxLimitPermitido", 0)
                 if total_items == 0 or max_queries_per_page == 0:
-                    logger.warning(f"{self.__class__.__name__}._get_query_limits: Zero total items or max limit for {url}")
+                    logger.warning(
+                        f"{self.__class__.__name__}._get_query_limits: Zero total items or max limit for {url}"
+                    )
                     # Return zero limits instead of raising error immediately
                     total_items = max_queries_per_page = 0
             logger.info(
@@ -160,16 +173,24 @@ class Scraper:
                 yield pos
         else:
             if _points_of_sale is None:
-                logger.warning(f"{self.__class__.__name__}._points_of_sale: none because no 'sucursales' key in response from {url}")
+                logger.warning(
+                    f"{self.__class__.__name__}._points_of_sale: none because no 'sucursales' key in response from {url}"
+                )
                 for key, value in response.items():
                     logger.warning(f"  {key}: {value}")
             elif isinstance(_points_of_sale, list):
                 if len(_points_of_sale) == 0:
-                    logger.warning(f"{self.__class__.__name__}._points_of_sale: none because len(list) == 0 in response from {url}")
+                    logger.warning(
+                        f"{self.__class__.__name__}._points_of_sale: none because len(list) == 0 in response from {url}"
+                    )
                 else:
-                    logger.warning(f"{self.__class__.__name__}._points_of_sale: none because len(list) != 0 in response from {url}. This is weird.")
+                    logger.warning(
+                        f"{self.__class__.__name__}._points_of_sale: none because len(list) != 0 in response from {url}. This is weird."
+                    )
             else:
-                logger.warning(f"{self.__class__.__name__}._points_of_sale: none because no way error from {url}. This is very weird.")
+                logger.warning(
+                    f"{self.__class__.__name__}._points_of_sale: none because no way error from {url}. This is very weird."
+                )
             raise ScraperStop()
 
     def points_of_sale(self) -> Generator[dict[str, Any], None, None]:
@@ -179,19 +200,25 @@ class Scraper:
         Yields:
             dictionaries, each representing a point of sale.
         """
-        logger.info(f"{self.__class__.__name__}.points_of_sale: Starting to fetch points of sale.")
+        logger.info(
+            f"{self.__class__.__name__}.points_of_sale: Starting to fetch points of sale."
+        )
         initial_url = f"{self.base_url}{self._points_of_sale_endpoint}?limit=0"
         query_limits = self._get_query_limits(initial_url)
 
         if query_limits.total_items == 0:
-            logger.warning(f"{self.__class__.__name__}.points_of_sale: No points of sale found.")
+            logger.warning(
+                f"{self.__class__.__name__}.points_of_sale: No points of sale found."
+            )
             yield from []
-            return # Stop iteration because no items
+            return  # Stop iteration because no items
         for page in range(query_limits.full_pages):
             offset = query_limits.offset(page)
             limit = query_limits.full_page_queries
             url = self._build_url(self._points_of_sale_endpoint, offset, limit)
-            logger.info(f"{self.__class__.__name__}.points_of_sale: Fetching points of sale from {url}")
+            logger.info(
+                f"{self.__class__.__name__}.points_of_sale: Fetching points of sale from {url}"
+            )
             for pos in self._points_of_sale(url):
                 yield pos
 
@@ -200,14 +227,19 @@ class Scraper:
             offset = query_limits.offset(query_limits.full_pages)
             limit = query_limits.last_page_queries
             url = self._build_url(self._points_of_sale_endpoint, offset, limit)
-            logger.info(f"{self.__class__.__name__}.points_of_sale: Fetching last page of points of sale from {url}")
+            logger.info(
+                f"{self.__class__.__name__}.points_of_sale: Fetching last page of points of sale from {url}"
+            )
             for pos in self._points_of_sale(url):
                 yield pos
 
-        logger.info(f"{self.__class__.__name__}.points_of_sale: Finished fetching points of sale.")
+        logger.info(
+            f"{self.__class__.__name__}.points_of_sale: Finished fetching points of sale."
+        )
 
-
-    def articles_by_point_of_sale(self, point_of_sale_id: str) -> Generator[dict[str, Any], None, None]:
+    def articles_by_point_of_sale(
+        self, point_of_sale_id: str
+    ) -> Generator[dict[str, Any], None, None]:
         """
         Fetches articles for a specific point of sale, handling pagination.
 
@@ -220,7 +252,9 @@ class Scraper:
         Raises:
             ScraperError: If the initial query for limits fails for this point of sale.
         """
-        logger.info(f"{self.__class__.__name__}.articles_by_point_of_sale: Starting to fetch articles for point_of_sale_id {point_of_sale_id}")
+        logger.info(
+            f"{self.__class__.__name__}.articles_by_point_of_sale: Starting to fetch articles for point_of_sale_id {point_of_sale_id}"
+        )
         # Base URL for articles for this point of sale (without offset/limit)
         articles_base_url = f"{self.base_url}{self._articles_endpoint}"
         _params = {"id_sucursal": point_of_sale_id}
@@ -229,25 +263,33 @@ class Scraper:
         query_limits = self._get_query_limits(initial_url)
 
         if query_limits.total_items == 0:
-            logger.warning(f"{self.__class__.__name__}.articles_by_point_of_sale: No articles found for point_of_sale_id {point_of_sale_id}")
+            logger.warning(
+                f"{self.__class__.__name__}.articles_by_point_of_sale: No articles found for point_of_sale_id {point_of_sale_id}"
+            )
             yield from []
-            return # Stop iteration if no items
+            return  # Stop iteration if no items
 
         for page in range(query_limits.full_pages):
             offset = query_limits.offset(page)
             limit = query_limits.full_page_queries
-            url = self._build_url(self._articles_endpoint, offset, limit, params=_params)
-            logger.info(f"{self.__class__.__name__}.articles_by_point_of_sale: Fetching articles from {url}")
+            url = self._build_url(
+                self._articles_endpoint, offset, limit, params=_params
+            )
+            logger.info(
+                f"{self.__class__.__name__}.articles_by_point_of_sale: Fetching articles from {url}"
+            )
             response = self.webclient.get(url)
             _articles = response.get("productos", None)
             if _articles:
-                 for article in _articles:
-                     # Add point of sale identifier to each article
-                     article["point_of_sale_id"] = point_of_sale_id
-                     yield article
+                for article in _articles:
+                    # Add point of sale identifier to each article
+                    article["point_of_sale_id"] = point_of_sale_id
+                    yield article
             else:
                 yield from []
-                logger.warning(f"{self.__class__.__name__}.articles_by_point_of_sale: No 'productos' key or empty list in response from {url}")
+                logger.warning(
+                    f"{self.__class__.__name__}.articles_by_point_of_sale: No 'productos' key or empty list in response from {url}"
+                )
                 for key, value in response.items():
                     logger.warning(f"  {key}: {value}")
 
@@ -255,20 +297,27 @@ class Scraper:
         if query_limits.last_page_queries > 0:
             offset = query_limits.offset(query_limits.full_pages)
             limit = query_limits.last_page_queries
-            url = self._build_url(self._articles_endpoint, offset, limit, params=_params)
-            logger.info(f"{self.__class__.__name__}.articles_by_point_of_sale: Fetching last page of articles from {url}")
+            url = self._build_url(
+                self._articles_endpoint, offset, limit, params=_params
+            )
+            logger.info(
+                f"{self.__class__.__name__}.articles_by_point_of_sale: Fetching last page of articles from {url}"
+            )
             response = self.webclient.get(url)
             _articles = response.get("productos", None)
             if _articles:
-                 for article in _articles:
+                for article in _articles:
                     # Add point of sale identifier to each article
                     article["point_of_sale_id"] = point_of_sale_id
                     yield article
             else:
                 yield from []
-                logger.warning(f"{self.__class__.__name__}.articles_by_point_of_sale: No 'productos' key or empty list in response from {url}")
+                logger.warning(
+                    f"{self.__class__.__name__}.articles_by_point_of_sale: No 'productos' key or empty list in response from {url}"
+                )
                 for key, value in response.items():
                     logger.warning(f"  {key}: {value}")
 
-        logger.info(f"{self.__class__.__name__}.articles_by_point_of_sale: Finished fetching articles for point_of_sale_id {point_of_sale_id}.")
-
+        logger.info(
+            f"{self.__class__.__name__}.articles_by_point_of_sale: Finished fetching articles for point_of_sale_id {point_of_sale_id}."
+        )

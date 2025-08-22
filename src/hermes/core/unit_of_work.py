@@ -1,4 +1,5 @@
-from typing import Self
+from typing import Any, Self
+
 
 class UnitOfWorkBuilder:
     def init(self) -> None:
@@ -12,7 +13,3 @@ class UnitOfWorkBuilder:
     def add_parameter(self, key: str, value: Any) -> Self:
         self._parameters[key] = value
         return self
-
-
-
-

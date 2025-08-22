@@ -7,8 +7,10 @@ from requests.exceptions import RequestException
 
 logger = logging.getLogger(__name__)
 
+
 class WebClientError(Exception):
     """Custom exception class for WebClient errors."""
+
     def __init__(self, message: str) -> None:
         super().__init__(message)
         logger.error(message)
@@ -53,7 +55,9 @@ class WebClient:
             logger.info(f"{self.__class__.__name__} session closed.")
             # self._session = None # Optional: prevent reuse after close
 
-    def get(self, url: str, params: Optional[dict[str, Any]] = None, timeout: int = 30) -> dict[str, Any]:
+    def get(
+        self, url: str, params: Optional[dict[str, Any]] = None, timeout: int = 30
+    ) -> dict[str, Any]:
         """
         Performs an HTTP GET request to the specified URL.
 
@@ -70,29 +74,35 @@ class WebClient:
                              timeout, non-200 status code, or JSON decoding errors.
         """
         if not self._session:
-             raise WebClientError(f"{self.__class__.__name__} session is closed. Cannot make requests.")
+            raise WebClientError(
+                f"{self.__class__.__name__} session is closed. Cannot make requests."
+            )
 
         headers = {"User-Agent": self._user_agent}
         logger.info(f"Attempting GET request to {url}")
         if params:
             logger.info(f"    with {params}")
         try:
-            response = self._session.get(url, headers=headers, params=params, timeout=timeout)
+            response = self._session.get(
+                url, headers=headers, params=params, timeout=timeout
+            )
             # Raise an exception for bad status codes (4xx or 5xx)
             response.raise_for_status()
 
             # Attempt to parse JSON response
             json_response = response.json()
-            logger.info(f"GET request to {url} successful (Status: {response.status_code})")
+            logger.info(
+                f"GET request to {url} successful (Status: {response.status_code})"
+            )
             return json_response
         except RequestException as e:
             # Catches connection errors, timeouts, invalid URL, etc.
             error_message = f"Request failed for {url}: {e}"
             raise WebClientError(error_message)
 
-        except ValueError as e: # Catches JSON decoding errors
-             error_message = f"Failed to decode JSON response from {url}: {e}"
-             raise WebClientError(error_message)
+        except ValueError as e:  # Catches JSON decoding errors
+            error_message = f"Failed to decode JSON response from {url}: {e}"
+            raise WebClientError(error_message)
 
 
 @contextmanager

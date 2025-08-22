@@ -8,15 +8,17 @@ from hermes.core.helpers import (
     get_container,
     get_directory,
     get_resource,
-    get_timestamp
+    get_timestamp,
 )
 from hermes.core.metadata import Metadata
 
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
 
+
 class TreeStoreException(Exception):
     """Exception for the tree_store module."""
+
     def __init__(self, message: str) -> None:
         super().__init__(message)
         logger.error(message)
@@ -28,7 +30,6 @@ class Store:
     index: int
     key: str
     timestamp: str
-
 
 
 MAX_INDEX_VALUE = 16777216
@@ -96,6 +97,7 @@ class Index:
     that is persisted in a JSON file.  It's used to keep track of the
     current store number in the TreeStore.
     """
+
     def __init__(self, resource: Path) -> None:
         """
         Initializes the Index object.
@@ -110,10 +112,12 @@ class Index:
             # Restarting Index: Load existing value.
             try:
                 value = self.read()
-                self._value = int(value.get("index", 0)) # Use .get() for safer access
+                self._value = int(value.get("index", 0))  # Use .get() for safer access
             except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
                 logging.error(f"Error reading index file {self.resource}: {e}")
-                raise TreeStoreException(f"Could not read or parse index file {self.resource}") from e
+                raise TreeStoreException(
+                    f"Could not read or parse index file {self.resource}"
+                ) from e
         else:
             # Initialize Index: Start from 0 and write to file
             self.write()
@@ -159,11 +163,10 @@ class Index:
         value = {"index": str(self.value)}
         try:
             with open(self.resource, "w") as target:
-                json.dump(value, target, indent=4) # Use indent for readability
+                json.dump(value, target, indent=4)  # Use indent for readability
         except IOError as e:
             message = f"Error writing index file {self.resource}: {e}"
             raise TreeStoreException(message)
-
 
     def read(self) -> dict[str, str]:
         """
@@ -220,6 +223,7 @@ class TreeStore:
                        255/
     ```
     """
+
     def __init__(self, base: Path, identifier: str) -> None:
         """
         Initializes a TreeStore object.
@@ -273,7 +277,9 @@ class TreeStore:
         """
         store_index = self.index.value
         (first_digit, second_digit, third_digit) = get_store_tuple(store_index)
-        store_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
+        store_home = get_directory(
+            Path(self.root, first_digit, second_digit, third_digit)
+        )
         self.index.value += 1
         store_key = f"{first_digit}{second_digit}{third_digit}"
         store_timestamp = get_timestamp()
@@ -285,7 +291,9 @@ class TreeStore:
 
     def _get_store(self, store_index: int) -> Store:
         (first_digit, second_digit, third_digit) = get_store_tuple(store_index)
-        store_home = get_directory(Path(self.root, first_digit, second_digit, third_digit))
+        store_home = get_directory(
+            Path(self.root, first_digit, second_digit, third_digit)
+        )
         store_key = f"{first_digit}{second_digit}{third_digit}"
         metadata = Metadata(store_home)
         metadata.read()
@@ -335,4 +343,3 @@ class TreeStore:
             raise TreeStoreException(explanation)
         for store_index in range(first, top):
             yield self._get_store(store_index)
-

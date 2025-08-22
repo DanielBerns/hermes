@@ -30,4 +30,3 @@ class Metadata:
 
     def write(self) -> None:
         write_json(self.resource, self.table)
-

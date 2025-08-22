@@ -12,10 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class SampleReader:
-    def __init__(
-        self,
-        base: Path
-    ) -> None:
+    def __init__(self, base: Path) -> None:
         self._rows_reader: RowsReader = RowsReader(base)
         self._metadata = Metadata(base)
 
@@ -42,5 +39,3 @@ class SampleReader:
             for this_article in self.rows_reader.execute("articles_per_point_of_sale"):
                 yield this_article
         logger.info(f"{self.__class__.__name__}.articles_by_point_of_sale: done")
-
-

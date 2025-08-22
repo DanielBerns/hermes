@@ -9,6 +9,7 @@ from hermes.message_board.client import MessageBoardClient
 
 logger = logging.getLogger(__name__)
 
+
 class AgentException(Exception):
     def __init__(self, message: str) -> None:
         super().__init__(message)
@@ -16,12 +17,10 @@ class AgentException(Exception):
 
 
 class AgentOperation(Protocol):
-    def execute(self, client: MessageBoardClient) -> None:
-        ...
+    def execute(self, client: MessageBoardClient) -> None: ...
 
     @property
-    def response(self) -> dict[str, Any] | None:
-        ...
+    def response(self) -> dict[str, Any] | None: ...
 
 
 def response_to_string(response: dict[str, Any] | None) -> str:
@@ -267,7 +266,6 @@ class DeleteMessage:
 
 
 class MessageBoardAgent:
-
     @staticmethod
     def get_secrets_resource(secrets_container: Path, identifier: str) -> Path:
         secrets_resource = get_resource(secrets_container, identifier, ".json")
@@ -277,20 +275,15 @@ class MessageBoardAgent:
             secrets_json = {
                 "base_url": "http://127.0.0.1:5000",
                 "username": "unknown",
-                "password": "unknown"
+                "password": "unknown",
             }
             write_json(secrets_resource, secrets_json)
         return secrets_resource
 
-    def __init__(
-        self,
-        secrets_container: str,
-        identifier: str
-    ) -> None:
+    def __init__(self, secrets_container: str, identifier: str) -> None:
         try:
             secrets_resource = MessageBoardAgent.get_secrets_resource(
-                secrets_container,
-                identifier
+                secrets_container, identifier
             )
             secrets_json = read_json(secrets_resource)
         except Exception as an_exception:
@@ -327,14 +320,15 @@ class MessageBoardAgent:
         client = MessageBoardClient(base_url)
         try:
             success, _ = client.login(username, password)
-            if not success:
-                return
         except Exception as an_exception:
-            message = f"{self.__class__.__item__}.run|: no credentials"
+            message = f"{self.__class__.__item__}.run: no credentials"
             raise AgentException(message) from an_exception
+        else:
+            if not success:
+                message = f"{self.__class__.__item__}.run: login fails"
+                raise AgentException(message)
 
         for this_operation in self.operations():
-            current_username = username
             try:
                 this_operation.execute(client)
             except Exception as an_exception:
@@ -350,7 +344,9 @@ class MessageBoardAgent:
 
 
 @contextmanager
-def initialize_agent(secrets_container: Path, identifier: str) -> Generator[MessageBoardAgent, None, None]:
+def initialize_agent(
+    secrets_container: Path, identifier: str
+) -> Generator[MessageBoardAgent, None, None]:
     try:
         agent = MessageBoardAgent(secrets_container, identifier)
         yield agent

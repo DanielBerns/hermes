@@ -9,6 +9,7 @@ from hermes.domain.sample_generator import SampleGenerator
 # Get a named logger for this module
 logger = logging.getLogger(__name__)
 
+
 class SampleWriter:
     def __init__(
         self,
@@ -34,7 +35,12 @@ class SampleWriter:
 
     def run(self) -> None:
         logger.info(f"{self.__class__.__name__}.run: start")
-        self.rows_writer.execute(Sample.POINTS_OF_SALE, self.sample_generator.points_of_sale, self.formatter)
-        self.rows_writer.execute(Sample.ARTICLES, self.sample_generator.articles_by_point_of_sale, self.formatter)
+        self.rows_writer.execute(
+            Sample.POINTS_OF_SALE, self.sample_generator.points_of_sale, self.formatter
+        )
+        self.rows_writer.execute(
+            Sample.ARTICLES,
+            self.sample_generator.articles_by_point_of_sale,
+            self.formatter,
+        )
         logger.info(f"{self.__class__.__name__}.run: done")
-

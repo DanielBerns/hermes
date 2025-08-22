@@ -105,10 +105,14 @@ def check_day_of_week(day_of_week: str) -> str:
             if 0 <= int(day_of_week) <= 6:
                 return day_of_week
             else:
-                explanation = f"crontab.check_hour: invalid day_of_week range: {day_of_week:s}"
+                explanation = (
+                    f"crontab.check_hour: invalid day_of_week range: {day_of_week:s}"
+                )
                 raise CrontabException(explanation)
         except ValueError:
-            explanation = f"crontab.check_hour: invalid day_of_week value: {day_of_week:s}"
+            explanation = (
+                f"crontab.check_hour: invalid day_of_week value: {day_of_week:s}"
+            )
             raise CrontabException(explanation)
     else:
         explanation = "crontab.check_hour: invalid day_of_week length"
@@ -123,15 +127,12 @@ class Crontab:
     def table(self) -> dict[str, str]:
         return self._table
 
-    def add(
-        self,
-        key: str,
-        command: str,
-        timing: str
-    ) -> None:
-        parts = timing.split(' ')
+    def add(self, key: str, command: str, timing: str) -> None:
+        parts = timing.split(" ")
         if len(parts) != 5:
-            explanation = f"{self.__class__.__name__} Bad timing: {key} - {command} - {timing}"
+            explanation = (
+                f"{self.__class__.__name__} Bad timing: {key} - {command} - {timing}"
+            )
             raise CrontabException(explanation)
         minute: str = parts[0]
         hour: str = parts[1]
@@ -147,15 +148,16 @@ class Crontab:
             _day_of_week = check_day_of_week(day_of_week)
         except CrontabException:
             explanation = " ".join(
-                    (   self.__class__.__name__,
-                        "erroneous parameters:",
-                        command,
-                        minute,
-                        hour,
-                        day_of_month,
-                        month,
-                        day_of_week,
-                    )
+                (
+                    self.__class__.__name__,
+                    "erroneous parameters:",
+                    command,
+                    minute,
+                    hour,
+                    day_of_month,
+                    month,
+                    day_of_week,
+                )
             )
             raise CrontabException(explanation)
         else:

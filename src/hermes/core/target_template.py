@@ -6,12 +6,10 @@ from jinja2 import Template
 
 class TargetTemplate(Protocol):
     @property
-    def template(self) -> Template:
-        ...
+    def template(self) -> Template: ...
 
     @property
-    def suffix(self) -> str:
-        ...
+    def suffix(self) -> str: ...
 
 
 class FromFileTargetTemplate:
