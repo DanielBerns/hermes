@@ -179,57 +179,24 @@ def read_text_lines(resource: Path) -> Generator[str, None, None]:
     Yields:
         Each line of the file as a string, with the trailing newline removed.
     """
-    with read_text_file(resource) as origin:
-        yield from (line[:-1] for line in origin)
+    with read_text_file(resource) as text:
+        yield from (line[:-1] for line in text)
 
+
+def write_text_lines(resource: Path, generate_lines: Generator[str, None, None]) -> None:
+    with create_text_file(resource) as text:
+        for line in generate_lines():
+            text.write(line + "\n")
 
 def read_json_lines(resource: Path) -> Generator[dict[str, Any], None, None]:
     for a_line in read_text_lines(resource):
         yield json.loads(a_line)
 
+def as_jsonl(row: dict[str, str]) -> str:
+    return json.dumps(row) + "\n"
 
-def as_jsonl(event: dict[str, str]) -> str:
-    return json.dumps(event) + "\n"
-
-
-def write_text_lines(resource: Path) -> Generator[int, str, None]:
-    """A generator that writes lines of text to a file.  Uses UTF-8 encoding.
-
-    The generator receives lines of text to write via its `send()` method.
-    It yields the number of lines written so far. The generator must be
-    initialized by sending `None` or calling `next()` on it. The generator
-    should be closed by sending `None` after the last line has been sent.
-
-    Args:
-        resource: The path to the file to write to.
-
-    Yields:
-        The number of lines written to the file (including the current line).
-
-    Receives:
-        str: The next line of text to write to the file.  Send `None` to
-            close the file and terminate the generator.
-
-    Example:
-        writer = write_text_lines(Path("my_file.txt"))
-        next(writer)  # Initialize the generator
-        writer.send("First line")
-        count = writer.send("Second line")
-        print(f"Lines written: {count}")  # Output: Lines written: 2
-        writer.send(None) # Close and terminate
-    """
-    number = 0
-    with create_text_file(resource) as target:
-        text_line = yield number  # Initial yield, returns 0
-        if text_line:
-            number += 1
-            target.write(text_line + "\n")
-            while True:
-                text_line = yield number
-                if text_line is None:
-                    break
-                number += 1
-                target.write(text_line + "\n")
+def as_row(line: str) -> dict[str, Any]:
+    return json.loads(line)
 
 
 def get_directory(base: Path) -> Path:

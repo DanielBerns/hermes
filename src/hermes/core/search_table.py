@@ -1,26 +1,24 @@
-from typing import Any
+from typing import Any, List
 
+class SearchTable:
+    def __init__(
+        self,
+        keys: List[str]
+    ) -> None:
+        self.sorted_keys = sorted(keys)
+        self._table: dict[str, dict[str, Any]] = {}
 
-class SearchTable[T]:
-    def __init__(self, identifier: str) -> None:
-        self._identifier = identifier
-        self._table: dict[str, T] = {}
+    def get_key(self, row: dict[str, Any]) -> str:
+        return "|".join(str(row.get(key, '')) for key in self.sorted_keys)
 
-    @property
-    def identifier(self) -> str:
-        return self._identifier
+    def insert(self, row: dict[str, Any]) -> None:
+        key = self.get_key(row)
+        self._table[key] = row
 
-    @property
-    def table(self) -> dict[str, T]:
-        return self._table
+    def search(self, row: dict[str, Any]) -> dict[str, Any] | None:
+        key = self._get_key(row)
+        return self._table.get(key, None)
 
-    def search(self, record: dict[str, Any]) -> T | None:
-        key = record.get(self.identifier, None)
-        value = self.table.get(str(key), None) if key else None
-        return value
-
-    def bulk_update(self, the_update: dict[str, T]) -> None:
-        self._table.update(the_update)
-
-    def update(self, key: str, value: T) -> None:
-        self._table[key] = value
+    def iterate(self) -> Generator[dict[str, Any], None, None]:
+        for key, value in self._table.items():
+            yield value

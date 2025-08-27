@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Generator
+from contextlib import contextmanager
+from pathlib import Path
 
 import sqlalchemy as sa
 from sqlalchemy import Index
@@ -10,6 +12,8 @@ from sqlalchemy.orm import (
     WriteOnlyMapped,
     mapped_column,
     relationship,
+    sessionmaker,
+    Session
 )
 
 from hermes.domain.rows_ops import get_int
@@ -103,6 +107,18 @@ class Timestamp(Base):
         timestamp_string = row.get("timestamp", "00000000000000")
         return Timestamp.from_string(timestamp_string)
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "year": self.year,
+            "month": self.month,
+            "day": self.day,
+            "hour": self.hour,
+            "minute": self.minute,
+            "second": self.second,
+        }
+
+    def labels(self) -> List[str]:
+        return ["year", "month", "day", "hour", "minute", "second"]
 
 class State(Base):
     __tablename__ = "states"
@@ -113,6 +129,12 @@ class State(Base):
     cities: WriteOnlyMapped[List["City"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="state"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "code": self.code,
+            "name": self.name
+        }
 
 
 class City(Base):
@@ -126,6 +148,12 @@ class City(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="city"
     )
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "state": self.state.code
+            "city": self.name
+        }
+
 
 class Flag(Base):
     """Represents a brand or flag of a point of sale"""
@@ -134,11 +162,16 @@ class Flag(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # Indexing the 'name' column for faster searches.
-    name: Mapped[str] = mapped_column(sa.String(32), index=True)
+    flag: Mapped[str] = mapped_column(sa.String(32), index=True)
 
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="flag"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "flag": self.flag,
+        }
 
 
 class Business(Base):
@@ -148,11 +181,16 @@ class Business(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     # Indexing the 'name' column for faster searches.
-    name: Mapped[str] = mapped_column(sa.String(32), index=True)
+    business: Mapped[str] = mapped_column(sa.String(32), index=True)
 
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="business"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "business": self.business,
+        }
 
 
 class Branch(Base):
@@ -161,10 +199,15 @@ class Branch(Base):
     __tablename__ = "branches"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(sa.String(32))
+    branch: Mapped[str] = mapped_column(sa.String(32))
     point_of_sale: Mapped["PointOfSale"] = relationship(
         back_populates="branch", uselist=False
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "branch": self.branch,
+        }
 
 
 # Association table for the many-to-many relationship between PointOfSale and Place.
@@ -186,6 +229,13 @@ class Place(Base):
     points_of_sale: Mapped[List["PointOfSale"]] = relationship(
         secondary=points_of_sale_and_places, back_populates="places"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "address": self.address,
+            "city": self.city.name,
+            "state": self.city.state.code
+        }
 
 
 class PointOfSale(Base):
@@ -223,6 +273,13 @@ class PointOfSale(Base):
         back_populates="point_of_sale",
     )
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "code": self.code,
+            "flag": self.flag.,
+            "business": self.business.business,
+            "branch": self.branch.branch
+        }
 
 class ArticleCode(Base):
     """Represents the unique code for an article or product."""
@@ -236,6 +293,10 @@ class ArticleCode(Base):
     cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code")
     prices: WriteOnlyMapped[List["Price"]] = relationship(back_populates="article_code")
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "code": code,
+        }
 
 class ArticleBrand(Base):
     """Represents the brand of an article."""
@@ -249,6 +310,11 @@ class ArticleBrand(Base):
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="brand"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "brand": self.brand,
+        }
 
 
 class ArticleDescription(Base):
@@ -266,6 +332,11 @@ class ArticleDescription(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="description"
     )
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "description": self.description,
+        }
+
 
 class ArticlePackage(Base):
     """Represents the packaging information for an article (e.g., '1L bottle')."""
@@ -279,6 +350,11 @@ class ArticlePackage(Base):
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="package"
     )
+
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "package": self.package,
+        }
 
 
 class ArticleCard(Base):
@@ -307,6 +383,14 @@ class ArticleCard(Base):
     code_id: Mapped[int] = mapped_column(sa.ForeignKey("article_codes.id"), index=True)
     code: Mapped["ArticleCode"] = relationship(back_populates="cards")
 
+    def to_row(self) -> dict[str, Any]:
+        return {
+            "brand": self.brand.brand,
+            "description": self.description.description,
+            "package": self.package.package,
+            "code": self.code.code
+        }
+
 
 class Price(Base):
     """Represents the price of an article at a specific point of sale at a given time."""
@@ -333,3 +417,30 @@ class Price(Base):
         sa.ForeignKey("points_of_sale.id"), index=True
     )
     point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="prices")
+
+
+@contextmanager
+def get_session(
+    database_uri: str | None = None
+) -> Generator[Session, None, None]:
+    if database_uri is None:
+        database_uri = ":memory:"
+        create_database = True
+    else:
+        database_path = Path(database_uri)
+        create_database = not database_path.exists()
+    database_home = "sqlite+pysqlite:///" + database_uri
+    db = sa.create_engine(database_home, future=True)
+    if create_database:
+        Base.metadata.create_all(db)
+    SessionLocal = sessionmaker(bind=db)
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except Exception as panic:
+        logger.error(str(panic))
+        session.rollback()
+    finally:
+        session.close()
+

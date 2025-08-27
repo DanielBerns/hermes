@@ -27,3 +27,12 @@ perform price comparisons, track historical fluctuations, and identify significa
 
 Hermes generates comprehensive reports in multiple standard formats, including CSV, JSON, and PDF. 
 The system can produce scheduled or on-demand reports detailing competitive pricing analyses, historical data visualizations, and customizable market insight dashboards.
+
+
+## Operation
+
+uv run scripts/hermes_scrape_precios_claros_start.py --message_board no --instance Patagonia --database_name db_dev
+uv run scripts/hermes_scrape_precios_claros_update.py --message_board yes --instance Patagonia --database_name db_dev
+uv run scripts/hermes_scrape_precios_claros_inspect.py --message_board yes --instance Patagonia --database_name db_dev
+
+

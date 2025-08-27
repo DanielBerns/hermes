@@ -8,23 +8,25 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class RowsOpsException(Exception):
+class SampleProcessorException(Exception):
     """Custom exception for rows ops related errors."""
 
     def __init__(self, message: str) -> None:
         super().__init__(message)
         logger.error(message)
 
-
-class PointOfSaleRowsProcessor:
-    def __init__(self, map_of_points_of_sale: dict[str, Any]) -> None:
-        self._map_of_points_of_sale: dict[str, Any] = map_of_points_of_sale
+class SampleProcessor:
+    def __init__(self) -> None:
+        self._map_of_points_of_sale: dict[str, Any] = {}
 
     @property
-    def map_of_point_of_sale(self) -> dict[str, Any]:
+    def map_of_points_of_sale(self) -> dict[str, Any]:
         return self._map_of_points_of_sale
 
-    def execute(self, row: dict[str, Any]) -> dict[str, Any]:
+    def point_of_sale_from_row(
+        self,
+        row: dict[str, Any]
+    ) -> dict[str, Any]:
         point_of_sale_code = (row["id"]).strip()
         state = (row["provincia"]).strip().lower()
         city = (row["localidad"]).strip().lower()
@@ -47,19 +49,13 @@ class PointOfSaleRowsProcessor:
             "place_key": place_key,
             "point_of_sale_key": point_of_sale_key,
         }
-        self.map_of_point_of_sale[point_of_sale_code] = point_of_sale_key
+        self.map_of_points_of_sale[point_of_sale_code] = point_of_sale_key
         return point_of_sale
 
-
-class ArticlesByPointOfSaleRowsProcessor:
-    def __init__(self, map_of_points_of_sale: dict[str, Any]) -> None:
-        self._map_of_points_of_sale: dict[str, Any] = map_of_points_of_sale
-
-    @property
-    def map_of_point_of_sale(self) -> dict[str, Any]:
-        return self._map_of_points_of_sale
-
-    def execute(self, row: dict[str, Any]) -> dict[str, Any]:
+    def article_per_point_of_sale_from_row(
+        self,
+        row: dict[str, Any]
+    ) -> dict[str, Any]:
         article_code = (row["id"]).strip()
         brand = (row["marca"]).strip().lower()
         description = (row["nombre"]).strip().lower()
@@ -82,7 +78,6 @@ class ArticlesByPointOfSaleRowsProcessor:
         }
         return article_per_point_of_sale
 
-
 def get_city_key(state: str, city: str) -> str:
     return f"({state})[{city}]"
 
@@ -95,32 +90,22 @@ def get_point_of_sale_key(point_of_sale_code: str, flag: str) -> str:
 def get_article_code_key(article_code: str) -> str:
     return article_code
 
-def get_article_card_key(
-    article_code: str, brand: str, description: str, package: str
-) -> str:
+def get_article_card_key(article_code: str, brand: str, description: str, package: str) -> str:
     return f"[{article_code}]({brand})({description})({package})"
 
-
-def get_mecon_rows_processors() -> Tuple[RowsProcessor, RowsProcessor]:
-    map_of_point_of_sale: dict[str, Any] = {}
-    points_of_sale_rows_processor = PointOfSaleRowsProcessor(map_of_point_of_sale)
-    articles_by_point_of_sale_rows_processor = ArticlesByPointOfSaleRowsProcessor(
-        map_of_point_of_sale
-    )
-    return points_of_sale_rows_processor, articles_by_point_of_sale_rows_processor
-
-
 def price_to_cents(price: str) -> int:
-    return int(float(price) * 100)
-
+    try:
+        return int(float(price) * 100)
+    except Exception as panic:
+        message = f"sample_processor.price_to_cents: check {price}"
+        raise SampleProcessorException(message)
 
 def cents_to_price(cents: str) -> str:
-    return f"{int(cents) / 100:>12.2f}"
-
-
-def row_to_string(row: dict[str, Any], separator="|") -> str:
-    return "{" + separator.join(f"{key}:{value}" for key, value in row.items()) + "}"
-
+    try:
+        return f"{int(cents) / 100:>12.2f}"
+    except Exception as panic:
+        message = f"sample_processor.cents_to_price: check {cents}"
+        raise SampleProcessorException(message)
 
 def get_int(string: str) -> int:
     """
@@ -133,13 +118,13 @@ def get_int(string: str) -> int:
         The converted integer.
 
     Raises:
-        RowsOpsException: If the conversion to integer fails.
+        SampleProcessorException: If the conversion to integer fails.
     """
     try:
         return int(string)
     except Exception as panic:
-        message = f"get_int: int('{string}') fails."
-        raise RowsOpsException(message) from panic
+        message = f"sample_processor.get_int: int('{string}') fails."
+        raise SampleProcessorException(message) from panic
 
 
 def timestamp_string_to_row(timestamp_string: str) -> dict[str, Any]:
@@ -152,4 +137,6 @@ def timestamp_string_to_row(timestamp_string: str) -> dict[str, Any]:
         "second": get_int(timestamp_string[12:14]),
     }
 
+def row_to_string(row: dict[str, Any], separator="|") -> str:
+    return "{" + separator.join(f"{key}:{value}" for key, value in row.items()) + "}"
 

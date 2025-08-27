@@ -15,6 +15,7 @@ from hermes.core.constants import (
     LOG_LEVEL_KEY,
     LOG_LEVEL_DEFAULT,
     DOTENV,
+    DATABASE_NAME_KEY
 )
 from hermes.core.helpers import (
     create_text_file,

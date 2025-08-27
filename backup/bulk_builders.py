@@ -90,7 +90,7 @@ def article_code_bulk_from_row(row: dict[str, Any]) -> dict[str, Any]:
     return {"code": code}
 
 
-def article_brand_bulk_from_row(row: dict[str, Any]) -> dict[str, Any]:
+def article_brand_from_row(row: dict[str, Any]) -> dict[str, Any]:
     brand = row.get("brand", None)
     if brand is None:
         raise BulkBuildersException(f"article_brand_bulk_from_row {row_to_string(row)}")
