@@ -1,12 +1,17 @@
+import pdb
 import logging
-from typing import Any, Callable, Generator, Type, List
+from collections.abc import Callable
+from typing import Any, Generator, Type, List
 from abc import ABC
 
 from sqlalchemy import insert, select, and_
 from sqlalchemy.orm import Session
 
 from hermes.core.search_table import SearchTable
+from hermes.core.tree_store import Store
 from hermes.domain.rows_ops import get_int, row_to_string, timestamp_string_to_row
+from hermes.domain.sample_reader import SampleReader
+# from hermes.domain.sample_processor import SampleProcessor
 
 # Import the models and custom exception from your database definition file
 from hermes.domain.database import (
@@ -81,7 +86,7 @@ CODES_AND_STATES = {
   "ar-x": ("ar-x", "Córdoba"),
   "cordoba": ("ar-x", "Córdoba"),
   "ar-y": ("ar-y", "Jujuy"),
-  "jujuy" ("ar-y", "Jujuy"),
+  "jujuy": ("ar-y", "Jujuy"),
   "ar-z": ("ar-z", "Santa Cruz"),
   "error": ("xxxx", "Error")
 }
@@ -197,11 +202,14 @@ class DatabaseFromSample:
             Raises an exception if multiple cities are found with the same name
             and state code, which would indicate a data integrity issue.
         """
-        city_name = row.get("city")
-        state_code = row.get("state")
+        city_name = row.get("name")
+        if not city_name:
+            message = f"{self.__class__.__name__}.get_city: Missing 'name' in row: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
 
-        if not city_name or not state_code:
-            message = f"{self.__class__.__name__}.get_city: Missing 'city' or 'state_code' in row: {row_to_string(row)}"
+        state_id = row.get("state_id")
+        if not state_id:
+            message = f"{self.__class__.__name__}.get_city: Missing 'state_id' in row: {row_to_string(row)}"
             raise DatabaseFromSampleException(message)
 
         try:
@@ -213,7 +221,7 @@ class DatabaseFromSample:
                 .where(
                     and_(
                         City.name == city_name,
-                        State.code == state_code
+                        State.id == state_id
                     )
                 )
             )
@@ -228,39 +236,87 @@ class DatabaseFromSample:
             )
             raise DatabaseFromSampleException(message) from panic
 
+    def get_place(self, row: dict[str, Any]) -> Place | None:
+        """
+        Queries the database for a City record by its name and the code of its state.
+        This composite lookup is necessary because city names are not unique across
+        different states.
+
+        Args:
+            row: A dict[str, Any] with 'address' and 'city' keys.
+
+        Returns:
+            The Place object if found, otherwise None.
+            Raises an exception if multiple places are found with the same name
+            and city, which would indicate a data integrity issue.
+        """
+        address = row.get("address")
+        if not address:
+            message = f"{self.__class__.__name__}.get_address: Missing 'address' in row: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+
+        city_id = row.get("city_id")
+        if not city_id:
+            message = f"{self.__class__.__name__}.get_city: Missing 'city_id' in row: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+
+        try:
+            # Construct a query with a join to the State table to filter by state_code.
+            # Using the 'City.state' relationship makes the join implicit and clean.
+            query = (
+                select(Place)
+                .join(Place.city)
+                .where(
+                    and_(
+                        Place.address == address,
+                        City.id == city_id
+                    )
+                )
+            )
+
+            # .scalar_one_or_none() is ideal for ensuring a unique result.
+            result = self.session.execute(query).scalar_one_or_none()
+            return result
+        except Exception as panic:
+            message = (
+                f"{self.__class__.__name__}.get_place: An error occurred while querying for place '{address}' "
+                f"in city_id '{city_id}': {panic}"
+            )
+            raise DatabaseFromSampleException(message) from panic
+
     # Refactored getter methods to use the generic helper
     def get_state(self, row: dict[str, Any]) -> State | None:
         return self._get_unique_record(State, State.code, row, "code")
 
     def get_flag(self, row: dict[str, Any]) -> Flag | None:
-        return self._get_unique_record(Flag, Flag.name, row, "flag")
+        return self._get_unique_record(Flag, Flag.flag, row, "flag")
 
     def get_business(self, row: dict[str, Any]) -> Business | None:
-        return self._get_unique_record(Business, Business.name, row, "business")
+        return self._get_unique_record(Business, Business.business, row, "business")
 
     def get_branch(self, row: dict[str, Any]) -> Branch | None:
-        return self._get_unique_record(Branch, Branch.name, row, "branch")
+        return self._get_unique_record(Branch, Branch.branch, row, "branch")
 
-    def get_place(self, row: dict[str, Any]) -> Place | None:
-        return self._get_unique_record(Place, Place.address, row, "address")
+    # def get_place(self, row: dict[str, Any]) -> Place | None:
+    #     return self._get_unique_record(Place, Place.address, row, "address")
 
     def get_point_of_sale(self, row: dict[str, Any]) -> PointOfSale | None:
         return self._get_unique_record(PointOfSale, PointOfSale.code, row, "code")
 
     def get_article_code(self, row: dict[str, Any]) -> ArticleCode | None:
-        return self._get_unique_record(ArticleCode, ArticleCode.article_code, row, "code")
+        return self._get_unique_record(ArticleCode, ArticleCode.code, row, "code")
 
     def get_article_brand(self, row: dict[str, Any]) -> ArticleBrand | None:
-        return self._get_unique_record(ArticleBrand, ArticleBrand.article_brand, row, "brand")
+        return self._get_unique_record(ArticleBrand, ArticleBrand.brand, row, "brand")
 
     def get_article_description(self, row: dict[str, Any]) -> ArticleDescription | None:
         return self._get_unique_record(
-            ArticleDescription, ArticleDescription.article_description, row, "description"
+            ArticleDescription, ArticleDescription.description, row, "description"
         )
 
     def get_article_package(self, row: dict[str, Any]) -> ArticlePackage | None:
         return self._get_unique_record(
-            ArticlePackage, ArticlePackage.article_package, row, "package"
+            ArticlePackage, ArticlePackage.package, row, "package"
         )
 
     def get_article_card(self, row: dict[str, Any]) -> ArticleCard | None:
@@ -270,23 +326,23 @@ class DatabaseFromSample:
         """
         try:
             # First, retrieve the related entities.
-            article_brand = self.get_article_brand(row)
-            article_description = self.get_article_description(row)
-            article_package = self.get_article_package(row)
-            article_code = self.get_article_code(row)
+            article_brand_id = row.get("brand_id")
+            article_description_id = row.get("description_id")
+            article_package_id = row.get("package_id")
+            article_code_id = row.get("code_id")
 
             # Ensure all components required for the card exist.
-            if not all([article_brand, article_description, article_package, article_code]):
-                # This indicates that one of the components (brand, desc, etc.) is not yet in the DB.
+            if not all([article_brand_id, article_description_id, article_package_id, article_code_id]):
+                # This indicates that one of the components (brand, description, etc.) is not yet in the DB.
                 # It's not an error, just means the card can't exist yet.
                 return None
 
             # Construct the query using the IDs of the found components.
             query = select(ArticleCard).where(
-                ArticleCard.brand_id == article_brand.id,
-                ArticleCard.description_id == article_description.id,
-                ArticleCard.package_id == article_package.id,
-                ArticleCard.code_id == article_code.id,
+                ArticleCard.brand_id == article_brand_id,
+                ArticleCard.description_id == article_description_id,
+                ArticleCard.package_id == article_package_id,
+                ArticleCard.code_id == article_code_id,
             )
             return self.session.execute(query).scalar_one_or_none()
         except Exception as panic:
@@ -309,12 +365,11 @@ class DatabaseFromSample:
         self,
         row: dict[str, Any]
     ) -> dict[str, Any]:
-        code = row.get("code")
-        name = row.get("name")
-        if not code or not name:
-            message = f"{self.__class__.__name__}.timestamp_from_row: Missing 'code' or 'name' for state in row: {row_to_string(row)}"
+        state = row.get("state")
+        if not state:
+            message = f"{self.__class__.__name__}.state_from_row: Missing 'state' in row: {row_to_string(row)}"
             raise DatabaseFromSampleException(message)
-        fixed = CODES_AND_STATES.get(code)
+        fixed = CODES_AND_STATES.get(state)
         if fixed:
             code, name = fixed
         else:
@@ -325,10 +380,15 @@ class DatabaseFromSample:
         self,
         row: dict[str, Any]
     ) -> dict[str, Any]:
-        state_code = row.get("state")
-        if state_code is None:
+        state = row.get("state")
+        if state is None:
             message = f"{self.__class__.__name__}.city_from_row: Missing 'state' in row: {row_to_string(row)}"
             raise DatabaseFromSampleException(message)
+        fixed = CODES_AND_STATES.get(state)
+        if fixed:
+            state_code, _ = fixed
+        else:
+            state_code, _ = "xxxx", "Error"
         city = row.get("city")
         if city is None:
             message = f"{self.__class__.__name__}.city_from_row: Missing 'city' in row: {row_to_string(row)}"
@@ -384,6 +444,55 @@ class DatabaseFromSample:
             message = f"{self.__class__.__name__}.branch_from_row: Missing 'branch' in row: {row_to_string(row)}"
             raise DatabaseFromSampleException(message)
         return {"branch": branch}
+
+
+    def point_of_sale_from_row(
+        self,
+        row: dict[str, Any]
+    ) -> dict[str, Any]:
+        point_of_sale_key = row.get("point_of_sale_key")
+        if point_of_sale_key is None:
+            message = f"{self.__class__.__name__}.point_of_sale_from_row: Missing 'point_of_sale_key' in row: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+        flag = self.get_flag(row)
+        if flag is None:
+            message = f"{self.__class__.__name__}.point_of_sale_from_row: Missing 'flag' in database: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+        business = self.get_business(row)
+        if business is None:
+            message = f"{self.__class__.__name__}.point_of_sale_from_row: Missing 'business' in database: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+        branch = self.get_branch(row)
+        if branch is None:
+            message = f"{self.__class__.__name__}.point_of_sale_from_row: Missing 'branch' in database: {row_to_string(row)}"
+            raise DatabaseFromSampleException(message)
+        return {
+            "code": point_of_sale_key,
+            "flag_id": flag.id,
+            "business_id": business.id,
+            "branch_id": branch.id
+        }
+
+
+    def point_of_sale_at_place_from_row(
+        self,
+        row: dict[str, Any]
+    ) -> dict[str, Any]:
+        # pdb.set_trace()
+        place_row = self.place_from_row(row)
+        point_of_sale_row = self.point_of_sale_from_row(row)
+        place = self.get_place(place_row)
+        if place is None:
+            message = f"{self.__class__.__name__}.point_of_sale_at_place_from_row: no 'place' in database - {row_to_string(place_row)}"
+            raise DatabaseFromSampleException(message)
+        point_of_sale = self.get_point_of_sale(point_of_sale_row)
+        if point_of_sale is None:
+            message = f"{self.__class__.__name__}.point_of_sale_at_place_from_row: no 'point_of_sale' in database - {row_to_string(point_of_sale_row)}"
+            raise DatabaseFromSampleException(message)
+        return {
+            "place": place,
+            "point_of_sale": point_of_sale
+        }
 
     def article_code_from_row(
         self,
@@ -462,7 +571,7 @@ class DatabaseFromSample:
         timestamp: Timestamp
     ) -> dict[str, Any]:
         try:
-           amount = int(row.get("price")))
+           amount = int(row.get("price"))
         except Exception as panic:
             message = f"{self.__class__.__name__}.price_from_row: Missing 'price' from {row_to_string(row)}"
             raise DatabaseFromSampleException(message) from panic
@@ -472,8 +581,8 @@ class DatabaseFromSample:
         if article_code is None:
             message = f"{self.__class__.__name__}.price_from_row: Missing article_code in database {row_to_string(article_code_row)}"
             raise DatabaseFromSampleException(message)
-        point_of_sale_row = self.point_of_sale_from_row(row)
-        point_of_sale = self.get_point_of_sale(point_of_sale_row)
+        point_of_sale_key = row.get("point_of_sale_key")
+        point_of_sale = self.get_point_of_sale({"code": point_of_sale_key})
         if point_of_sale is None:
             message = f"{self.__class__.__name__}.price_from_row: Missing point_of_sale in database {row_to_string(point_of_sale_row)}"
             raise DatabaseFromSampleException(message)
@@ -518,65 +627,122 @@ class DatabaseFromSample:
         self._execute_bulk_insert(Timestamp, bulk, "timestamps")
 
     def insert_states(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.state_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(State, bulk, "states")
 
     def insert_cities(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.city_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(City, bulk, "cities")
 
     def insert_places(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.place_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(Place, bulk, "places")
 
     def insert_flags(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.flag_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(Flag, bulk, "flags")
 
     def insert_businesses(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.business_from_row(row, all_the_businesses) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(Business, bulk, "businesses")
 
     def insert_branches(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.branch_from_row(row, all_the_branches) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(Branch, bulk, "branches")
 
+    def insert_points_of_sale(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
+        bulk = [row for row in generate_rows()]
+        self._execute_bulk_insert(PointOfSale, bulk, "points_of_sale")
+
+    def insert_point_of_sale_at_place(
+        self,
+        generate_rows: Callable[[], Generator[dict[str, Any], None, None]]
+    ) -> None:
+        """
+        Creates associations between multiple PointsOfSale and Places in a single
+        database transaction.
+
+        This is a highly efficient method for populating the association table from
+        a large dataset. It will skip rows where the PointOfSale or Place cannot
+        be found, or where the association already exists, and log them instead
+        of failing the entire operation.
+
+        Args:
+            generate_rows: A function that returns a generator of dictionaries.
+                           Each dictionary must contain the keys to identify a
+                           PointOfSale and a Place.
+        """
+        # pdb.set_trace()
+        rows_count = 0
+        success_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        try:
+            for row in generate_rows():
+                rows_count += 1
+                place = row.get("place")
+                point_of_sale = row.get("point_of_sale")
+                if not point_of_sale or not place:
+                    logger.warning(
+                        f"Skipping unexpected bad row"
+                    )
+                    error_count += 1
+                    continue
+
+                # Check if the association already exists
+                if place in point_of_sale.places:
+                    skipped_count += 1
+                    continue
+
+                # Stage the new association. SQLAlchemy tracks this change.
+                point_of_sale.places.append(place)
+                success_count += 1
+
+            # After the loop, if any changes were staged, commit them all at once.
+            if success_count > 0:
+                self.session.commit()
+
+                # Log a final summary
+                logger.info(
+                    f"Summary: {rows_count} rows generated,"
+                    f"{success_count} new associations created, "
+                    f"{skipped_count} duplicates skipped, "
+                    f"{error_count} rows with errors."
+                )
+
+        except Exception as panic:
+            # If any error occurs (e.g., during the commit), roll back everything.
+            self.session.rollback()
+            message = f"Bulk association failed: {panic}"
+            raise DatabaseFromSampleException(message) from panic
+
     def insert_article_codes(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.article_code_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(ArticleCode, bulk, "article_codes")
 
     def insert_article_brands(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.article_brand_from_row(row, all_the_article_brands) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(ArticleBrand, bulk, "article_brands")
 
     def insert_article_descriptions(
         self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]
     ) -> None:
-        bulk = [
-            self.article_description_from_row(row, all_the_article_descriptions)
-            for row in generate_rows()
-            if all_the_article_descriptions.search(row) is None
-        ]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(ArticleDescription, bulk, "article_descriptions")
 
     def insert_article_packages(
         self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]
     ) -> None:
-        bulk = [self.article_package_from_row(row) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(ArticlePackage, bulk, "article_packages")
 
     def insert_article_cards(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
-        bulk = [self.article_card_from_row(row, all_the_article_cards) for row in generate_rows()]
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(ArticleCard, bulk, "article_cards")
 
-    def insert_prices(
-        self,
-        generate_rows: Callable[[], Generator[dict[str, Any], None, None]],
-        timestamp: Timestamp,
-    ) -> None:
-        # Note: Prices are always inserted as new records for a given timestamp
-        # and are not checked for pre-existence, which is the intended behavior.
-        bulk = [self.price_from_row(row, timestamp) for row in generate_rows()]
+    def insert_prices(self, generate_rows: Callable[[], Generator[dict[str, Any], None, None]]) -> None:
+        bulk = [row for row in generate_rows()]
         self._execute_bulk_insert(Price, bulk, "prices")
 
     # --- Read and Process a Sample
@@ -586,156 +752,185 @@ class DatabaseFromSample:
         store: Store
     ) -> None:
         reader = SampleReader(store)
-        processor = SampleProcessor()
-        current_timestamp = reader.timestamp()
-        if self.get_timestamp(current_timestamp):
+        # processor = SampleProcessor()
+        reader_timestamp_row = reader.timestamp_row()
+        if self.get_timestamp(reader_timestamp_row):
             return
 
         sample_points_of_sale = [
-            processor.point_of_sale_from_row(sample_row)
-            for sample_row in reader.points_of_sale()
+            sample_row for sample_row in reader.points_of_sale()
         ]
 
         sample_articles_by_point_of_sale = [
-            processor.point_of_sale_from_row(sample_row)
-            for sample_row in reader.articles_by_point_of_sale()
+            sample_row for sample_row in reader.articles_by_point_of_sale()
         ]
 
         def generate_timestamps() -> Generator[dict[str, Any], None, None]:
-            yield from [current_timestamp]
+            yield from [reader_timestamp_row]
 
         self.insert_timestamps(generate_timestamps)
 
+        current_timestamp = self.get_timestamp(reader_timestamp_row)
+        if current_timestamp is None:
+            message = f"{self.__class__.__name__}.read_and_process_sample: current_timestamp is None. Check {row_to_string(reader_timestamp_row)}"
+            raise DatabaseFromSampleException(message)
+
+        # #   () # After inserting timestamps
         def generate_states() -> Generator[dict[str, Any], None, None]:
             search_table = SearchTable(["code", "name"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.state_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_state(candidate):
-                    continue
-                yield candidate
+                # #   ()
+                candidate = self.state_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_state(candidate):
+                        continue
+                    yield candidate
 
         self.insert_states(generate_states)
 
+        # #   () # Cities
         def generate_cities() -> Generator[dict[str, Any], None, None]:
             search_table = SearchTable(["name", "state_id"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.city_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_city(candidate):
-                    continue
-                yield candidate
+                candidate = self.city_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_city(candidate):
+                        continue
+                    yield candidate
 
         self.insert_cities(generate_cities)
 
+        # #   () # Places
         def generate_places() -> Generator[dict[str, Any], None, None]:
             search_table = SearchTable(["address", "city_id"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.place_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_place(candidate):
-                    continue
-                yield candidate
+                candidate = self.place_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_place(candidate):
+                        continue
+                    yield candidate
 
         self.insert_places(generate_places)
 
-        def generate_businesses() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(["name"])
+        # #   () # Flags
+        def generate_flags() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["flag"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.business_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_business(candidate):
-                    continue
-                yield candidate
+                candidate = self.flag_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_flag(candidate):
+                        continue
+                    yield candidate
+
+        self.insert_flags(generate_flags)
+
+        # #   () # Businesses
+        def generate_businesses() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["business"])
+            for a_row in sample_points_of_sale:
+                candidate = self.business_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_business(candidate):
+                        continue
+                    yield candidate
 
         self.insert_businesses(generate_businesses)
 
+        # #   () # Branches
         def generate_branches() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(["name"])
+            search_table = SearchTable(["branch"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.branch_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_branch(candidate):
-                    continue
-                yield candidate
+                candidate = self.branch_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_branch(candidate):
+                        continue
+                    yield candidate
 
-        self.insert_branches(generate_businesses)
+        self.insert_branches(generate_branches)
 
+        # #   () # Points of sale
         def generate_points_of_sale() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable([])
+            search_table = SearchTable(["code", "flag", "business", "branch"])
             for a_row in sample_points_of_sale:
-                search_table.insert(
-                    self.point_of_sale_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_point_of_sale(candidate):
-                    continue
-                yield candidate
+                candidate = self.point_of_sale_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_point_of_sale(candidate):
+                        continue
+                    yield candidate
 
         self.insert_points_of_sale(generate_points_of_sale)
 
-        def generate_brands() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(ArticleBrand.labels())
+        def generate_point_of_sale_at_place() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["place", "point_of_sale"])
+            for a_row in sample_points_of_sale:
+                candidate = self.point_of_sale_at_place_from_row(a_row)
+                if search_table.insert(candidate):
+                    yield candidate
+
+        # pdb.set_trace()
+        self.insert_point_of_sale_at_place(generate_point_of_sale_at_place)
+
+        # #   () # Codes
+        def generate_article_codes() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["code"])
             for a_row in sample_articles_by_point_of_sale:
-                search_table.insert(
-                    self.article_brand_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_article_brand(candidate):
-                    continue
-                yield candidate
+                candidate = self.article_code_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_article_code(candidate):
+                        continue
+                    yield candidate
+
+        self.insert_article_codes(generate_article_codes)
+
+        # #   () # Brands
+        def generate_article_brands() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["brand"])
+            for a_row in sample_articles_by_point_of_sale:
+                candidate = self.article_brand_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_article_brand(candidate):
+                        continue
+                    yield candidate
 
         self.insert_article_brands(generate_article_brands)
 
-        def generate_descriptions() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(ArticleDescription.labels())
+        # #   () # Descriptions
+        def generate_article_descriptions() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["description"])
             for a_row in sample_articles_by_point_of_sale:
-                search_table.insert(
-                    self.article_description_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_article_description(candidate):
-                    continue
-                yield candidate
+                candidate = self.article_description_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_article_description(candidate):
+                        continue
+                    yield candidate
 
         self.insert_article_descriptions(generate_article_descriptions)
 
-        def generate_packages() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(ArticlePackage.labels())
+        # #   () # Packages
+        def generate_article_packages() -> Generator[dict[str, Any], None, None]:
+            search_table = SearchTable(["package"])
             for a_row in sample_articles_by_point_of_sale:
-                search_table.insert(
-                    self.article_package_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_article_package(candidate):
-                    continue
-                yield candidate
+                candidate = self.article_package_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_article_package(candidate):
+                        continue
+                    yield candidate
 
         self.insert_article_packages(generate_article_packages)
 
+        # #   () # Cards
         def generate_article_cards() -> Generator[dict[str, Any], None, None]:
-            search_table = SearchTable(ArticleCard.labels())
+            search_table = SearchTable(["brand_id", "description_id", "package_id", "code_id"])
             for a_row in sample_articles_by_point_of_sale:
-                search_table.insert(
-                    self.article_card_from_row(a_row)
-                )
-            for candidate in search_table.iterate():
-                if self.get_article_card(candidate):
-                    continue
-                yield candidate
+                candidate = self.article_card_from_row(a_row)
+                if search_table.insert(candidate):
+                    if self.get_article_card(candidate):
+                        continue
+                    yield candidate
 
         self.insert_article_cards(generate_article_cards)
 
+        #   () # Prices
         def generate_prices() -> Generator[dict[str, Any], None, None]:
             for a_row in sample_articles_by_point_of_sale:
                 yield self.price_from_row(a_row, current_timestamp)

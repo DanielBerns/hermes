@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Generator
 
 class SearchTable:
     def __init__(
@@ -11,13 +11,17 @@ class SearchTable:
     def get_key(self, row: dict[str, Any]) -> str:
         return "|".join(str(row.get(key, '')) for key in self.sorted_keys)
 
-    def insert(self, row: dict[str, Any]) -> None:
+    def insert(self, row: dict[str, Any]) -> bool:
         key = self.get_key(row)
-        self._table[key] = row
+        if self._table.get(key):
+            return False
+        else:
+            self._table[key] = True
+            return True
 
-    def search(self, row: dict[str, Any]) -> dict[str, Any] | None:
+    def search(self, row: dict[str, Any]) -> bool:
         key = self._get_key(row)
-        return self._table.get(key, None)
+        return self._table.get(key, False)
 
     def iterate(self) -> Generator[dict[str, Any], None, None]:
         for key, value in self._table.items():

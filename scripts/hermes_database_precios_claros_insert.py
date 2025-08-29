@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from hermes.core.action import execute
-from hermes.domain.database_from_sample import DatabaseFromSample
+from hermes.domain.database_insert import DatabaseInsert
 
 
 def main() -> None:

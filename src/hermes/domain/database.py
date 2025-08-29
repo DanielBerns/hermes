@@ -150,7 +150,7 @@ class City(Base):
 
     def to_row(self) -> dict[str, Any]:
         return {
-            "state": self.state.code
+            "state": self.state.code,
             "city": self.name
         }
 
@@ -237,6 +237,9 @@ class Place(Base):
             "state": self.city.state.code
         }
 
+    def __repr__(self) -> str:
+        """Returns a string representation of the place."""
+        return f"({self.id})({self.city.id})({self.city.state.id})"
 
 class PointOfSale(Base):
     """The central model representing a single point of sale"""
@@ -276,10 +279,14 @@ class PointOfSale(Base):
     def to_row(self) -> dict[str, Any]:
         return {
             "code": self.code,
-            "flag": self.flag.,
+            "flag": self.flag.flag,
             "business": self.business.business,
             "branch": self.branch.branch
         }
+
+    def __repr__(self) -> str:
+        """Returns a string representation of the point_of_sale."""
+        return f"({self.id})({self.code})({self.flag.flag})({self.business.business})({self.branch.branch})"
 
 class ArticleCode(Base):
     """Represents the unique code for an article or product."""

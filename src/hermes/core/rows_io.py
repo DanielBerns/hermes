@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Generator
 
@@ -12,7 +13,7 @@ def read_rows(
     resource = get_resource(
         container, identifier, ROWS_SUFFIX
     )
-    yield from read_json_lines(resorce)
+    yield from read_json_lines(resource)
 
 
 def write_rows(

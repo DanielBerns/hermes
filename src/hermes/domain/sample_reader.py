@@ -1,3 +1,4 @@
+
 import logging
 from pathlib import Path
 from typing import Any, Generator
@@ -23,7 +24,7 @@ class SampleReader:
     def store(self) -> Store:
         return self._store
 
-    def timestamp(self) -> dict[str, Any]:
+    def timestamp_row(self) -> dict[str, Any]:
         return {"timestamp": self.store.timestamp}
 
     def points_of_sale(self) -> Generator[dict[str, Any], None, None]:
