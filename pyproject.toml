@@ -16,6 +16,7 @@ dependencies = [
   "ruff>=0.12.5",
   "types-requests>=2.32.0.20250328",
   "markdown>=3.8.2",
+  "pytest>=8.4.1",
 ]
 
 [build-system]

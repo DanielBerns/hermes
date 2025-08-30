@@ -3,114 +3,108 @@ from typing import Any
 
 from hermes.domain.sample import Sample
 from hermes.domain.sample_writer import SampleWriter
-from hermes.domain.rows_to_db import get_mecon_rows_processors
+from hermes.domain.data_processor import DataProcessor
+from hermes.domain.database import get_session
+from hermes.domain.database_repository import DatabaseRepository
 from hermes.scrape_precios_claros.sample_builder import SampleBuilder
 from hermes.scrape_precios_claros.web_client import WebClient
 from hermes.scrape_precios_claros.scraper import Scraper
 from hermes.scrape_precios_claros.scrape_stats import get_scrape_stats
 from hermes.core.cli import CLI
-from hermes.core.helpers import get_container, get_timestamp, get_directory
+from hermes.core.constants import DATABASE_NAME_KEY
+from hermes.core.formatter import JSONFormatter
+from hermes.core.helpers import get_container, get_directory, get_resource, get_timestamp
+from hermes.core.rows_selector import RowsSelector
+from hermes.core.rows_writer import RowsWriter
 from hermes.core.storage import Storage
 from hermes.core.tree_store import TreeStore
-from hermes.core.rows_writer import RowsWriter
-from hermes.core.rows_selector import RowsSelector
-from hermes.core.formatter import JSONFormatter
 
 logger = logging.getLogger(__name__)
 
-
 class ScrapePreciosClarosException(Exception):
-    def __init__(self, message: str) -> None:
-        super().__init__(message)
-        logger.error(message)
-
+    pass
 
 class ScrapePreciosClarosStart:
-    def __init__(self) -> None:
-        pass
-
+    """Action to initialize the parameters for a scrape run."""
     def configure(self, this_cli: CLI) -> None:
         pass
 
-    def run(
-        self,
-        script: str,
-        arguments: dict[str, Any],
-        config: dict[str, Any],
-        storage: Storage,
-    ) -> None:
-        logger.info(f"{self.__class__.__name__}.run: start")
-        logger.info(f"Storage.base: {storage.info_base}")
+    def run(self, script: str, arguments: dict, config: dict, storage: Storage) -> None:
+        logger.info("Initializing Precios Claros scrape parameters...")
         tree_store = TreeStore(storage.container(Sample.MECON), Sample.TREE_STORE)
         SampleBuilder.initialize_parameters_home(tree_store.home)
-        logger.info(f"{self.__class__.__name__}.run: done")
-
+        logger.info("Initialization complete.")
 
 class ScrapePreciosClarosUpdate:
-    def __init__(self) -> None:
-        pass
-
+    """Action to perform a scrape and save the raw data to files."""
     def configure(self, this_cli: CLI) -> None:
         pass
 
-    def run(
-        self,
-        script: str,
-        arguments: dict[str, Any],
-        config: dict[str, Any],
-        storage: Storage,
-    ) -> None:
-        logger.info(f"{self.__class__.__name__}.run: start")
-        logger.info(f"Storage.base: {storage.info_base}")
+    def run(self, script: str, arguments: dict, config: dict, storage: Storage) -> None:
+        logger.info("Starting Precios Claros data update scrape...")
         tree_store = TreeStore(storage.container(Sample.MECON), Sample.TREE_STORE)
         parameters_home = get_container(tree_store.home, Sample.PARAMETERS)
-        if not parameters_home.exists():
-            message = f"{self.__class__.__name__}.create_sample: no parameters_home {parameters_home}"
-            raise ScrapePreciosClarosException(message)
+
+        # Instantiate all the refactored components
         web_client = WebClient()
         scraper = Scraper(web_client)
-        points_of_sale_processor, articles_by_point_of_sale_processor = (
-            get_mecon_rows_processors()
-        )
-        states_and_cities_selector = RowsSelector.read(
-            parameters_home, Sample.STATES_AND_CITIES_SELECTOR
-        )
-        sample_builder = SampleBuilder(
-            scraper,
-            points_of_sale_processor,
-            states_and_cities_selector,
-            articles_by_point_of_sale_processor,
-        )
+        data_processor = DataProcessor()
+        selector = RowsSelector.read(parameters_home, Sample.STATES_AND_CITIES_SELECTOR)
+
+        sample_builder = SampleBuilder(scraper, data_processor, selector)
+
+        # Create a new store for this run
         store = tree_store.create_store()
+        logger.info(f"Created new data store: {store.key}")
+
         writer = RowsWriter(store.home)
-        json_formatter = JSONFormatter()
-        sample_writer = SampleWriter(sample_builder, writer, json_formatter)
+        formatter = JSONFormatter()
+        sample_writer = SampleWriter(sample_builder, writer, formatter)
+
+        # Execute the full scrape-and-write process
         sample_writer.run()
-        logger.info(f"{self.__class__.__name__}.run: done")
+        logger.info("Scrape and write process complete.")
 
-
-class ScrapePreciosClarosInspect:
-    def __init__(self) -> None:
-        pass
-
+class ScrapePreciosClarosToDB:
+    """Action to process all saved samples and insert them into the database."""
     def configure(self, this_cli: CLI) -> None:
         pass
 
-    def run(
-        self,
-        script: str,
-        arguments: dict[str, Any],
-        config: dict[str, Any],
-        storage: Storage,
-    ) -> None:
+    def run(self, script: str, arguments: dict, config: dict, storage: Storage) -> None:
+        logger.info("Starting to process samples and update database...")
+        mecon_container = storage.container(Sample.MECON)
+        tree_store = TreeStore(mecon_container, Sample.TREE_STORE)
+
+        db_container = storage.container(Sample.DATABASE, base=mecon_container)
+        db_name = arguments.get(DATABASE_NAME_KEY, "mecon_dev")
+        db_uri = str(get_resource(db_container, db_name, ".db"))
+        logger.info(f"Connecting to database: {db_uri}")
+
+        with get_session(db_uri) as session:
+            repo = DatabaseRepository(session)
+            for store in tree_store.iterate():
+                try:
+                    logger.info(f"Processing store {store.key} with timestamp {store.timestamp}...")
+                    repo.process_sample(store)
+                except Exception as e:
+                    logger.error(f"Failed to process store {store.key}: {e}", exc_info=True)
+
+        logger.info("Database update process complete.")
+
+class ScrapePreciosClarosInspect:
+    """Action to generate statistics and reports from the stored data."""
+    def configure(self, this_cli: CLI) -> None:
+        pass
+
+    def run(self, script: str, arguments: dict, config: dict, storage: Storage) -> None:
+        logger.info("Starting inspection of scraped data...")
         tree_store = TreeStore(storage.container(Sample.MECON), Sample.TREE_STORE)
-        tree_store_stats, point_of_sale_stats, article_stats = get_scrape_stats(
-            tree_store
-        )
+        tree_store_stats, point_of_sale_stats, article_stats = get_scrape_stats(tree_store)
+
         timestamp = get_timestamp()
-        inspection_home = get_directory(
-            tree_store.home / Sample.REPORTS / "inspection" / timestamp
-        )
+        inspection_home = get_directory(tree_store.home / Sample.REPORTS / "inspection" / timestamp)
+
         tree_store_stats.report(inspection_home, "tree_store")
         point_of_sale_stats.report(inspection_home, "point_of_sale")
         article_stats.report(inspection_home, "article")
+        logger.info(f"Inspection reports saved to: {inspection_home}")
