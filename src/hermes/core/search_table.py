@@ -6,7 +6,7 @@ class SearchTable:
         keys: List[str]
     ) -> None:
         self.sorted_keys = sorted(keys)
-        self._table: dict[str, dict[str, Any]] = {}
+        self._table: dict[str, bool] = {}
 
     def get_key(self, row: dict[str, Any]) -> str:
         return "|".join(str(row.get(key, '')) for key in self.sorted_keys)
@@ -16,13 +16,12 @@ class SearchTable:
         if self._table.get(key):
             return False
         else:
+            # Store a boolean flag to indicate presence, not the whole row
             self._table[key] = True
             return True
 
     def search(self, row: dict[str, Any]) -> bool:
-        key = self._get_key(row)
+        # Corrected the typo from _get_key to get_key
+        key = self.get_key(row)
         return self._table.get(key, False)
 
-    def iterate(self) -> Generator[dict[str, Any], None, None]:
-        for key, value in self._table.items():
-            yield value

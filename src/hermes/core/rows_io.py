@@ -1,3 +1,4 @@
+import json
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Generator
@@ -13,6 +14,9 @@ def read_rows(
     resource = get_resource(
         container, identifier, ROWS_SUFFIX
     )
+    # Ensure the file exists to avoid FileNotFoundError
+    if not resource.exists():
+        return
     yield from read_json_lines(resource)
 
 
@@ -21,11 +25,10 @@ def write_rows(
     identifier: str,
     generate_rows: Callable[[], Generator[dict[str, Any], None, None]],
 ) -> None:
-    resource = get_resource(self.directory, identifier, ROWS_SUFFIX)
+    resource = get_resource(container, identifier, ROWS_SUFFIX)
 
     def generate_lines() -> Generator[str, None, None]:
         for row in generate_rows():
             yield json.dumps(row)
 
     write_text_lines(resource, generate_lines)
-

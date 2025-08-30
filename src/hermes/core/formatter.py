@@ -9,7 +9,7 @@ class Formatter(Protocol):
 
     def row_to_line(self, row: dict[str, Any]) -> str: ...
 
-    def line_to_row(self, line: str) -> dict[str, Any] ...
+    def line_to_row(self, line: str) -> dict[str, Any]: ...
 
 class JSONFormatter:
     def __init__(self) -> None:
@@ -22,5 +22,5 @@ class JSONFormatter:
     def row_to_line(self, row: dict[str, Any]) -> str:
         return as_jsonl(row)
 
-    def line_to_row(self, line: str) -> dict[str, Any] ...
+    def line_to_row(self, line: str) -> dict[str, Any]:
         return as_row(line)

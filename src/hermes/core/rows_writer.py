@@ -22,6 +22,6 @@ class RowsWriter:
     ) -> None:
         resource = get_resource(self.directory, identifier, formatter.extension)
         with create_text_file(resource) as text:
-            for record in generator():
-                line = formatter.line(record)
+            for row in generator():
+                line = formatter.row_to_line(row)
                 text.write(line)
