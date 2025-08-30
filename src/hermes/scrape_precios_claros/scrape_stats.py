@@ -1,3 +1,4 @@
+import pdb
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Tuple, List
@@ -57,7 +58,7 @@ def get_scrape_stats(
     point_of_sale_stats = SampleStats()
     article_stats = SampleStats()
     for number, this_sample in enumerate(tree_store.iterate()):
-        reader = SampleReader(this_sample.home)
+        reader = SampleReader(this_sample)
         for this_point_of_sale in reader.points_of_sale():
             point_of_sale_stats.add(this_point_of_sale)
         for this_article in reader.articles_by_point_of_sale():
