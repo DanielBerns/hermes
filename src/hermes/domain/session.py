@@ -27,14 +27,14 @@ def get_session(database_uri: str) -> Generator[Session, None, None]:
         Session: The SQLAlchemy session object.
     """
     # Use an absolute path for file-based databases unless it's in-memory
-    if database_uri != ":memory:":
+    if database_uri == ":memory:":
+        is_new_db = True
+        connection_string = "sqlite+pysqlite:///:memory:"
+    else:
         db_path = Path(database_uri).resolve()
         db_path.parent.mkdir(parents=True, exist_ok=True)
         is_new_db = not db_path.exists()
         connection_string = f"sqlite+pysqlite:///{db_path}"
-    else:
-        is_new_db = True
-        connection_string = "sqlite+pysqlite:///:memory:"
 
     engine = sa.create_engine(connection_string, future=True)
 

@@ -4,7 +4,7 @@ from typing import Any
 from hermes.domain.sample import Sample
 from hermes.domain.sample_writer import SampleWriter
 from hermes.domain.data_processor import DataProcessor
-from hermes.domain.database import get_session
+from hermes.domain.session import get_session
 from hermes.domain.database_repository import DatabaseRepository
 from hermes.scrape_precios_claros.sample_builder import SampleBuilder
 from hermes.scrape_precios_claros.web_client import WebClient
@@ -18,6 +18,7 @@ from hermes.core.rows_selector import RowsSelector
 from hermes.core.rows_writer import RowsWriter
 from hermes.core.storage import Storage
 from hermes.core.tree_store import TreeStore
+from hermes.scrape_precios_claros.scrape_stats import get_scrape_stats
 
 logger = logging.getLogger(__name__)
 
