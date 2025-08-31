@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from datetime import datetime
-from sqlalchemy import Index
+from sqlalchemy import Index, String
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -27,7 +27,24 @@ points_of_sale_and_places = sa.Table(
     sa.Column("place_id", sa.ForeignKey("places.id"), primary_key=True),
 )
 
+article_cards_and_article_tags = sa.Table(
+    "article_cards_and_article_tags",
+    Base.metadata,
+    sa.Column("article_card_id", sa.ForeignKey("article_cards.id"), primary_key=True),
+    sa.Column("article_tag_id", sa.ForeignKey("article_tags.id"), primary_key=True),
+)
+
+
 # --- Model Definitions ---
+
+class ArticleTag(Base):
+    __tablename__ = "article_tags"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tag: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
+
+    article_cards: Mapped[List["ArticleCard"]] = relationship(
+        secondary=article_cards_and_article_tags, back_populates="tags"
+    )
 
 class Timestamp(Base):
     """Represents a specific point in time, broken down into its components."""
@@ -191,6 +208,9 @@ class ArticleCard(Base):
     description: Mapped["ArticleDescription"] = relationship(back_populates="cards")
     package: Mapped["ArticlePackage"] = relationship(back_populates="cards")
     code: Mapped["ArticleCode"] = relationship(back_populates="cards")
+    tags: Mapped[List["ArticleTag"]] = relationship(
+        secondary=article_cards_and_article_tags, back_populates="article_cards"
+    )
 
 class Price(Base):
     __tablename__ = "prices"
