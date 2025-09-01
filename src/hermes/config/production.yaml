@@ -1,0 +1,8 @@
+logging:
+  level: "WARNING"
+
+database:
+  name: "hermes_prod.db"
+
+api:
+  host: "0.0.0.0"

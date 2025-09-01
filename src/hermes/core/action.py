@@ -6,7 +6,7 @@ from typing import Any, Protocol
 from hermes.message_board.agent import initialize_agent, SendPublicMessage
 
 from hermes.core.cli import CLI
-from hermes.core.config import load_config
+from hermes.core.config import config
 from hermes.core.constants import (
     INSTANCE_KEY,
     MESSAGE_BOARD_KEY,
@@ -23,8 +23,6 @@ from hermes.core.storage import Storage
 
 
 class Action(Protocol):
-    def configure(self, this_cli: CLI) -> None: ...
-
     def run(
         self,
         script: str,
@@ -82,28 +80,6 @@ def configure_logging(
 def execute(script: str, project_identifier: str, this_action: Action) -> None:
     info_root = get_directory(Path.home() / INFO)
     secrets_root = get_directory(Path.home() / SECRETS)
-    my_cli = CLI(
-        description="Download data from precios_claros@mecon for a given region."
-    )
-    my_cli.add_argument(
-        f"--{MESSAGE_BOARD_KEY}",
-        choices=[YES, NO],  # Define the allowed choices
-        required=True,
-        help="use message_board server (choices: %(choices)s)",  # Use %(choices)s to list options in help
-    )
-    my_cli.add_argument(
-        f"--{INSTANCE_KEY}",
-        choices=["Patagonia", "noA", "nEa", "Centro"],  # Define the allowed choices
-        required=True,
-        help="Set the name of the instance (choices: %(choices)s)",  # Use %(choices)s to list options in help
-    )
-    my_cli.add_argument(
-        f"--{DATABASE_NAME_KEY}",
-        required=True,
-        help="Set the name of the current database",
-    )
-    this_action.configure(my_cli)
-    arguments = my_cli.arguments
     message_board = arguments.get(MESSAGE_BOARD_KEY) == YES
     instance = arguments.get(INSTANCE_KEY)
     database_name = arguments.get(DATABASE_NAME_KEY)

@@ -1,6 +1,14 @@
+# hermes-main/src/hermes/domain/models.py
 import sqlalchemy as sa
 from datetime import datetime
-from sqlalchemy import Index, String
+from sqlalchemy import (
+    Index,
+    String,
+    ForeignKey,
+    Table,
+    Column,
+    Integer,
+)
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -12,42 +20,44 @@ from typing import Any, List
 
 from hermes.domain.data_processor import get_int
 
-# --- Base Class ---
 
+# --- Base Class ---
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy ORM models."""
+
     pass
 
-# --- Association Table ---
 
-points_of_sale_and_places = sa.Table(
+# --- Association Tables ---
+points_of_sale_and_places = Table(
     "points_of_sale_and_places",
     Base.metadata,
-    sa.Column("point_of_sale_id", sa.ForeignKey("points_of_sale.id"), primary_key=True),
-    sa.Column("place_id", sa.ForeignKey("places.id"), primary_key=True),
+    Column("point_of_sale_id", ForeignKey("points_of_sale.id"), primary_key=True),
+    Column("place_id", ForeignKey("places.id"), primary_key=True),
 )
 
-article_cards_and_article_tags = sa.Table(
-    "article_cards_and_article_tags",
+article_cards_and_tag_dictionary = Table(
+    "article_cards_and_tag_dictionary",
     Base.metadata,
-    sa.Column("article_card_id", sa.ForeignKey("article_cards.id"), primary_key=True),
-    sa.Column("article_tag_id", sa.ForeignKey("article_tags.id"), primary_key=True),
+    Column("article_card_id", ForeignKey("article_cards.id"), primary_key=True),
+    Column("tag_dictionary_id", ForeignKey("tag_dictionary.id"), primary_key=True),
 )
 
 
 # --- Model Definitions ---
-
-class ArticleTag(Base):
-    __tablename__ = "article_tags"
+class TagDictionary(Base):
+    __tablename__ = "tag_dictionary"
     id: Mapped[int] = mapped_column(primary_key=True)
-    tag: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
+    tag_name: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("tag_dictionary.id"), nullable=True)
 
-    article_cards: Mapped[List["ArticleCard"]] = relationship(
-        secondary=article_cards_and_article_tags, back_populates="tags"
-    )
+    parent = relationship("TagDictionary", remote_side=[id], back_populates="children")
+    children = relationship("TagDictionary", back_populates="parent")
+
 
 class Timestamp(Base):
     """Represents a specific point in time, broken down into its components."""
+
     __tablename__ = "timestamps"
     __table_args__ = (Index("ix_timestamp_ymdh", "year", "month", "day", "hour"),)
 
@@ -67,11 +77,20 @@ class Timestamp(Base):
         return f"{self.year:4d}{self.month:02d}{self.day:02d}{self.hour:02d}{self.minute:02d}{self.second:02d}"
 
     def to_datetime(self) -> datetime:
-        return datetime(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        return datetime(
+            self.year, self.month, self.day, self.hour, self.minute, self.second
+        )
 
     @classmethod
     def from_datetime(cls, dt: datetime) -> "Timestamp":
-        return cls(year=dt.year, month=dt.month, day=dt.day, hour=dt.hour, minute=dt.minute, second=dt.second)
+        return cls(
+            year=dt.year,
+            month=dt.month,
+            day=dt.day,
+            hour=dt.hour,
+            minute=dt.minute,
+            second=dt.second,
+        )
 
     @classmethod
     def from_string(cls, string: str) -> "Timestamp":
@@ -84,6 +103,7 @@ class Timestamp(Base):
             second=get_int(string[12:14]),
         )
 
+
 class State(Base):
     __tablename__ = "states"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -93,6 +113,7 @@ class State(Base):
     cities: WriteOnlyMapped[List["City"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="state"
     )
+
 
 class City(Base):
     __tablename__ = "cities"
@@ -105,6 +126,7 @@ class City(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="city"
     )
 
+
 class Place(Base):
     __tablename__ = "places"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -116,6 +138,7 @@ class Place(Base):
         secondary=points_of_sale_and_places, back_populates="places"
     )
 
+
 class Flag(Base):
     __tablename__ = "flags"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -124,6 +147,7 @@ class Flag(Base):
     points_of_sale: WriteOnlyMapped[List["PointOfSale"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="flag"
     )
+
 
 class Business(Base):
     __tablename__ = "businesses"
@@ -134,6 +158,7 @@ class Business(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="business"
     )
 
+
 class Branch(Base):
     __tablename__ = "branches"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -143,13 +168,20 @@ class Branch(Base):
         back_populates="branch", uselist=False
     )
 
+
 class PointOfSale(Base):
     __tablename__ = "points_of_sale"
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(unique=True, index=True)
-    flag_id: Mapped[int] = mapped_column(sa.ForeignKey("flags.id"), nullable=False, index=True)
-    business_id: Mapped[int] = mapped_column(sa.ForeignKey("businesses.id"), nullable=False, index=True)
-    branch_id: Mapped[int] = mapped_column(sa.ForeignKey("branches.id"), nullable=False, index=True)
+    flag_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("flags.id"), nullable=False, index=True
+    )
+    business_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("businesses.id"), nullable=False, index=True
+    )
+    branch_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("branches.id"), nullable=False, index=True
+    )
 
     flag: Mapped["Flag"] = relationship(back_populates="points_of_sale")
     business: Mapped["Business"] = relationship(back_populates="points_of_sale")
@@ -158,8 +190,11 @@ class PointOfSale(Base):
         secondary=points_of_sale_and_places, back_populates="points_of_sale"
     )
     prices: WriteOnlyMapped[List["Price"]] = relationship(
-        cascade="all, delete-orphan", passive_deletes=True, back_populates="point_of_sale"
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="point_of_sale",
     )
+
 
 class ArticleCode(Base):
     __tablename__ = "article_codes"
@@ -168,6 +203,7 @@ class ArticleCode(Base):
 
     cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code")
     prices: WriteOnlyMapped[List["Price"]] = relationship(back_populates="article_code")
+
 
 class ArticleBrand(Base):
     __tablename__ = "article_brands"
@@ -178,14 +214,18 @@ class ArticleBrand(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="brand"
     )
 
+
 class ArticleDescription(Base):
     __tablename__ = "article_descriptions"
     id: Mapped[int] = mapped_column(primary_key=True)
-    description: Mapped[str] = mapped_column(sa.String(128), unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(
+        sa.String(128), unique=True, nullable=False
+    )
 
     cards: WriteOnlyMapped[List["ArticleCard"]] = relationship(
         cascade="all, delete-orphan", passive_deletes=True, back_populates="description"
     )
+
 
 class ArticlePackage(Base):
     __tablename__ = "article_packages"
@@ -196,29 +236,43 @@ class ArticlePackage(Base):
         cascade="all, delete-orphan", passive_deletes=True, back_populates="package"
     )
 
+
 class ArticleCard(Base):
     __tablename__ = "article_cards"
     id: Mapped[int] = mapped_column(primary_key=True)
-    brand_id: Mapped[int] = mapped_column(sa.ForeignKey("article_brands.id"), index=True)
-    description_id: Mapped[int] = mapped_column(sa.ForeignKey("article_descriptions.id"), index=True)
-    package_id: Mapped[int] = mapped_column(sa.ForeignKey("article_packages.id"), index=True)
+    brand_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_brands.id"), index=True
+    )
+    description_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_descriptions.id"), index=True
+    )
+    package_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_packages.id"), index=True
+    )
     code_id: Mapped[int] = mapped_column(sa.ForeignKey("article_codes.id"), index=True)
 
     brand: Mapped["ArticleBrand"] = relationship(back_populates="cards")
     description: Mapped["ArticleDescription"] = relationship(back_populates="cards")
     package: Mapped["ArticlePackage"] = relationship(back_populates="cards")
     code: Mapped["ArticleCode"] = relationship(back_populates="cards")
-    tags: Mapped[List["ArticleTag"]] = relationship(
-        secondary=article_cards_and_article_tags, back_populates="article_cards"
+    tags: Mapped[List["TagDictionary"]] = relationship(
+        secondary=article_cards_and_tag_dictionary, backref="article_cards"
     )
+
 
 class Price(Base):
     __tablename__ = "prices"
     id: Mapped[int] = mapped_column(primary_key=True)
     amount: Mapped[int] = mapped_column(nullable=False, index=True)
-    timestamp_id: Mapped[int] = mapped_column(sa.ForeignKey("timestamps.id"), index=True)
-    article_code_id: Mapped[int] = mapped_column(sa.ForeignKey("article_codes.id"), index=True)
-    point_of_sale_id: Mapped[int] = mapped_column(sa.ForeignKey("points_of_sale.id"), index=True)
+    timestamp_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("timestamps.id"), index=True
+    )
+    article_code_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("article_codes.id"), index=True
+    )
+    point_of_sale_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("points_of_sale.id"), index=True
+    )
 
     timestamp: Mapped["Timestamp"] = relationship(back_populates="prices")
     article_code: Mapped["ArticleCode"] = relationship(back_populates="prices")

@@ -1,61 +1,74 @@
+import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
-from dotenv import load_dotenv
+import yaml
+from pydantic import BaseModel, Field
 
-from hermes.core.constants import (
-    INFO_BASE_KEY,
-    SECRETS_BASE_KEY,
-    PROJECT_KEY,
-    VERSION_LABEL_KEY,
-    VERSION_LABEL,
-    VERSION_STORAGE_KEY,
-    VERSION_STORAGE_DEFAULT,
-    INSTANCE_KEY,
-    LOG_LEVEL_KEY,
-    LOG_LEVEL_DEFAULT,
-    DOTENV,
-    DATABASE_NAME_KEY
-)
-from hermes.core.helpers import (
-    create_text_file,
-    get_directory,
-    get_resource,
-    get_environment_variable,
-)
+# --- Pydantic Models for Type-Safe Configuration ---
 
-# No logging in this module
-# Logging will start after load_config invocation
+class LoggingConfig(BaseModel):
+    level: str = "INFO"
+    file: str = "hermes.log"
 
+class DatabaseConfig(BaseModel):
+    name: str
 
-def load_config(
-    info_root: Path, secrets_root: Path, project: str, instance: str
-) -> dict[str, Any]:
-    version_storage = get_environment_variable(
-        VERSION_STORAGE_KEY, VERSION_STORAGE_DEFAULT
-    )
-    info_base = get_directory(info_root / project / version_storage / instance)
-    secrets_base = get_directory(secrets_root / project / version_storage / instance)
-    instance_dotenv_file = get_resource(info_base, DOTENV, "")
+class APIConfig(BaseModel):
+    host: str = "127.0.0.1"
+    port: int = 8000
 
-    config: dict[str, Any] = {}
-    if not instance_dotenv_file.exists():
-        print(f"Warning: dotenv file not found at {instance_dotenv_file}")
-        with create_text_file(instance_dotenv_file) as text_file:
-            text_file.write("# settings\n")
-            text_file.write(f"{LOG_LEVEL_KEY}={LOG_LEVEL_DEFAULT}\n")
+class MessageBoardConfig(BaseModel):
+    enabled: bool = False
+
+class Config(BaseModel):
+    logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    database: DatabaseConfig
+    api: APIConfig = Field(default_factory=APIConfig)
+    message_board: MessageBoardConfig = Field(default_factory=MessageBoardConfig
+                                              )
+# --- Configuration Loading Logic ---
+
+def _load_config_from_file(path: Path) -> Dict[str, Any]:
+    """Loads a YAML configuration file."""
+    if not path.exists():
+        return {}
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
+def _merge_configs(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    """Recursively merges two dictionaries."""
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(base.get(key), dict):
+            base[key] = _merge_configs(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+def get_config() -> Config:
+    """
+    Loads the application configuration from YAML files.
+
+    The configuration is loaded in the following order:
+    1. `base.yml` (default values)
+    2. The file specified by the `HERMES_CONFIG_PATH` environment variable
+       (environment-specific overrides)
+    """
+    config_dir = Path(__file__).parent.parent / "config"
+    base_config = _load_config_from_file(config_dir / "base.yml")
+
+    env_config_path = os.getenv("HERMES_CONFIG_PATH")
+    if env_config_path:
+        env_config = _load_config_from_file(Path(env_config_path))
+        merged_config = _merge_configs(base_config, env_config)
     else:
-        pass
-    # load settings
-    load_dotenv(dotenv_path=instance_dotenv_file)
-    # Load environment variables
-    config[LOG_LEVEL_KEY] = get_environment_variable(LOG_LEVEL_KEY, LOG_LEVEL_DEFAULT)
-    # Load filesystem variables
-    config[PROJECT_KEY] = project
-    config[VERSION_LABEL_KEY] = VERSION_LABEL
-    config[VERSION_STORAGE_KEY] = version_storage
-    config[INSTANCE_KEY] = instance
-    config[INFO_BASE_KEY] = info_base
-    config[SECRETS_BASE_KEY] = secrets_base
+        # Load development.yml by default if no path is specified
+        env_config = _load_config_from_file(config_dir / "development.yml")
+        merged_config = _merge_configs(base_config, env_config)
 
-    return config
+
+    return Config(**merged_config)
+
+# --- Global Config Object ---
+
+config = get_config()
