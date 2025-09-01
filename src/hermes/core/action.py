@@ -117,6 +117,7 @@ def execute(script: str, project_identifier: str, this_action: Action) -> None:
 
     secrets_base = storage.secrets_base
     identifier = this_action.__class__.__name__
+
     try:
         if message_board:
             with initialize_agent(secrets_base, "message_board") as agent:
