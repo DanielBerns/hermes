@@ -1,0 +1,22 @@
+# This file structure matches the Pydantic models in config.py.
+
+project:
+  # 'instance' is a required field with no default.
+  instance: "Patagonia"
+
+logging:
+  # Set a more verbose logging level for development.
+  level: "DEBUG"
+  timestamped: true
+
+database:
+  # 'name' is a required field within the DatabaseConfig.
+  name: "mecon_dev"
+
+api:
+  host: "0.0.0.0"
+  port: 8080
+
+message_board:
+  enabled: false
+  identifier: "hermes_dev"

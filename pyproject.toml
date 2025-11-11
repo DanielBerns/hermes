@@ -18,6 +18,7 @@ dependencies = [
   "markdown>=3.8.2",
   "pytest>=8.4.1",
   "thefuzz>=0.22.1",
+  "bcrypt>=4.3.0",
 ]
 
 [build-system]

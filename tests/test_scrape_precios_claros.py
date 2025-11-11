@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import MagicMock, patch
 
 from hermes.scrape_precios_claros.scrape_precios_claros import (
-    ScrapePreciosClarosUpdate,
-    ScrapePreciosClarosToDB
+    PreciosClarosUpdate,
+    PreciosClarosToDB
 )
 from hermes.core.storage import Storage
 
@@ -24,7 +24,7 @@ def mock_arguments() -> dict:
 
 def test_scrape_precios_claros_update_action(mock_storage, mock_config, mock_arguments, mocker):
     """
-    Tests that the ScrapePreciosClarosUpdate action correctly instantiates and runs
+    Tests that the PreciosClarosUpdate action correctly instantiates and runs
     the full scraping and writing pipeline.
     """
     # --- Arrange: Mock all dependencies instantiated within the action ---
@@ -40,7 +40,7 @@ def test_scrape_precios_claros_update_action(mock_storage, mock_config, mock_arg
     mock_sample_writer_instance = mock_sample_writer_class.return_value
 
     # --- Act ---
-    action = ScrapePreciosClarosUpdate()
+    action = PreciosClarosUpdate()
     action.run("test_script", mock_arguments, mock_config, mock_storage)
 
     # --- Assert ---
@@ -50,7 +50,7 @@ def test_scrape_precios_claros_update_action(mock_storage, mock_config, mock_arg
 
 def test_scrape_precios_claros_to_db_action(mock_storage, mock_config, mock_arguments, mocker):
     """
-    Tests that the ScrapePreciosClarosToDB action correctly iterates through
+    Tests that the PreciosClarosToDB action correctly iterates through
     stores and calls the DatabaseRepository to process each one.
     """
     # --- Arrange ---
@@ -67,7 +67,7 @@ def test_scrape_precios_claros_to_db_action(mock_storage, mock_config, mock_argu
     mock_tree_store_instance.iterate.return_value = [mock_store1, mock_store2]
 
     # --- Act ---
-    action = ScrapePreciosClarosToDB()
+    action = PreciosClarosToDB()
     action.run("test_script", mock_arguments, mock_config, mock_storage)
 
     # --- Assert ---

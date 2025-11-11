@@ -13,7 +13,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Self  # Use Self for fluent interface type hints
 
-
 @dataclass(frozen=True)
 class Branches:
     """

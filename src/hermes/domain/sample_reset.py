@@ -32,7 +32,7 @@ class SampleReset:
         config: dict[str, Any],
         storage: Storage,
     ) -> None:
-        mecon_container = storage.container(Sample.MECON)
+        mecon_container = storage.container(Sample.MECON, base=)
         tree_store = TreeStore(mecon_container, Sample.DBPreciosClarosInterface)
         db_container = storage.container(Sample.DATABASE, base=mecon_container)
         db_name = config.get(Sample.DB_NAME, "mecon_dev")

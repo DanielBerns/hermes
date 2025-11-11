@@ -321,11 +321,11 @@ class MessageBoardAgent:
         try:
             success, _ = client.login(username, password)
         except Exception as an_exception:
-            message = f"{self.__class__.__item__}.run: no credentials"
+            message = f"{self.__class__.__name__}.run: no credentials"
             raise AgentException(message) from an_exception
         else:
             if not success:
-                message = f"{self.__class__.__item__}.run: login fails"
+                message = f"{self.__class__.__name__}.run: login fails"
                 raise AgentException(message)
 
         for this_operation in self.operations():

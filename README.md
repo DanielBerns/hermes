@@ -31,8 +31,8 @@ The system can produce scheduled or on-demand reports detailing competitive pric
 
 ## Operation
 
-uv run scripts/hermes_scrape_precios_claros_start.py --message_board no --instance Patagonia --database_name db_dev
-uv run scripts/hermes_scrape_precios_claros_update.py --message_board yes --instance Patagonia --database_name db_dev
-uv run scripts/hermes_scrape_precios_claros_inspect.py --message_board yes --instance Patagonia --database_name db_dev
+### Get buscavida database
 
+uv run scripts/hermes_scrape_precios_claros_to_database.py 
+uv run scripts/hermes_scrape_precios_claros_clean_descriptions.py
 

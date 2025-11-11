@@ -71,12 +71,3 @@ class SampleBuilder:
 
         logger.info("Finished building articles sample.")
 
-    @staticmethod
-    def initialize_parameters_home(home: Path) -> None:
-        """
-        Creates the initial selector configuration file if it doesn't exist.
-        """
-        parameters_home = get_container(home, Sample.PARAMETERS)
-        RowsSelector.create(
-            parameters_home, Sample.STATES_AND_CITIES_SELECTOR, Sample.STATES_AND_CITIES
-        )

@@ -87,24 +87,20 @@ class DatabaseRepository:
         reader = SampleReader(store)
         timestamp_str = reader.store.timestamp
 
-        ts_components = Timestamp.from_string(timestamp_str)
-        existing_ts = self._session.query(Timestamp).filter_by(
-            year=ts_components.year, month=ts_components.month, day=ts_components.day,
-            hour=ts_components.hour, minute=ts_components.minute, second=ts_components.second
-        ).first()
+        ts = Timestamp.from_string(timestamp_str)
+        existing_ts = self._session.query(Timestamp).filter_by(timestamp=ts.timestamp).first()
 
         if existing_ts:
             logger.warning(f"Sample with timestamp {timestamp_str} already processed. Skipping.")
             return
 
-        ts_obj = ts_components
-        self._session.add(ts_obj)
+        self._session.add(ts)
         self._session.flush()
 
         points_of_sale_data = list(reader.points_of_sale())
         articles_data = list(reader.articles_by_point_of_sale())
 
-        self._process_entities(points_of_sale_data, articles_data, ts_obj.id)
+        self._process_entities(points_of_sale_data, articles_data, ts.id)
 
         logger.info(f"Successfully processed sample for timestamp {timestamp_str}.")
 
@@ -221,18 +217,19 @@ class DatabaseRepository:
 
         new_pos = []
         for row in pos_data:
-            if row["point_of_sale_key"] not in pos_cache:
+            point_of_sale_key = row["point_of_sale_key"]
+            if point_of_sale_key not in pos_cache:
                 flag = flags_cache.get(row["flag"])
                 business = businesses_cache.get(row["business"])
                 branch = branches_cache.get(row["branch"])
                 if flag and business and branch:
                     new_pos.append({
-                        "code": row["point_of_sale_key"],
+                        "code": point_of_sale_key,
                         "flag_id": flag.id,
                         "business_id": business.id,
                         "branch_id": branch.id
                     })
-                    pos_cache[row["point_of_sale_key"]] = True
+                    pos_cache[point_of_sale_key] = True
 
         if new_pos:
             self._bulk_insert(PointOfSale, new_pos)

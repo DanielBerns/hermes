@@ -224,16 +224,16 @@ class TreeStore:
     ```
     """
 
-    def __init__(self, base: Path, identifier: str) -> None:
+    def __init__(self, home: Path) -> None:
         """
         Initializes a TreeStore object.
 
         Args:
-            base: The base directory where the TreeStore will be created.
-            identifier: A string identifier for this specific TreeStore instance.
+            home: The directory where the TreeStore will be created.
         """
-        self._home = get_container(base, identifier)
+        self._home = home
         self._root = get_container(self.home, "root")
+        self._parameters = get_container(self.home, "parameters")
         resource = get_resource(self.home, "index", ".json")
         self._index = Index(resource)
 
@@ -257,6 +257,16 @@ class TreeStore:
             Path: The path to the root directory.
         """
         return self._root
+
+    @property
+    def parameters(self) -> Path:
+        """
+        Returns the directory containing the parameters directory,
+
+        Returns:
+            Path: The path to the parameters directory.
+        """
+        return self._parameters
 
     @property
     def index(self) -> Index:

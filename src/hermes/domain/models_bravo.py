@@ -21,7 +21,6 @@ class Base(DeclarativeBase):
     """Base class for all SQLAlchemy ORM models."""
     pass
 
-
 # --- Association Tables ---
 points_of_sale_and_places = sa.Table(
     "points_of_sale_and_places",
@@ -41,7 +40,7 @@ shopping_list_articles = sa.Table(
     'shopping_list_articles',
     Base.metadata,
     sa.Column('shopping_list_id', sa.ForeignKey('shopping_lists.id'), primary_key=True),
-    sa.Column('article_card_id', sa.ForeignKey('article_cards.id'), primary_key=True)  # ✅ fixed typo
+    sa.Column('article_code_id', sa.ForeignKey('article_codes.id'), primary_key=True)
 )
 
 
@@ -53,19 +52,18 @@ class ArticleTag(Base):
     tag: Mapped[str] = mapped_column(String(256), unique=True, nullable=False, index=True)
 
     article_cards: WriteOnlyMapped["ArticleCard"] = relationship(
-        secondary=article_cards_and_article_tags, back_populates="tags", cascade="all, delete"
+        secondary=article_cards_and_article_tags, back_populates="tags"
     )
 
     def __repr__(self):
         return f"<ArticleTag({self.id}) '{self.tag}'>"
-
 
 class Timestamp(Base):
     __tablename__ = "timestamps"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, index=True)
 
-    prices: WriteOnlyMapped["Price"] = relationship(back_populates="timestamp", cascade="all, delete-orphan")
+    prices: WriteOnlyMapped["Price"] = relationship(back_populates="timestamp")
 
     def __repr__(self) -> str:
         return self.timestamp.strftime("%Y%m%d%H%M%S")
@@ -80,18 +78,16 @@ class Timestamp(Base):
         second = int(string[12:14])
         return cls(timestamp=datetime(year, month, day, hour, minute, second))
 
-
 class State(Base):
     __tablename__ = "states"
     id: Mapped[int] = mapped_column(primary_key=True)
-    code: Mapped[str] = mapped_column(sa.String(8), unique=True)
+    code: Mapped[str] = mapped_column(sa.String(8), unique=True, index=True)
     name: Mapped[str] = mapped_column(sa.String(32), index=True)
 
-    cities: WriteOnlyMapped["City"] = relationship(back_populates="state", cascade="all, delete-orphan")
+    cities: WriteOnlyMapped["City"] = relationship(back_populates="state")
 
     def __repr__(self):
         return f"<State {self.name}>"
-
 
 class City(Base):
     __tablename__ = "cities"
@@ -100,11 +96,10 @@ class City(Base):
     state_id: Mapped[int] = mapped_column(sa.ForeignKey("states.id"))
 
     state: Mapped["State"] = relationship(back_populates="cities")
-    places: WriteOnlyMapped["Place"] = relationship(back_populates="city", cascade="all, delete-orphan")
+    places: WriteOnlyMapped["Place"] = relationship(back_populates="city")
 
     def __repr__(self):
         return f"<City {self.name} at {self.state.name}>"
-
 
 class Place(Base):
     __tablename__ = "places"
@@ -120,30 +115,26 @@ class Place(Base):
     def __repr__(self):
         return f"<Place {self.address}, {self.city.name}, {self.city.state.name}>"
 
-
 class Flag(Base):
     __tablename__ = "flags"
     id: Mapped[int] = mapped_column(primary_key=True)
     flag: Mapped[str] = mapped_column(sa.String(32), unique=True, index=True)
-    points_of_sale: WriteOnlyMapped["PointOfSale"] = relationship(back_populates="flag", cascade="all, delete-orphan")
+    points_of_sale: WriteOnlyMapped["PointOfSale"] = relationship(back_populates="flag")
 
     def __repr__(self):
         return f"<Flag({self.id}) {self.flag}>"
-
 
 class Business(Base):
     __tablename__ = "businesses"
     id: Mapped[int] = mapped_column(primary_key=True)
     business: Mapped[str] = mapped_column(sa.String(32), unique=True, index=True)
-    points_of_sale: WriteOnlyMapped["PointOfSale"] = relationship(back_populates="business", cascade="all, delete-orphan")
-
+    points_of_sale: WriteOnlyMapped["PointOfSale"] = relationship(back_populates="business")
 
 class Branch(Base):
     __tablename__ = "branches"
     id: Mapped[int] = mapped_column(primary_key=True)
-    branch: Mapped[str] = mapped_column(sa.String(32), unique=True)
-    point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="branch", cascade="all, delete-orphan")
-
+    branch: Mapped[str] = mapped_column(sa.String(32), unique=True, index=True)
+    point_of_sale: Mapped["PointOfSale"] = relationship(back_populates="branch")
 
 class PointOfSale(Base):
     __tablename__ = "points_of_sale"
@@ -151,7 +142,8 @@ class PointOfSale(Base):
     code: Mapped[str] = mapped_column(unique=True, index=True)
     flag_id: Mapped[int] = mapped_column(sa.ForeignKey("flags.id"), nullable=False, index=True)
     business_id: Mapped[int] = mapped_column(sa.ForeignKey("businesses.id"), nullable=False, index=True)
-    branch_id: Mapped[int] = mapped_column(sa.ForeignKey("branches.id"), nullable=False, index=True)
+    # The unique constraint on branch_id makes this a one-to-one relationship
+    branch_id: Mapped[int] = mapped_column(sa.ForeignKey("branches.id"), unique=True, nullable=False, index=True)
 
     flag: Mapped["Flag"] = relationship(back_populates="points_of_sale")
     business: Mapped["Business"] = relationship(back_populates="points_of_sale")
@@ -159,37 +151,35 @@ class PointOfSale(Base):
     places: Mapped[List["Place"]] = relationship(
         secondary=points_of_sale_and_places, back_populates="points_of_sale"
     )
-    prices: WriteOnlyMapped["Price"] = relationship(back_populates="point_of_sale", cascade="all, delete-orphan")
-
+    prices: WriteOnlyMapped["Price"] = relationship(back_populates="point_of_sale")
 
 class ArticleCode(Base):
     __tablename__ = "article_codes"
     id: Mapped[int] = mapped_column(primary_key=True)
     code: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
-    cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code", cascade="all, delete-orphan")
-    prices: WriteOnlyMapped["Price"] = relationship(back_populates="article_code", cascade="all, delete-orphan")
-
+    cards: Mapped[List["ArticleCard"]] = relationship(back_populates="code")
+    prices: WriteOnlyMapped["Price"] = relationship(back_populates="article_code")
+    shopping_lists: Mapped[List["ShoppingList"]] = relationship(
+        secondary=shopping_list_articles, back_populates="article_codes"
+    )
 
 class ArticleBrand(Base):
     __tablename__ = "article_brands"
     id: Mapped[int] = mapped_column(primary_key=True)
     brand: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
-    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="brand", cascade="all, delete-orphan")
-
+    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="brand")
 
 class ArticleDescription(Base):
     __tablename__ = "article_descriptions"
     id: Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(sa.String(128), unique=True, nullable=False)
-    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="description", cascade="all, delete-orphan")
-
+    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="description")
 
 class ArticlePackage(Base):
     __tablename__ = "article_packages"
     id: Mapped[int] = mapped_column(primary_key=True)
     package: Mapped[str] = mapped_column(sa.String(32), unique=True, nullable=False)
-    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="package", cascade="all, delete-orphan")
-
+    cards: WriteOnlyMapped["ArticleCard"] = relationship(back_populates="package")
 
 class ArticleCard(Base):
     __tablename__ = "article_cards"
@@ -206,10 +196,6 @@ class ArticleCard(Base):
     tags: Mapped[List["ArticleTag"]] = relationship(
         secondary=article_cards_and_article_tags, back_populates="article_cards"
     )
-    shopping_lists: Mapped[List["ShoppingList"]] = relationship(
-        secondary=shopping_list_articles, back_populates="article_cards"
-    )
-
 
 class Price(Base):
     __tablename__ = "prices"
@@ -239,7 +225,6 @@ class User(Base):
     def check_password(self, password: str) -> bool:
         return bcrypt.checkpw(password.encode("utf-8"), self.password_hash.encode("utf-8"))
 
-
 class ShoppingList(Base):
     __tablename__ = 'shopping_lists'
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -247,6 +232,6 @@ class ShoppingList(Base):
     user_id: Mapped[int] = mapped_column(sa.ForeignKey('users.id'))
     user: Mapped["User"] = relationship(back_populates="shopping_lists")
     is_public: Mapped[bool] = mapped_column(sa.Boolean, default=False)
-    article_cards: Mapped[List["ArticleCard"]] = relationship(
+    article_codes: Mapped[List["ArticleCode"]] = relationship(
         secondary=shopping_list_articles, back_populates="shopping_lists"
     )

@@ -1,26 +1,11 @@
-INFO_BASE_KEY = "INFO_BASE"
-SECRETS_BASE_KEY = "SECRETS_BASE"
-PROJECT_KEY = "PROJECT"
-VERSION_MAJOR: int = 0
-VERSION_MINOR: int = 1
-VERSION_PATCH: int = 0
-VERSION_LABEL_KEY: str = "VERSION_LABEL"
-VERSION_LABEL: str = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}"
-VERSION_STORAGE_KEY: str = "VERSION_STORAGE"
-VERSION_STORAGE_DEFAULT: str = f"{VERSION_MAJOR}.{VERSION_MINOR}"
-INSTANCE_KEY = "instance"
-MESSAGE_BOARD_KEY = "message_board"
-LOG_LEVEL_KEY = "log_level"
-LOG_LEVEL_DEFAULT = "DEBUG"
-DATABASE_NAME_KEY = "database_name"
+from pathlib import Path
+from hermes.core.helpers import get_directory
+
+
 INFO = "Info"
 SECRETS = "Secrets"
-PROJECT = "hermes"
-DOTENV = ".env"
 LOGS = "logs"
-DATA = "data"
-REPORTS = "reports"
-RESULTS = "results"
-DATABASE = "database"
-YES = "yes"
-NO = "no"
+MESSAGE_BOARD = "message_board"
+
+info_root = get_directory(Path.home() / INFO)
+secrets_root = get_directory(Path.home() / SECRETS)
