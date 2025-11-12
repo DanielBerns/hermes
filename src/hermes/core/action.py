@@ -92,17 +92,10 @@ def execute(script: str, project_identifier: str, this_action: Action) -> None:
     logger = logging.getLogger(__name__)
     logger.info("start.")
 
-<<<<<<< HEAD
     message_board_enabled = config.message_board.enabled
-
     action_name = this_action.__class__.__name__
     message_board_base = secrets_storage.container(MESSAGE_BOARD)
     message_board_identifier = config.message_board.identifier
-=======
-    secrets_base = storage.secrets_base
-    identifier = this_action.__class__.__name__
-
->>>>>>> origin/main
     try:
         if message_board_enabled:
             with initialize_agent(message_board_base, message_board_identifier) as agent:
