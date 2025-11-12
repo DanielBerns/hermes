@@ -18,7 +18,12 @@ dependencies = [
   "markdown>=3.8.2",
   "pytest>=8.4.1",
   "thefuzz>=0.22.1",
+<<<<<<< HEAD
   "bcrypt>=4.3.0",
+=======
+  "nicegui>=2.23.3",
+  "fastapi[all]>=0.116.1",
+>>>>>>> origin/main
 ]
 
 [build-system]
