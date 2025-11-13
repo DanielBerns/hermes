@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from hermes.core.cli import CLI
-from hermes.core.config import load_config
+from hermes.core.config import get_config
 from hermes.core.constants import (
     INSTANCE_KEY,
     MESSAGE_BOARD_KEY,
@@ -90,7 +90,7 @@ class Services:
         self.instance = arguments.get(INSTANCE_KEY)
         self.database_name = arguments.get(DATABASE_NAME_KEY)
         assert self.instance and self.database_name
-        self.config = load_config(self.info_root, self.secrets_root, project_identifier, self.instance)
+        self.config = get_config(self.info_root, self.secrets_root, project_identifier, self.instance)
         self.storage = Storage(self.config)
 
         configure_logging(script, arguments, self.config, self.storage)
