@@ -1,3 +1,0 @@
-I want a website developed with python, flask, and sqlalchemy.
-The admin of the website can create, read, update and delete access credentials (identifier + password) using an API. There are up to sixteen access credentials. Using the access credentials different scripts can create, read, update and delete posts with short texts (no more than 512 chars) with some tags and timestamps using an API. There are a web page, accesible with some access credentials, where it is possible to see the different posts, grouped by the respective identifier of the access credentials. The tags can be customized with different colors (red, orange, yellow, green, blue).
-
