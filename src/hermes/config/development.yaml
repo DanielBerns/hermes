@@ -1,1 +1,4 @@
 # development.yml can be empty for now, as it will inherit all settings from base.yml
+database:
+  # 'name' is a required field within the DatabaseConfig.
+  name: "development.db"

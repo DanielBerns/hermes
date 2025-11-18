@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from hermes.core.helpers import get_resource, read_json, write_json
-from hermes.message_board.client import MessageBoardClient
+from hermes.message_board.client import MessageBoardClient, MessageBoardDummyClient
 
 logger = logging.getLogger(__name__)
 
@@ -315,9 +315,9 @@ class MessageBoardAgent:
     def operations(self) -> Generator[AgentOperation, None, None]:
         yield from self._operations
 
-    def run(self) -> None:
+    def run(self, enabled=True) -> None:
         base_url, username, password = self.credentials
-        client = MessageBoardClient(base_url)
+        client = MessageBoardClient(base_url) if enabled else MessageBoardDummyClient(base_url)
         try:
             success, _ = client.login(username, password)
         except Exception as an_exception:

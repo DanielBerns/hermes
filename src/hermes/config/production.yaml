@@ -2,7 +2,7 @@ logging:
   level: "WARNING"
 
 database:
-  name: "hermes_prod.db"
+  name: "production.db"
 
 api:
   host: "0.0.0.0"

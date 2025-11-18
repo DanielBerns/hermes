@@ -172,3 +172,52 @@ class MessageBoardClient:
         url = f"{self.base_url}/api/admin/status"
         response = requests.get(url, headers=self._make_headers())
         return self._handle_response(response)
+
+
+class MessageBoardDummyClient:
+    def __init__(self, base_url="http://127.0.0.1:5000"):
+        self.base_url = base_url.rstrip("/")
+
+    def _handle_response(self, response):
+        return {}
+
+    def login(self, username, password):
+        return True, {}
+
+    def logout(self):
+        return True, {}
+
+    # --- Message Sending Methods ---
+    def send_private_message(self, recipient_username, content):
+        return self._handle_response(response)
+
+    def send_group_message(self, recipient_usernames, content):
+        return self._handle_response(response)
+
+    def send_public_message(self, content, tags=None):
+        return self._handle_response(response)
+
+    # --- Message Retrieval Methods ---
+    def get_private_messages(self):
+        return self._handle_response(response)
+
+    def get_group_messages(self):
+        return self._handle_response(response)
+
+    def get_public_messages(self, filter_tags=None):  # filter_tags can be a list
+        return self._handle_response(response)
+
+    # --- Tag Subscription Methods ---
+    def subscribe_to_tags(self, tags):
+        return self._handle_response(response)
+
+    def unsubscribe_from_tags(self, tags):
+        return self._handle_response(response)
+
+    # --- Message Deletion Method ---
+    def delete_message(self, message_id):
+        return self._handle_response(response)
+
+    # --- Admin Method ---
+    def get_server_status(self):  # Assumes admin is logged in
+        return self._handle_response(response)

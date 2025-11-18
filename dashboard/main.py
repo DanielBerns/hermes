@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 # from hermes.message_board.agent import initialize_agent, SendPublicMessage
 from hermes.core.helpers import get_directory, get_resource
-from hermes.core.services import Services
+from hermes.core.infra import Infra
 from hermes.domain.sample import Sample
 from hermes.domain.session import get_session
 
@@ -27,19 +27,16 @@ from hermes.reporting.reports import (
 
 filename = Path(__file__)
 script, project_identifier = filename.stem, filename.parents[1].stem
-services = Services(script, project_identifier)
+infra = Infra(script, project_identifier)
 
 logger = logging.getLogger(__name__)
 logger.info(f"Starting {script}")
 
-mecon_container = services.storage.container(Sample.MECON)
+mecon_container = infra.info_storage.container(Sample.MECON)
+db_container = infra.info_storage.container(Sample.DATABASE, base=mecon_container)
+db_uri = str(get_resource(db_container, infra.database_name, ".db"))
 
-db_container = services.storage.container(Sample.DATABASE, base=mecon_container)
-db_uri = str(get_resource(db_container, services.database_name, ".db"))
-
-# DATABASE_URL = "sqlite:///hermes.db"
-# engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+logger.info(f"DB_URI: {db_uri}")
 
 # --- FastAPI App Initialization ---
 app = FastAPI()

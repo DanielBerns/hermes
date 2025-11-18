@@ -3,6 +3,8 @@
 project:
   # 'instance' is a required field with no default.
   instance: "Patagonia"
+  # You can override default values like the version.
+  version: [0, 1, 0] # Corresponds to Tuple[int, int, int]
 
 logging:
   # Set a more verbose logging level for development.
@@ -11,7 +13,7 @@ logging:
 
 database:
   # 'name' is a required field within the DatabaseConfig.
-  name: "mecon_dev"
+  name: "app"
 
 api:
   host: "0.0.0.0"

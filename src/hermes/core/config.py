@@ -4,11 +4,12 @@ from typing import Any, Tuple
 
 import yaml
 from pydantic import BaseModel, Field
+from hermes.core.constants import PRODUCTION_CONFIG_PATH
+
 
 # --- Pydantic Models for Type-Safe Configuration ---
 
 class ProjectConfig(BaseModel):
-    identifier: str = "hermes"
     version: Tuple[int, int, int] = [0, 1, 0]
     instance: str
 
@@ -25,7 +26,7 @@ class APIConfig(BaseModel):
 
 class MessageBoardConfig(BaseModel):
     enabled: bool = False
-    identifier: str = "hermes_dev"
+    identifier: str = "dev"
 
 
 class Config(BaseModel):
@@ -53,8 +54,6 @@ def _merge_configs(base: dict[str, Any], override: dict[str, Any]) -> dict[str, 
             base[key] = value
     return base
 
-import pdb
-
 def get_config() -> Config:
     """
     Loads the application configuration from YAML files.
@@ -67,14 +66,14 @@ def get_config() -> Config:
     config_dir = Path(__file__).parent.parent / "config"
     base_config = _load_config_from_file(config_dir / "base.yaml")
 
-    env_config_path = os.getenv("HERMES_CONFIG_PATH")
-    if env_config_path:
-        env_config = _load_config_from_file(Path(env_config_path))
-        merged_config = _merge_configs(base_config, env_config)
+    production_config_path = os.getenv(PRODUCTION_CONFIG_PATH, None)
+    if production_config_path:
+        production_config = _load_config_from_file(Path(production_config_path))
+        merged_config = _merge_configs(base_config, production_config)
     else:
         # Load development.yml by default if no path is specified
-        env_config = _load_config_from_file(config_dir / "development.yml")
-        merged_config = _merge_configs(base_config, env_config)
+        development_config = _load_config_from_file(config_dir / "development.yml")
+        merged_config = _merge_configs(base_config, development_config)
 
     return Config(**merged_config)
 
