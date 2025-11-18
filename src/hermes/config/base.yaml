@@ -13,12 +13,12 @@ logging:
 
 database:
   # 'name' is a required field within the DatabaseConfig.
-  name: "app"
+  name: "mecon_dev"
 
 api:
   host: "0.0.0.0"
   port: 8080
 
 message_board:
-  enabled: false
+  enabled: True
   identifier: "hermes_dev"
