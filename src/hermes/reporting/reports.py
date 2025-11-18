@@ -3,7 +3,8 @@
 from collections import defaultdict
 from typing import Dict, List
 from sqlalchemy.orm import Session, joinedload, selectinload
-from src.hermes.domain.models import ArticleTag, ArticleBrand, ArticleCard
+# ADD ArticleDescription to the imports
+from src.hermes.domain.models import ArticleTag, ArticleBrand, ArticleCard, ArticleDescription
 
 def _sort_report_data(report: Dict) -> Dict:
     """Helper function to recursively sort report data."""
@@ -26,21 +27,29 @@ def _sort_report_data(report: Dict) -> Dict:
 def get_report_by_tag(session: Session) -> Dict[str, Dict[str, List[str]]]:
     """
     Generates a sorted report of brands and articles associated with each tag.
+    Refactored to use explicit joins, supporting WriteOnlyMapped relationships
+    and improving performance on large datasets.
     """
     report: Dict[str, Dict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
-    tags = (
-        session.query(ArticleTag)
-        .options(
-            selectinload(ArticleTag.article_cards).joinedload(ArticleCard.brand),
-            selectinload(ArticleTag.article_cards).joinedload(ArticleCard.description),
+
+    # Query specific columns instead of loading full objects
+    # This works with WriteOnlyMapped relationships because we use join()
+    rows = (
+        session.query(
+            ArticleTag.tag,
+            ArticleBrand.brand,
+            ArticleDescription.description
         )
+        .select_from(ArticleTag)
+        .join(ArticleTag.article_cards)
+        .join(ArticleCard.brand)
+        .join(ArticleCard.description)
         .all()
     )
 
-    for tag in tags:
-        for card in tag.article_cards:
-            if card.brand and card.description:
-                report[tag.tag][card.brand.brand].append(card.description.description)
+    # Iterate over the result tuples (tag_name, brand_name, description_text)
+    for tag_name, brand_name, description_text in rows:
+        report[tag_name][brand_name].append(description_text)
 
     return _sort_report_data(report)
 
