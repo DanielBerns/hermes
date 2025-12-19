@@ -1,0 +1,94 @@
+>> uv run ./scripts/hermes_scrape_precios_claros_query_descriptions.py
+hermes.domain.session - ERROR - Database transaction failed. Rolling back. Error: 'ArticleTag.article_cards' does not support object population - eager loading cannot be applied.
+Traceback (most recent call last):
+  File "/home/dberns/Projects/github/DanielBerns/hermes/src/hermes/domain/session.py", line 50, in get_session
+    yield session
+  File "/home/dberns/Projects/github/DanielBerns/hermes/src/hermes/scrape_precios_claros/query_article_tags_and_article_cards.py", line 84, in run
+    tagged_article_cards = repo.get_sorted_tags_with_cards()
+  File "/home/dberns/Projects/github/DanielBerns/hermes/src/hermes/domain/database_repository.py", line 329, in get_sorted_tags_with_cards
+    .all()
+     ~~~^^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ~~~~~~~~~~^^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+        params,
+        ^^^^^^^
+        execution_options={"_sa_orm_load_options": self.load_options},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/context.py", line 309, in orm_execute_statement
+    return cls.orm_setup_cursor_result(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        session,
+        ^^^^^^^^
+    ...<4 lines>...
+        result,
+        ^^^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/context.py", line 616, in orm_setup_cursor_result
+    return loading.instances(result, querycontext)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/loading.py", line 133, in instances
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/loading.py", line 115, in instances
+    query_entity.row_processor(context, cursor)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/context.py", line 2786, in row_processor
+    _instance = loading._instance_processor(
+        self,
+    ...<7 lines>...
+        polymorphic_discriminator=self._polymorphic_discriminator,
+    )
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/loading.py", line 959, in _instance_processor
+    prop.create_row_processor(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        context, query_entity, path, mapper, result, adapter, populators
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/interfaces.py", line 1099, in create_row_processor
+    strat.create_row_processor(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        context,
+        ^^^^^^^^
+    ...<6 lines>...
+        populators,
+        ^^^^^^^^^^^
+    )
+    ^
+  File "/home/dberns/Projects/github/DanielBerns/hermes/.venv/lib64/python3.14/site-packages/sqlalchemy/orm/strategies.py", line 2808, in create_row_processor
+    raise sa_exc.InvalidRequestError(
+    ...<2 lines>...
+    )
+sqlalchemy.exc.InvalidRequestError: 'ArticleTag.article_cards' does not support object population - eager loading cannot be applied.
+hermes.core.action - ERROR - Transaction failed and was rolled back.

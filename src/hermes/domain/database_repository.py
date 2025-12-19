@@ -1,13 +1,13 @@
 import logging
-from typing import Any, Callable, Generator, Type, List, Dict
+from typing import Any, Callable, Generator, Type, List, Dict, Tuple
 
 from sqlalchemy import insert
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from hermes.core.tree_store import Store
 from hermes.domain.sample_reader import SampleReader
 from hermes.domain.models import (
-    ArticleBrand, ArticleCard, ArticleCode, ArticleDescription, ArticlePackage,
+    ArticleBrand, ArticleCard, ArticleCode, ArticleDescription, ArticlePackage, ArticleTag,
     Base, Branch, Business, City, Flag, Place, PointOfSale, Price, State, Timestamp
 )
 
@@ -291,4 +291,56 @@ class DatabaseRepository:
                 })
         if prices:
             self._bulk_insert(Price, prices)
+
+    def get_untagged_article_cards(self) -> List[ArticleCard]:
+        """
+        Queries the database for all ArticleCards that have no associated ArticleTags.
+        """
+        return (
+            self._session.query(ArticleCard)
+            .options(
+                joinedload(ArticleCard.brand),
+                joinedload(ArticleCard.description),
+                joinedload(ArticleCard.package),
+                joinedload(ArticleCard.code),
+            )
+            .filter(~ArticleCard.tags.any())
+            .all()
+        )
+
+    def get_sorted_tags_with_cards(self) -> List[Tuple[ArticleTag, List[ArticleCard]]]:
+        """
+        Queries the database for all ArticleTags, sorted alphabetically by tag,
+        and eagerly loads their associated ArticleCards with all related details.
+        
+        Because ArticleTag.article_cards is WriteOnlyMapped, we cannot access it directly.
+        Instead, we query ArticleCard (where tags are Mapped) and group them by tag in memory.
+        """
+        # 1. Get all tags to ensure complete list
+        all_tags = self._session.query(ArticleTag).order_by(ArticleTag.tag).all()
+        
+        # 2. Get all cards with their tags and details
+        # We query from ArticleCard side where relationship is standard Mapped[List]
+        cards = (
+            self._session.query(ArticleCard)
+            .filter(ArticleCard.tags.any())
+            .options(
+                joinedload(ArticleCard.brand),
+                joinedload(ArticleCard.description),
+                joinedload(ArticleCard.package),
+                joinedload(ArticleCard.code),
+                joinedload(ArticleCard.tags)
+            )
+            .all()
+        )
+
+        # 3. Group in memory
+        tag_map = {tag: [] for tag in all_tags}
+        for card in cards:
+            for tag in card.tags:
+                 if tag in tag_map:
+                     tag_map[tag].append(card)
+        
+        # Return as list of tuples, implicitly sorted by tag (since all_tags was sorted)
+        return list(tag_map.items())
 

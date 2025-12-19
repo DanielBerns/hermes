@@ -17,6 +17,7 @@ from hermes.core.constants import (
 )
 
 from hermes.core.helpers import get_directory, get_resource, get_timestamp
+from hermes.core.infra import Infra
 from hermes.core.storage import Storage
 
 
@@ -27,6 +28,11 @@ class Action(Protocol):
 def execute(script: str, project_identifier: str, this_action: Action) -> None:
 
     infra = Infra(script, project_identifier)
+    
+    # Initialize storage using infra
+    info_storage = infra.info_storage
+    secrets_storage = infra.secrets_storage
+    
     action_name = this_action.__class__.__name__
     event_name = f"{script}.{action_name}@{project_identifier}:"
     logger = logging.getLogger(__name__)
@@ -51,7 +57,7 @@ def execute(script: str, project_identifier: str, this_action: Action) -> None:
         logger.info(f"{event_name} failed {get_timestamp()}")
 
         if infra.message_board_enabled:
-            with initialize_agent(message_board_base, message_board_identifier) as agent:
+            with initialize_agent(infra.message_board_base, infra.message_board_identifier) as agent:
                 message = SendPublicMessage(
                     ["pipeline", "error"], f"{script}.{action_name}@{project_identifier} failed {get_timestamp()}"
                 )
