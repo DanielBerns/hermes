@@ -1,8 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // --- Element Selections ---
     const reportSelect = document.getElementById('report-select');
-    const brandInputContainer = document.getElementById('brand-input-container');
+    const brandInputContainer = document.getElementById('brand-input-container'); // For competition analysis (text input)
     const brandInput = document.getElementById('brand-input');
+
+    const tagInputContainer = document.getElementById('tag-input-container');
+    const tagSelect = document.getElementById('tag-select');
+
+    const brandSelectContainer = document.getElementById('brand-select-container'); // For "View by Brand" (dropdown)
+    const brandSelect = document.getElementById('brand-select');
+
     const generateBtn = document.getElementById('generate-report-btn');
     const saveBtn = document.getElementById('save-report-btn');
     const reportArea = document.getElementById('report-area');
@@ -11,12 +18,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal-btn');
 
     // --- State Variable ---
-    let currentReportData = null; // To store the latest generated report data
+    let currentReportData = null;
+
+    // --- Initialization: Fetch Tags and Brands ---
+    async function loadOptions() {
+        try {
+            const [tagsResponse, brandsResponse] = await Promise.all([
+                fetch('/api/tags'),
+                fetch('/api/brands')
+            ]);
+
+            if (tagsResponse.ok) {
+                const tags = await tagsResponse.json();
+                tags.forEach(tag => {
+                    const option = document.createElement('option');
+                    option.value = tag;
+                    option.textContent = tag;
+                    tagSelect.appendChild(option);
+                });
+            }
+
+            if (brandsResponse.ok) {
+                const brands = await brandsResponse.json();
+                brands.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand;
+                    option.textContent = brand;
+                    brandSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error("Failed to load options:", error);
+            reportArea.innerHTML += `<p class="text-red-500 text-sm">Warning: Failed to load filter options.</p>`;
+        }
+    }
+
+    await loadOptions();
 
     // --- Event Listeners ---
-    reportSelect.addEventListener('change', () => {
-        brandInputContainer.classList.toggle('hidden', reportSelect.value !== 'brand-competition');
-    });
+    function updateUI() {
+        const reportType = reportSelect.value;
+
+        // Hide all first
+        brandInputContainer.classList.add('hidden');
+        tagInputContainer.classList.add('hidden');
+        brandSelectContainer.classList.add('hidden');
+
+        if (reportType === 'brand-competition') {
+            brandInputContainer.classList.remove('hidden');
+        } else if (reportType === 'by-tag') {
+            tagInputContainer.classList.remove('hidden');
+        } else if (reportType === 'by-brand') {
+            brandSelectContainer.classList.remove('hidden');
+        }
+    }
+
+    reportSelect.addEventListener('change', updateUI);
+    // Initial call to set correct state (e.g. if browser cached selection)
+    updateUI();
 
     generateBtn.addEventListener('click', generateReport);
     saveBtn.addEventListener('click', saveReportAsMarkdown);
@@ -44,7 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             url = `/api/reports/brand-competition/${encodeURIComponent(brandName)}`;
+        } else if (reportType === 'by-tag') {
+            const selectedTag = tagSelect.value;
+            if (!selectedTag) {
+                reportArea.innerHTML = `<p class="text-red-500">Please select a product tag.</p>`;
+                return;
+            }
+            url = `/api/reports/by-tag?tag=${encodeURIComponent(selectedTag)}`;
+        } else if (reportType === 'by-brand') {
+            const selectedBrand = brandSelect.value;
+            if (!selectedBrand) {
+                reportArea.innerHTML = `<p class="text-red-500">Please select a brand.</p>`;
+                return;
+            }
+            url = `/api/reports/by-brand?brand=${encodeURIComponent(selectedBrand)}`;
         } else {
+            // Fallback
             url = `/api/reports/${reportType}`;
         }
 
@@ -55,9 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            currentReportData = data; // Store data for saving
+            currentReportData = data;
             renderReport(data);
-            saveBtn.disabled = Object.keys(data).length === 0; // Enable save if data exists
+            saveBtn.disabled = Object.keys(data).length === 0;
         } catch (error) {
             reportArea.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
         }
@@ -107,19 +181,17 @@ document.addEventListener('DOMContentLoaded', () => {
             let md = '';
             const prefix = '#'.repeat(level);
 
-            // Handle bullet lists (arrays of strings)
             if (Array.isArray(data)) {
                 data.forEach(item => {
                     md += `- ${item}\n`;
                 });
-                md += '\n'; // Add the extra newline character after the entire list
+                md += '\n';
                 return md;
             }
 
-            // Handle headings (objects)
             for (const key in data) {
                 const value = data[key];
-                md += `${prefix} ${key}\n\n`; // Add extra space after headings
+                md += `${prefix} ${key}\n\n`;
                 if (typeof value === 'object' && value !== null) {
                     md += buildMarkdown(value, level + 1);
                 }
@@ -129,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         markdown += buildMarkdown(currentReportData, 2);
 
-        // Create a downloadable file
         const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
