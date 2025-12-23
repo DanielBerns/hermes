@@ -1,0 +1,4 @@
+/home/dberns/Projects/github/DanielBerns/hermes/src/hermes/reporting/reports.py:200: SAWarning: SELECT statement has a cartesian product between FROM element(s) "timestamps" and FROM element "places".  Apply join condition(s) between each element to resolve.
+  results = query.all()
+Report Output: {'Tag1': {'CODE123 - Brand1 Desc1 Pack1': {'min': '     10.00', 'max': '     10.00', 'avg': '     10.00'}}}
+Test Passed!

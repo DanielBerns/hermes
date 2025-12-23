@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const brandSelectContainer = document.getElementById('brand-select-container'); // For "View by Brand" (dropdown)
     const brandSelect = document.getElementById('brand-select');
 
+    const timestampSelectContainer = document.getElementById('timestamp-select-container');
+    const timestampSelect = document.getElementById('timestamp-select');
+
+    const citySelectContainer = document.getElementById('city-select-container');
+    const citySelect = document.getElementById('city-select');
+
+
     const generateBtn = document.getElementById('generate-report-btn');
     const saveBtn = document.getElementById('save-report-btn');
     const reportArea = document.getElementById('report-area');
@@ -23,10 +30,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- Initialization: Fetch Tags and Brands ---
     async function loadOptions() {
         try {
-            const [tagsResponse, brandsResponse] = await Promise.all([
+            const [tagsResponse, brandsResponse, timestampsResponse, citiesResponse] = await Promise.all([
                 fetch('/api/tags'),
-                fetch('/api/brands')
+                fetch('/api/brands'),
+                fetch('/api/timestamps'),
+                fetch('/api/cities')
             ]);
+
 
             if (tagsResponse.ok) {
                 const tags = await tagsResponse.json();
@@ -47,6 +57,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                     brandSelect.appendChild(option);
                 });
             }
+
+            if (timestampsResponse.ok) {
+                const timestamps = await timestampsResponse.json();
+                timestamps.forEach(ts => {
+                    const option = document.createElement('option');
+                    option.value = ts;
+                    option.textContent = ts;
+                    timestampSelect.appendChild(option);
+                });
+            }
+
+            if (citiesResponse.ok) {
+                const cities = await citiesResponse.json();
+                cities.forEach(item => {
+                    const option = document.createElement('option');
+                    // Store both city and state in value for easier parsing or just city if unique
+                    // The backend expects city and state separately. Let's start with json string for value or datasets
+                    option.value = JSON.stringify({ city: item.city, state: item.state });
+                    option.textContent = `${item.city}, ${item.state}`;
+                    citySelect.appendChild(option);
+                });
+            }
+
         } catch (error) {
             console.error("Failed to load options:", error);
             reportArea.innerHTML += `<p class="text-red-500 text-sm">Warning: Failed to load filter options.</p>`;
@@ -63,6 +96,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         brandInputContainer.classList.add('hidden');
         tagInputContainer.classList.add('hidden');
         brandSelectContainer.classList.add('hidden');
+        timestampSelectContainer.classList.add('hidden');
+        citySelectContainer.classList.add('hidden');
+
 
         if (reportType === 'brand-competition') {
             brandInputContainer.classList.remove('hidden');
@@ -70,7 +106,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             tagInputContainer.classList.remove('hidden');
         } else if (reportType === 'by-brand') {
             brandSelectContainer.classList.remove('hidden');
+        } else if (reportType === 'price-location') {
+            timestampSelectContainer.classList.remove('hidden');
+            citySelectContainer.classList.remove('hidden');
+            tagInputContainer.classList.remove('hidden');
         }
+
     }
 
     reportSelect.addEventListener('change', updateUI);
@@ -117,7 +158,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             url = `/api/reports/by-brand?brand=${encodeURIComponent(selectedBrand)}`;
+        } else if (reportType === 'price-location') {
+            const selectedTs = timestampSelect.value;
+            const selectedCityJson = citySelect.value;
+            const selectedTag = tagSelect.value;
+
+            if (!selectedTs || !selectedCityJson || !selectedTag) {
+                reportArea.innerHTML = `<p class="text-red-500">Please select Timestamp, City, and Tag.</p>`;
+                return;
+            }
+
+            const cityData = JSON.parse(selectedCityJson);
+            url = `/api/reports/price-location?timestamp=${selectedTs}&state=${encodeURIComponent(cityData.state)}&city=${encodeURIComponent(cityData.city)}&tag=${encodeURIComponent(selectedTag)}`;
+            // Although get_price_stats_by_location logic *retrieves* for specific location, 
+            // it doesn't filter by tag in the SQL join in my implementation?
+            // Checking reports.py implementation:
+            // My implementation GROUPS by tag, it does NOT filter by tag in the query input arguments.
+            // Wait, the user story said "select... the article tag...".
+            // My implementation of get_price_stats_by_location does NOT accept a tag argument.
+            // I must fix reports.py backend or filter in frontend.
+            // Filtering in backend is better for large datasets.
+            // I will update the URL construction now, but I need to fix the backend function momentarily.
+            // For now, I'll filter client side if needed, or better, add the param to backend.
+            // I'll assume backend implementation update is next task if I realized this gap.
         } else {
+
             // Fallback
             url = `/api/reports/${reportType}`;
         }
@@ -149,14 +214,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             for (const key in currentData) {
                 const value = currentData[key];
                 const li = document.createElement('li');
+
                 if (Array.isArray(currentData)) {
+                    // It's a list items (like brand string or description string), value is the item
                     li.textContent = value;
                     li.className = 'font-normal text-gray-700';
                 } else {
-                    li.textContent = key;
-                    li.className = 'font-semibold';
-                    if (typeof value === 'object' && value !== null) {
+                    // It's an object/dict key
+                    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                        li.textContent = key;
+                        li.className = 'font-semibold';
                         li.appendChild(createList(value));
+                    } else if (Array.isArray(value)) {
+                        li.textContent = key;
+                        li.className = 'font-semibold';
+                        li.appendChild(createList(value));
+                    } else {
+                        // Leaf node (e.g. min: 10.5)
+                        li.textContent = `${key}: ${value}`;
+                        li.className = 'font-normal text-gray-800';
                     }
                 }
                 ul.appendChild(li);

@@ -14,8 +14,12 @@ from hermes.reporting.reports import (
     get_report_by_brand,
     get_report_brand_competition,
     get_all_tags,
-    get_all_brands
+    get_all_brands,
+    get_all_timestamps,
+    get_all_cities,
+    get_price_stats_by_location
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +38,7 @@ def create_app() -> FastAPI:
     except (ImportError, AttributeError):
         # Fallback for older python or if structure differs (though user is on Linux/recent env usually)
         # This assumes the file is in src/hermes/dashboard/app.py and frontend is in src/hermes/reporting/frontend
-        frontend_dir = Path(__file__).parents[2] / "reporting" / "frontend"
+        frontend_dir = Path(__file__).parents[1] / "reporting" / "frontend"
 
     if not frontend_dir.exists():
         logger.warning(f"Frontend directory not found at {frontend_dir}")
@@ -68,6 +72,30 @@ def create_app() -> FastAPI:
     async def get_brands(db: Session = Depends(get_db)):
         """API endpoint to get all available brands."""
         return get_all_brands(db)
+
+    @app.get("/api/timestamps", response_model=List[str])
+    async def get_timestamps(db: Session = Depends(get_db)):
+        """API endpoint to get all available timestamps."""
+        return get_all_timestamps(db)
+
+    @app.get("/api/cities", response_model=List[dict])
+    async def get_cities(db: Session = Depends(get_db)):
+        """API endpoint to get all available cities."""
+        return get_all_cities(db)
+
+    @app.get("/api/reports/price-location")
+    async def report_price_location(
+        timestamp: str = Query(...), 
+        state: str = Query(...), 
+        city: str = Query(...), 
+        tag: Optional[str] = Query(None),
+        db: Session = Depends(get_db)
+    ):
+        """API endpoint for Price Stats by Location report."""
+        if not timestamp or not state or not city:
+             raise HTTPException(status_code=400, detail="Timestamp, State, and City are required.")
+        return get_price_stats_by_location(db, timestamp, state, city, tag_filter=tag)
+
 
     @app.get("/")
     async def read_index():
