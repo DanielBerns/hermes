@@ -274,6 +274,24 @@ class DatabaseRepository:
             if place and pos and place not in pos.places:
                  pos.places.append(place)
 
+    # def _insert_prices(self, articles_data: list, timestamp_id: int):
+    #     codes_cache = self._get_or_create_cache(ArticleCode, "code")
+    #     pos_cache = self._get_or_create_cache(PointOfSale, "code")
+    #
+    #     prices = []
+    #     for row in articles_data:
+    #         code = codes_cache.get(row["article_code"])
+    #         pos = pos_cache.get(row["point_of_sale_key"])
+    #         if code and pos:
+    #             prices.append({
+    #                 "amount": int(row["price"]),
+    #                 "timestamp_id": timestamp_id,
+    #                 "article_code_id": code.id,
+    #                 "point_of_sale_id": pos.id,
+    #             })
+    #     if prices:
+    #         self._bulk_insert(Price, prices)
+
     def _insert_prices(self, articles_data: list, timestamp_id: int):
         codes_cache = self._get_or_create_cache(ArticleCode, "code")
         pos_cache = self._get_or_create_cache(PointOfSale, "code")
@@ -289,8 +307,17 @@ class DatabaseRepository:
                     "article_code_id": code.id,
                     "point_of_sale_id": pos.id,
                 })
+            else:
+                # FIX: Log warning when references are missing to debug silent failures
+                if not code:
+                    logger.warning(f"Skipping price: Article Code '{row.get('article_code')}' not found in cache.")
+                if not pos:
+                    logger.warning(f"Skipping price: Point of Sale '{row.get('point_of_sale_key')}' not found in cache.")
+
         if prices:
             self._bulk_insert(Price, prices)
+        else:
+            logger.warning("No prices were staged for insertion. Check for cache misses.")
 
     def get_untagged_article_cards(self) -> List[ArticleCard]:
         """
