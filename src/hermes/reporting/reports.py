@@ -24,7 +24,19 @@ def _sort_report_data(report: Dict) -> Dict:
             sorted_report[key] = sorted(value)
     return sorted_report
 
-def get_report_by_tag(session: Session) -> Dict[str, Dict[str, List[str]]]:
+
+def get_all_tags(session: Session) -> List[str]:
+    """Returns a list of all distinct tags."""
+    return [t[0] for t in session.query(ArticleTag.tag).distinct().order_by(ArticleTag.tag).all()]
+
+
+def get_all_brands(session: Session) -> List[str]:
+    """Returns a list of all distinct brands."""
+    return [b[0] for b in session.query(ArticleBrand.brand).distinct().order_by(ArticleBrand.brand).all()]
+
+
+def get_report_by_tag(session: Session, tag_filter: str = None) -> Dict[str, Dict[str, List[str]]]:
+
     """
     Generates a sorted report of brands and articles associated with each tag.
     Refactored to use explicit joins, supporting WriteOnlyMapped relationships
@@ -34,7 +46,7 @@ def get_report_by_tag(session: Session) -> Dict[str, Dict[str, List[str]]]:
 
     # Query specific columns instead of loading full objects
     # This works with WriteOnlyMapped relationships because we use join()
-    rows = (
+    query = (
         session.query(
             ArticleTag.tag,
             ArticleBrand.brand,
@@ -44,8 +56,13 @@ def get_report_by_tag(session: Session) -> Dict[str, Dict[str, List[str]]]:
         .join(ArticleTag.article_cards)
         .join(ArticleCard.brand)
         .join(ArticleCard.description)
-        .all()
     )
+
+    if tag_filter:
+        query = query.filter(ArticleTag.tag == tag_filter)
+
+    rows = query.all()
+
 
     # Iterate over the result tuples (tag_name, brand_name, description_text)
     for tag_name, brand_name, description_text in rows:
@@ -54,12 +71,17 @@ def get_report_by_tag(session: Session) -> Dict[str, Dict[str, List[str]]]:
     return _sort_report_data(report)
 
 
-def get_report_by_brand(session: Session) -> Dict[str, Dict[str, List[str]]]:
+def get_report_by_brand(session: Session, brand_filter: str = None) -> Dict[str, Dict[str, List[str]]]:
     """
     Generates a sorted report of tags and articles associated with each brand.
     """
     report: Dict[str, Dict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
-    brands = session.query(ArticleBrand).order_by(ArticleBrand.brand).all()
+    
+    brand_query = session.query(ArticleBrand).order_by(ArticleBrand.brand)
+    if brand_filter:
+        brand_query = brand_query.filter(ArticleBrand.brand == brand_filter)
+        
+    brands = brand_query.all()
 
     for brand in brands:
         cards_for_brand = (
