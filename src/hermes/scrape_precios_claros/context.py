@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Generator
 import logging
 
-from hermes.core.config import get_config
+from hermes.core.config import config
 from hermes.core.helpers import get_resource
 from hermes.core.storage import Storage
 from hermes.core.tree_store import TreeStore
@@ -26,7 +26,6 @@ def get_precios_claros_context(info_storage: Storage) -> PreciosClarosContext:
         info_storage.container(Sample.TREE_STORE, base=mecon_container)
     )
     
-    config = get_config()
     db_container = info_storage.container(Sample.DATABASE, base=mecon_container)
     db_name = config.database.name
     db_uri = str(get_resource(db_container, db_name, ".db"))

@@ -20,5 +20,5 @@ api:
   port: 8080
 
 message_board:
-  enabled: True
+  enabled: False
   identifier: "hermes_dev"
