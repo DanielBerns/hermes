@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import Dict, List
 from sqlalchemy.orm import Session, joinedload, selectinload
 # ADD ArticleDescription to the imports
-from src.hermes.domain.models import ArticleTag, ArticleBrand, ArticleCard, ArticleDescription
+from hermes.domain.models import ArticleTag, ArticleBrand, ArticleCard, ArticleDescription
 
 def _sort_report_data(report: Dict) -> Dict:
     """Helper function to recursively sort report data."""
