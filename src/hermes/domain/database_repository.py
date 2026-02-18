@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from hermes.core.tree_store import Store
 from hermes.domain.sample_reader import SampleReader
-from hermes.domain.models import (
+from hermes.domain.database import (
     ArticleBrand, ArticleCard, ArticleCode, ArticleDescription, ArticlePackage, ArticleTag,
     Base, Branch, Business, City, Flag, Place, PointOfSale, Price, State, Timestamp
 )

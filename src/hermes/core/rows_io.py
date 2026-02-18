@@ -5,7 +5,15 @@ from typing import Any, Generator
 
 from hermes.core.helpers import get_resource, read_json_lines, write_text_lines
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 ROWS_SUFFIX = ".jsonl"
+
+class RowsIOException(Exception):
+    def __init__(self, identifier: str) -> None:
+        logger.info(f"RowsIOException: {identifier}")
 
 def read_rows(
     container: Path,
@@ -16,7 +24,7 @@ def read_rows(
     )
     # Ensure the file exists to avoid FileNotFoundError
     if not resource.exists():
-        return
+        raise RowsIOException(str(resource))
     yield from read_json_lines(resource)
 
 

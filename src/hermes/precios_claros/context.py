@@ -7,7 +7,6 @@ from hermes.core.helpers import get_resource
 from hermes.core.storage import Storage
 from hermes.core.tree_store import TreeStore
 from hermes.domain.sample import Sample
-from hermes.domain.session import get_session
 
 logger = logging.getLogger(__name__)
 

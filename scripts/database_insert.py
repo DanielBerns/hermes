@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from hermes.core.action import execute
-from hermes.domain.database_insert import DatabaseInsert
-
+from hermes.precios_claros.database_insert import DatabaseInsert
 
 def main() -> None:
     filename = Path(__file__)

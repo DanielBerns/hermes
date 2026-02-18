@@ -6,7 +6,7 @@ from typing import Generator
 import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker, Session
 
-from hermes.domain.models import Base
+from hermes.domain.database import Base
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ class DatabaseException(Exception):
     pass
 
 @contextmanager
-def get_session(database_uri: str) -> Generator[Session, None, None]:
+def get_database_session(database_uri: str) -> Generator[Session, None, None]:
     """
     Provides a transactional scope around a series of database operations.
 
