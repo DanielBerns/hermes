@@ -25,20 +25,19 @@
                             <option value="brand-competition">Brand Competition Analysis</option>
                         </select>
                     </div>
-                    
+
                     <div id="tag-input-container" class="hidden">
                          <label for="tag-select" class="block text-sm font-medium text-gray-700">Select Product Tag</label>
-                         <select id="tag-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option value="">Select a tag...</option>
-                         </select>
+                         <input list="tag-list" id="tag-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" placeholder="Type to search a tag...">
+                         <datalist id="tag-list"></datalist>
                     </div>
 
                     <div id="brand-select-container" class="hidden">
                          <label for="brand-select" class="block text-sm font-medium text-gray-700">Select Brand</label>
-                         <select id="brand-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                            <option value="">Select a brand...</option>
-                         </select>
+                         <input list="brand-list" id="brand-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" placeholder="Type to search a brand...">
+                         <datalist id="brand-list"></datalist>
                     </div>
+
                     <div id="brand-input-container" class="hidden">
                         <label for="brand-input" class="block text-sm font-medium text-gray-700">Enter Brand Name</label>
                         <input type="text" id="brand-input" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
