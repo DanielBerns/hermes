@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional
 from sqlalchemy.orm import Session, joinedload
-from hermes.domain.models import ArticleCard, ArticleTag, ArticleDescription
+from hermes.domain.database import ArticleCard, ArticleTag, ArticleDescription
 from hermes.core.cleaning_by_context import search_insertion_context, compare_prefix, levenshtein
 
 logger = logging.getLogger(__name__)

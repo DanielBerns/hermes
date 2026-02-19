@@ -1,13 +1,12 @@
 from pathlib import Path
 
 from hermes.core.action import execute
-from hermes.scrape_precios_claros.scrape_precios_claros import CleanArticleDescriptions
-
+from hermes.precios_claros.database_clean_article_description import DatabaseCleanArticleDescription
 
 def main() -> None:
     filename = Path(__file__)
     script, project_identifier = filename.stem, filename.parents[1].stem
-    action = CleanArticleDescriptions()
+    action = DatabaseCleanArticleDescription()
     execute(script, project_identifier, action)
 
 if __name__ == "__main__":

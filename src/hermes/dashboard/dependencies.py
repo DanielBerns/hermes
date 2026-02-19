@@ -8,7 +8,7 @@ from hermes.core.config import config
 from hermes.core.helpers import get_resource
 from hermes.core.infra import Infra
 from hermes.domain.sample import Sample
-from hermes.domain.session import get_session
+from hermes.domain.database_session import get_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ def get_db_uri() -> str:
     mecon_container = infra.info_storage.container(Sample.MECON)
     db_container = infra.info_storage.container(Sample.DATABASE, base=mecon_container)
     db_uri = str(get_resource(db_container, infra.database_name, ".db"))
+    logger.info(db_uri)
     return db_uri
 
 def get_db() -> Generator[Session, None, None]:
@@ -39,5 +40,5 @@ def get_db() -> Generator[Session, None, None]:
     Dependency that yields a database session.
     """
     db_uri = get_db_uri()
-    with get_session(db_uri) as session:
+    with get_database_session(db_uri) as session:
         yield session
