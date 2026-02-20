@@ -1,9 +1,13 @@
 # hermes/reporting/reports.py
 
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Any
 from sqlalchemy.orm import Session, joinedload, selectinload
-from hermes.domain.database import ArticleTag, ArticleBrand, ArticleCard, ArticleDescription
+from sqlalchemy import func
+from hermes.domain.database import (
+    ArticleTag, ArticleBrand, ArticleCard, ArticleDescription, ArticleCode,
+    Price, Timestamp, PointOfSale, Place, City
+)
 
 def _sort_report_data(report: Dict) -> Dict:
     """Helper function to recursively sort report data."""
@@ -15,8 +19,13 @@ def _sort_report_data(report: Dict) -> Dict:
             sorted_value = {k: value[k] for k in sorted(value.keys())}
             for sub_key, sub_value in sorted_value.items():
                 if isinstance(sub_value, list):
-                    # Sort the final list of strings
-                    sorted_value[sub_key] = sorted(sub_value)
+                    # Sort the final list
+                    if sub_value and isinstance(sub_value[0], dict):
+                        # Sort by description for the new dictionary format
+                        sorted_value[sub_key] = sorted(sub_value, key=lambda x: x.get("description", ""))
+                    else:
+                        # Fallback for simple lists of strings (e.g., brand competition)
+                        sorted_value[sub_key] = sorted(sub_value)
             sorted_report[key] = sorted_value
         elif isinstance(value, list):
             # Sort a top-level list (for brand competition)
@@ -34,27 +43,25 @@ def get_all_brands(session: Session) -> List[str]:
     return [b[0] for b in session.query(ArticleBrand.brand).distinct().order_by(ArticleBrand.brand).all()]
 
 
-def get_report_by_tag(session: Session, tag_filter: str = None) -> Dict[str, Dict[str, List[str]]]:
-
+def get_report_by_tag(session: Session, tag_filter: str = None) -> Dict[str, Dict[str, List[Dict[str, str]]]]:
     """
     Generates a sorted report of brands and articles associated with each tag.
-    Refactored to use explicit joins, supporting WriteOnlyMapped relationships
-    and improving performance on large datasets.
+    Returns format: { "Tag": { "Brand": [{"description": "...", "code": "..."}] } }
     """
-    report: Dict[str, Dict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
+    report: Dict[str, Dict[str, List[Dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
 
-    # Query specific columns instead of loading full objects
-    # This works with WriteOnlyMapped relationships because we use join()
     query = (
         session.query(
             ArticleTag.tag,
             ArticleBrand.brand,
-            ArticleDescription.description
+            ArticleDescription.description,
+            ArticleCode.code
         )
         .select_from(ArticleTag)
         .join(ArticleTag.article_cards)
         .join(ArticleCard.brand)
         .join(ArticleCard.description)
+        .join(ArticleCard.code)
     )
 
     if tag_filter:
@@ -62,24 +69,26 @@ def get_report_by_tag(session: Session, tag_filter: str = None) -> Dict[str, Dic
 
     rows = query.all()
 
-
-    # Iterate over the result tuples (tag_name, brand_name, description_text)
-    for tag_name, brand_name, description_text in rows:
-        report[tag_name][brand_name].append(description_text)
+    for tag_name, brand_name, description_text, code_text in rows:
+        report[tag_name][brand_name].append({
+            "description": description_text,
+            "code": code_text
+        })
 
     return _sort_report_data(report)
 
 
-def get_report_by_brand(session: Session, brand_filter: str = None) -> Dict[str, Dict[str, List[str]]]:
+def get_report_by_brand(session: Session, brand_filter: str = None) -> Dict[str, Dict[str, List[Dict[str, str]]]]:
     """
     Generates a sorted report of tags and articles associated with each brand.
+    Returns format: { "Brand": { "Tag": [{"description": "...", "code": "..."}] } }
     """
-    report: Dict[str, Dict[str, List[str]]] = defaultdict(lambda: defaultdict(list))
-    
+    report: Dict[str, Dict[str, List[Dict[str, str]]]] = defaultdict(lambda: defaultdict(list))
+
     brand_query = session.query(ArticleBrand).order_by(ArticleBrand.brand)
     if brand_filter:
         brand_query = brand_query.filter(ArticleBrand.brand == brand_filter)
-        
+
     brands = brand_query.all()
 
     for brand in brands:
@@ -88,15 +97,19 @@ def get_report_by_brand(session: Session, brand_filter: str = None) -> Dict[str,
             .filter(ArticleCard.brand_id == brand.id)
             .options(
                 selectinload(ArticleCard.tags),
-                joinedload(ArticleCard.description)
+                joinedload(ArticleCard.description),
+                joinedload(ArticleCard.code)
             )
             .all()
         )
 
         for card in cards_for_brand:
             for tag in card.tags:
-                if card.description:
-                    report[brand.brand][tag.tag].append(card.description.description)
+                if card.description and card.code:
+                    report[brand.brand][tag.tag].append({
+                        "description": card.description.description,
+                        "code": card.code.code
+                    })
 
     return _sort_report_data(report)
 
@@ -134,3 +147,37 @@ def get_report_brand_competition(session: Session, target_brand_name: str) -> Di
                 report[tag.tag].append(brand.brand)
 
     return _sort_report_data(report)
+
+
+def get_article_price_history(session: Session, article_code: str) -> List[Dict[str, Any]]:
+    """
+    Retrieves the min and max price for a specific article, grouped by Timestamp and City.
+    Ordered by Timestamp and City name.
+    """
+    query = (
+        session.query(
+            Timestamp.timestamp,
+            City.name.label("city_name"),
+            func.min(Price.amount).label("min_price"),
+            func.max(Price.amount).label("max_price")
+        )
+        .select_from(Price)
+        .join(Price.timestamp)
+        .join(Price.article_code)
+        .join(Price.point_of_sale)
+        .join(PointOfSale.places)
+        .join(Place.city)
+        .filter(ArticleCode.code == article_code)
+        .group_by(Timestamp.timestamp, City.name)
+        .order_by(Timestamp.timestamp, City.name)
+    )
+
+    results = []
+    for ts, city, min_p, max_p in query.all():
+        results.append({
+            "timestamp": ts.isoformat(),
+            "city": city,
+            "min_price": min_p,
+            "max_price": max_p
+        })
+    return results

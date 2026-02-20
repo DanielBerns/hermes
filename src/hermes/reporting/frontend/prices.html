@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Price History - Hermes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="flex flex-col h-screen">
+        <header class="bg-blue-700 text-white shadow-md p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Price History</h1>
+            <button onclick="window.close()" class="text-white hover:text-gray-200 underline">Close Tab</button>
+        </header>
+
+        <main class="flex-1 p-6 overflow-y-auto w-full max-w-5xl mx-auto">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-2" id="article-title">Loading prices...</h2>
+                <p class="text-gray-600 mb-6" id="article-code-display"></p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Price</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Max Price</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="prices-tbody">
+                            </tbody>
+                    </table>
+                </div>
+                <div id="no-data-message" class="hidden text-gray-500 mt-4 text-center py-4 bg-gray-50 rounded">No price history found for this article.</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/prices.js"></script>
+</body>
+</html>

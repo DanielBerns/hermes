@@ -31,7 +31,7 @@ async function loadOptions() {
         if (tagsResponse.ok) {
             const tags = await tagsResponse.json();
             const tagList = document.getElementById('tag-list');
-            const fragment = document.createDocumentFragment(); // Batch insertions
+            const fragment = document.createDocumentFragment();
 
             tags.forEach(tag => {
                 const option = document.createElement('option');
@@ -44,7 +44,7 @@ async function loadOptions() {
         if (brandsResponse.ok) {
             const brands = await brandsResponse.json();
             const brandList = document.getElementById('brand-list');
-            const fragment = document.createDocumentFragment(); // Batch insertions
+            const fragment = document.createDocumentFragment();
 
             brands.forEach(brand => {
                 const option = document.createElement('option');
@@ -152,15 +152,31 @@ function renderReport(data) {
     const createList = (currentData) => {
         const ul = document.createElement('ul');
         ul.className = 'list-disc ml-5 space-y-1';
+
         for (const key in currentData) {
             const value = currentData[key];
             const li = document.createElement('li');
+
             if (Array.isArray(currentData)) {
-                li.textContent = value;
-                li.className = 'font-normal text-gray-700';
+                // It's a list. Check if it's the new array of objects (has 'code' and 'description') or just strings.
+                if (typeof value === 'object' && value.code && value.description) {
+                    li.className = 'font-normal text-gray-700 my-1';
+                    li.innerHTML = `
+                    ${value.description}
+                    <span class="text-xs text-gray-400 bg-gray-100 rounded px-1 ml-1 border">Code: ${value.code}</span>
+                    <a href="/prices?code=${encodeURIComponent(value.code)}" target="_blank" class="text-xs text-blue-500 hover:text-blue-700 hover:underline ml-2 inline-flex items-center">
+                    View Price History &rarr;
+                    </a>
+                    `;
+                } else {
+                    // Fallback for array of strings (like in brand-competition)
+                    li.textContent = value;
+                    li.className = 'font-normal text-gray-700';
+                }
             } else {
+                // It's a dictionary key (Tag or Brand)
                 li.textContent = key;
-                li.className = 'font-semibold';
+                li.className = 'font-semibold mt-2';
                 if (typeof value === 'object' && value !== null) {
                     li.appendChild(createList(value));
                 }
@@ -189,7 +205,12 @@ function saveReportAsMarkdown() {
 
         if (Array.isArray(data)) {
             data.forEach(item => {
-                md += `- ${item}\n`;
+                if (typeof item === 'object' && item.code && item.description) {
+                    // Include the article code in the markdown
+                    md += `- ${item.description} (Code: ${item.code})\n`;
+                } else {
+                    md += `- ${item}\n`;
+                }
             });
             md += '\n';
             return md;

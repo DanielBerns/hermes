@@ -14,7 +14,8 @@ from hermes.reporting.reports import (
     get_report_by_brand,
     get_report_brand_competition,
     get_all_tags,
-    get_all_brands
+    get_all_brands,
+    get_article_price_history
 )
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,23 @@ def create_app() -> FastAPI:
     async def get_brands(db: Session = Depends(get_db)):
         """API endpoint to get all available brands."""
         return get_all_brands(db)
+
+    @app.get("/api/prices/{article_code}")
+    async def article_prices(article_code: str, db: Session = Depends(get_db)):
+        """API endpoint to get price history for a specific article code."""
+        if not article_code:
+            raise HTTPException(status_code=400, detail="Article code cannot be empty.")
+        return get_article_price_history(db, article_code)
+
+    @app.get("/prices")
+    async def read_prices():
+        """Serves the prices.html file."""
+        if not frontend_dir.exists():
+             raise HTTPException(status_code=404, detail="Frontend not found")
+        prices_path = frontend_dir / "prices.html"
+        if not prices_path.exists():
+             raise HTTPException(status_code=404, detail="Prices page not found")
+        return FileResponse(prices_path)
 
     @app.get("/")
     async def read_index():
