@@ -151,13 +151,13 @@ def get_report_brand_competition(session: Session, target_brand_name: str) -> Di
 
 def get_article_price_history(session: Session, article_code: str) -> List[Dict[str, Any]]:
     """
-    Retrieves the min and max price for a specific article, grouped by Timestamp and City.
-    Ordered by Timestamp and City name.
+    Retrieves the min and max price for a specific article, grouped by City and Timestamp.
+    Ordered by City name first, then by Timestamp.
     """
     query = (
         session.query(
-            Timestamp.timestamp,
             City.name.label("city_name"),
+            Timestamp.timestamp,
             func.min(Price.amount).label("min_price"),
             func.max(Price.amount).label("max_price")
         )
@@ -168,15 +168,15 @@ def get_article_price_history(session: Session, article_code: str) -> List[Dict[
         .join(PointOfSale.places)
         .join(Place.city)
         .filter(ArticleCode.code == article_code)
-        .group_by(Timestamp.timestamp, City.name)
-        .order_by(Timestamp.timestamp, City.name)
+        .group_by(City.name, Timestamp.timestamp)
+        .order_by(City.name, Timestamp.timestamp)
     )
 
     results = []
-    for ts, city, min_p, max_p in query.all():
+    for city, ts, min_p, max_p in query.all():
         results.append({
-            "timestamp": ts.isoformat(),
             "city": city,
+            "timestamp": ts.isoformat(),
             "min_price": min_p,
             "max_price": max_p
         })

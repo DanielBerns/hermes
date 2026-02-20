@@ -48,13 +48,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-gray-50';
 
-            const tdTime = document.createElement('td');
-            tdTime.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
-            tdTime.textContent = formatTimestamp(row.timestamp);
-
             const tdCity = document.createElement('td');
-            tdCity.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900';
+            tdCity.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium';
             tdCity.textContent = row.city;
+
+            const tdTime = document.createElement('td');
+            tdTime.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+            tdTime.textContent = formatTimestamp(row.timestamp);
 
             const tdMin = document.createElement('td');
             tdMin.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium text-green-600';
@@ -64,8 +64,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             tdMax.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium text-red-600';
             tdMax.textContent = formatPrice(row.max_price);
 
-            tr.appendChild(tdTime);
+            // Appended in the new sorted order (City -> Timestamp)
             tr.appendChild(tdCity);
+            tr.appendChild(tdTime);
             tr.appendChild(tdMin);
             tr.appendChild(tdMax);
 
