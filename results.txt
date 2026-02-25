@@ -1,0 +1,1289 @@
+
+Product: Zapallo anco x kg.
+  Price: ARS 999
+Product: Zapallo japonés x kg.
+  Price: ARS 1199
+Product: Zapallo tasty x kg
+  Price: ARS 1050
+Product: Zapallo en rodajas 350 grs
+  Price: ARS 2090
+Product: Zapallo kabutia orgánico x kg.
+  Price: ARS 745
+Product: Zapallo anco organico x kg.
+  Price: ARS 1399
+Product: Puré de papas Knorr tradicional listo 125 g.
+  Price: ARS 2799
+Product: Fideos fettuccini Don Vicente de zapallo y zanahoria 500 grs
+  Price: ARS 3950
+Product: Puré de papas y zapallo instantáneo Carrefour classic 100 g.
+  Price: ARS None
+Product: Puré de papas Knorr receta completa  125 g.
+  Price: ARS 3125
+Product: Sopa instantánea Knorr Quick zapallo Balance 5 Sobres
+  Price: ARS 3305
+Product: Sopa crema Knorr zapallo con nuez moscada 70 g.
+  Price: ARS 2475
+Product: Sopa crema Knorr de vegetales 60 g.
+  Price: ARS 2475
+Product: Sopa instantánea Knorr Quick zapallo romero 5 sobres
+  Price: ARS 3305
+Product: Salsa pomodoro con zapallo Knorr 340 g.
+  Price: ARS 1499
+Product: Puré de papas y zapallo listo Knorr en bolsa 125 grs
+  Price: ARS 3219
+Product: Arroz largo fino Molinos Ala 1 kg.
+  Price: ARS 1790
+Product: Arroz parboil Gallo oro en bolsa 1 kg.
+  Price: ARS 2500
+Product: Arroz largo fino 00000 Carrefour Classic en bolsa 1 kg.
+  Price: ARS None
+Product: Arroz Molinos Ala parboil bolsa 1 kg.
+  Price: ARS 2100
+Product: Arroz parboil Carrefour Classic en bolsa 1 kg.
+  Price: ARS None
+Product: Arroz Molinos Ala doble carolina bolsa 1 kg.
+  Price: ARS 3250
+Product: Arroz parboil Lucchetti 1 kg.
+  Price: ARS 2099
+Product: Arroz integral Molinos Ala bolsa 1 kg.
+  Price: ARS 2250
+Product: Arroz Molinos Ala largo fino 00000 bolsa 500 g.
+  Price: ARS 1050
+Product: Arroz largo fino 00000 Lucchetti 1 kg.
+  Price: ARS 1799
+Product: Arroz integral Gallo en bolsa 500 g.
+  Price: ARS 1579
+Product: Arroz largo fino Crucero 00000 1 kg.
+  Price: ARS 1280
+Product: Arroz doble Gallo 500 g.
+  Price: ARS 2200
+Product: Arroz parboil Dos Hermanos bolsa 1 kg.
+  Price: ARS 2050
+Product: Arroz integral Molinos Ala bolsa 500 g.
+  Price: ARS 1189
+Product: Arroz blanco Shangrila 1 kg
+  Price: ARS 1050
+Product: Papa x kg.
+  Price: ARS 417
+Product: Papa cepillada x kg.
+  Price: ARS None
+Product: Papa negra Huella Natural x kg.
+  Price: ARS 1590
+Product: Papines x kg.
+  Price: ARS 4990
+Product: Papa x kg.
+  Price: ARS 567
+Product: Papa roja x kg.
+  Price: ARS 538
+Product: Papas blancas andinas 600 g.
+  Price: ARS 8990
+Product: Lechuga Capuchina x kg.
+  Price: ARS None
+Product: Lechuga francesa x kg.
+  Price: ARS None
+Product: Lechuga mantecosa x kg.
+  Price: ARS None
+Product: Lechuga francesa hidropónica 220 g.
+  Price: ARS 2490
+Product: Lechuga bicolor hidropónica en cono
+  Price: ARS 2990
+Product: Lechuga crispy hidropónica en cono
+  Price: ARS 2490
+Product: Lechuga mantecosa lavada Filieres 200 g.
+  Price: ARS 4499
+Product: Mix de lechugas Huella Natural 300 g.
+  Price: ARS 4990
+Product: Semillas Parque lechuga criolla
+  Price: ARS 899
+Product: Semillas lechuga grand rapids Parque
+  Price: ARS 1199
+Product: Semillas lechuga batavia blanca Parque
+  Price: ARS 899
+Product: Zanahoria Huella Natural x kg.
+  Price: ARS 995
+Product: Zanahoria rallada Huella Natural 200 g.
+  Price: ARS 1999
+Product: Zanahoria rallada Song 200 g.
+  Price: ARS 3190
+Product: Zanahoria Rocky bolsa 200 g.
+  Price: ARS 1890
+Product: Zanahoria rallada filieres 250 g.
+  Price: ARS 3790
+Product: Zanahoria baby Sueño Verde 250 g.
+  Price: ARS 4999
+Product: Café Torrado molido La planta de Café Cabrales 500 g.
+  Price: ARS 13900
+Product: Café molido Carrefour Classic torrado doypack 500 grs
+  Price: ARS 10161
+Product: Café molido torrado equilibrado La Virginia 500 g.
+  Price: ARS 12699
+Product: Café molido torrado intenso Bonafide Sensaciones 1 kg.
+  Price: ARS 26199
+Product: Café molido Carrefour Classic torrado 250 grs
+  Price: ARS 5571
+Product: Café molido torrado intenso la Morenita 125 g.
+  Price: ARS 3230
+Product: Café molido Bonafide Sensaciones torrado suave 500 g.
+  Price: ARS 13100
+Product: Café Torrado molido La Planta de Café Cabrales 125 g.
+  Price: ARS 3645
+Product: Café molido torrado Bonafide Sensaciones intenso 200 grs
+  Price: ARS 5655
+Product: Café molido torrado Bonafide Sensaciones suave 200 grs
+  Price: ARS 5750
+Product: Café Torrado molido La Planta de Café Cabrales 1 kg.
+  Price: ARS 27105
+Product: Café molido Carrefour classic torrado 250 g.
+  Price: ARS 5571
+Product: Café molido torrado intenso Bonafide Sensaciones 125 g.
+  Price: ARS 3555
+Product: Café molido torrado La Virginia 125 g.
+  Price: ARS 3550
+Product: Nescafé Dolca original 170 grs
+  Price: ARS 5685
+Product: Nescafé Dolca Original en frasco170 grs
+  Price: ARS 6735
+Product: Leche UAT entera Carrefour classic brik 1 lt.
+  Price: ARS None
+Product: Leche La serenisima clásica 3% 1L.
+  Price: ARS 2490
+Product: Leche entera larga vida Las tres niñas 1 l.
+  Price: ARS 2385
+Product: Leche entera UAT Carrefour classic tetra 1 lt.
+  Price: ARS None
+Product: Leche La Serenísima ultra entera multivit 3% sachet 1 lt
+  Price: ARS 1580
+Product: Leche La Serenísima reducida en lactosa sachet 1 l.
+  Price: ARS 1580
+Product: Leche ultra entera Carrefour classic sachet 1 lt.
+  Price: ARS None
+Product: Leche entera La Serenísima uat fortificada 3% tetra 200 cc.
+  Price: ARS 1150
+Product: Leche en polvo entera Carrefour classic pouch 400 g.
+  Price: ARS None
+Product: Leche entera Casanto 3 ultra para sachet 1 l.
+  Price: ARS 1595
+Product: Leche descremada La Serenísima extra calcio 1 l.
+  Price: ARS 2679
+Product: Leche La Serenísima ultra parc descremada multivit 2% sachet 1 lt
+  Price: ARS 1580
+Product: Leche en polvo entera La Serenísima bolsa 200 g.
+  Price: ARS 3315
+Product: Leche en polvo entera Carrefour classic pouch 250 g.
+  Price: ARS None
+Product: Leche en polvo entera Purísima 400 g.
+  Price: ARS 5539
+Product: Leche en polvo entera Carrefour classic pouch 125 g.
+  Price: ARS None
+Product: Yerba mate Playadito con palo 500 g.
+  Price: ARS 2650
+Product: Yerba mate Mañanita bajo polvo 4flex 1 kg.
+  Price: ARS 3490
+Product: Yerba mate Mañanita bajo polvo 4flex 500 g.
+  Price: ARS 2440
+Product: Yerba mate Playadito suave con palo 1 kg.
+  Price: ARS 4555
+Product: Yerba mate Rosamonte 55 aniversario 1 kg.
+  Price: ARS 3765
+Product: Yerba mate Taragüi con palo origen controlado 1 kg.
+  Price: ARS 4919
+Product: Yerba mate Amanda tradicional 1 kg.
+  Price: ARS 4300
+Product: Yerba mate Amanda 500 g.
+  Price: ARS 2150
+Product: Yerba mate suave Unión 4flex 1 kg.
+  Price: ARS 4919
+Product: Yerba mate de campo orígen controlado La Merced 500 g.
+  Price: ARS 4425
+Product: Yerba mate Buenas y santas de hierbas 500 g.
+  Price: ARS 2800
+Product: Yerba mate Verdeflor con hierbas serranas 500 g.
+  Price: ARS 2199
+Product: Yerba mate Rosamonte suave 55 aniversario 1 kg.
+  Price: ARS 4290
+Product: Yerba mate suave Cósmico selección sin tacc 500 grs
+  Price: ARS 3950
+Product: Yerba mate Union suave origen controlado 4flex 500 g.
+  Price: ARS 2705
+Product: Yerba mate Cruz de Malta con palo sin TACC 1 kg.
+  Price: ARS 4800
+Product: Queso feteado Classic danbo  200 g.
+  Price: ARS 4990
+Product: Queso danbo La Serenísima feteado 150 g.
+  Price: ARS 5219
+Product: Queso danbo feteado Cremac 180 g.
+  Price: ARS 4290
+Product: Queso feteado Adler cheddar 144 g.
+  Price: ARS 4169
+Product: Queso danbo feteado Carrefour 200 grs
+  Price: ARS 4969
+Product: Queso tybo feteado Carrefour classic 200 grs
+  Price: ARS 4990
+Product: Queso danbo Adler en fetas 144 g.
+  Price: ARS 4440
+Product: Queso feteado SanCor danbo 200 g.
+  Price: ARS 5800
+Product: Queso cheddar en fetas Felices las Vacas 150 g.
+  Price: ARS 2539
+Product: La Paulina queso mozzarella en fetas 180 grs
+  Price: ARS 4799
+Product: Queso tybo Doña aurora feteado 170 g.
+  Price: ARS 4569
+Product: Queso tybo feteado Silvia 180 g.
+  Price: ARS 4859
+Product: Queso danbo La Serenísima feteado light 150 g.
+  Price: ARS 5219
+Product: Queso cheddar La Serenísima feteado 150 g.
+  Price: ARS 5219
+Product: Fetas veganas Felices Las Vacas sabor danbo 200 g.
+  Price: ARS 2539
+Product: Queso feteado Quesabores danbo 180 g.
+  Price: ARS 7200
+Product: Sal gruesa Dos Anclas caja 500 g.
+  Price: ARS 1299
+Product: Sal gruesa Bulnez en bolsa 1 kg.
+  Price: ARS 1590
+Product: Sal gruesa Celusal paquete 1 kg.
+  Price: ARS 2445
+Product: Sal gruesa Celusal 500 g.
+  Price: ARS 1405
+Product: Sal gruesa Dos Estrellas 1 kg.
+  Price: ARS 1635
+Product: Sal gruesa Dos Anclas en paquete 1 kg.
+  Price: ARS 2459
+Product: Sal gruesa Carrefour Classic 1 kg
+  Price: ARS None
+Product: Sal gruesa Celusal caja 1 kg.
+  Price: ARS 2579
+Product: Sal gruesa Celusal salero 1 kg.
+  Price: ARS 4729
+Product: Sal gruesa Carrefour Classic salero 750 grs
+  Price: ARS None
+Product: Asado Novillo x kg.
+  Price: ARS 13200
+Product: Finlandia light sin sal agregada 290 g.
+  Price: ARS 4989
+Product: Finlandia light sin sal agregada 180 g.
+  Price: ARS 3329
+Product: Carbon vegetal asados x 4 kg
+  Price: ARS 6499
+Product: Asado banderita etiquet negra
+  Price: ARS 27900
+Product: Hueso de carne para perro x uni. GoloCan
+  Price: ARS 849
+Product: Hueso Tops porta bolsa recolectoras
+  Price: ARS 5290
+Product: Escalera familiar 7 escalones 1.90 m
+  Price: ARS None
+Product: Kit de Asado Premium – Cuchillo + Chaira + Funda de Cuero | SCHMIEDEN
+  Price: ARS None
+Product: Queso crema entero San Ignacio sin lactosa 290 grs
+  Price: ARS 3825
+Product: Queso crema light San ignacio en pote 480 g.
+  Price: ARS 5015
+Product: Queso untable Finlandia light pote 290 g.
+  Price: ARS 4989
+Product: Queso La Serenísima cremón light pote 280 g.
+  Price: ARS 3637
+Product: Queso crema Tonadita cremette light 290 g.
+  Price: ARS 2650
+Product: Queso blanco light La SerenÍsima Clásico 290 grs
+  Price: ARS 3699
+Product: Queso blanco Tregar light 290 g.
+  Price: ARS 3790
+Product: Cuadrada orgánica x kg.
+  Price: ARS 12900
+Product: Fuente de vidrio cuadrada Carrefour 1 l.
+  Price: ARS 5943
+Product: Bandeja para air fryer Domestic papel cuadrada x 30 uni
+  Price: ARS 10999
+Product: Botella cuadrada 250 ml con pico vertedor
+  Price: ARS 2589
+Product: Aceitera cuadrada 250 ml con pico vertedor
+  Price: ARS 3190
+Product: Vinagrera cuadrada 250 ml con pico vertedor
+  Price: ARS 3190
+Product: Fuente de vidrio cuadrada Carrefour 1.8 l.
+  Price: ARS 9793
+Product: Fuente Pyrex Cuadrada 20 cm.
+  Price: ARS None
+Product: Bifera cuadrada pintada 24x24 cm.
+  Price: ARS 34990
+Product: Tabla cuadrada madera pino 23x23 cm
+  Price: ARS 6990
+Product: Lima cuadrada Brand beauty 1 uni
+  Price: ARS 4785
+Product: Sartén Electrica Eiffel E-622 Cuadrada de 30 x 30 cm
+  Price: ARS 49999
+Product: Fuente Le Cuisine cuadrada 1 lt
+  Price: ARS 13993
+Product: Fuente cuadrada Pyrex con tapa 21 cm.
+  Price: ARS None
+Product: Ojota Tex lisa 35-40 cuadrada
+  Price: ARS 7990  Price: ARS 7990  Price: ARS 7990
+Product: Ojota Tex lisa 35-40 cuadrada
+  Price: ARS 7990  Price: ARS 7990  Price: ARS 7990
+Product: Tomate x kg.
+  Price: ARS None
+Product: Tomate perita x kg.
+  Price: ARS None
+Product: Tomate perita entero Carrefour classic en lata 400 cc.
+  Price: ARS None
+Product: Tomate triturado Carrefour 970 cc.
+  Price: ARS None
+Product: Tomate cherry rojo Huella Natural x kg.
+  Price: ARS None
+Product: Tomate triturado Don Francisco botella 950 g.
+  Price: ARS 2600
+Product: Tomate perita entero Bulnez en lata 400 g.
+  Price: ARS 1090
+Product: Tomate perita Bulnez cubeteados en lata 400 g.
+  Price: ARS 1190
+Product: Tomate perita La campagnola 400 g.
+  Price: ARS 1419
+Product: Tomate perita Arcor 400 g.
+  Price: ARS 1269
+Product: Tomate perita cubeteado Arcor 400 g.
+  Price: ARS 1575
+Product: Tomate triturado Corper sin gluten 910 grs
+  Price: ARS 1699
+Product: Tomate cubeteado La Campagnola 400 g.
+  Price: ARS 1730
+Product: Tomate perita Salsati pelado 400 grs
+  Price: ARS 1639
+Product: Tomate perita Classic cubeteados en lata 400 g.
+  Price: ARS None
+Product: Tomate redondo Huella Natural x kg.
+  Price: ARS None
+Product: Tomate triturado Don Francisco botella 950 g.
+  Price: ARS 2600
+Product: Puré de tomate Carrefour classic 520 g.
+  Price: ARS None
+Product: Puré de tomate Arcor brik 520 g.
+  Price: ARS 1055
+Product: Puré de tomate La Campagnola tetra 530 g.
+  Price: ARS 1135
+Product: Puré de tomate Salsati 520 g.
+  Price: ARS 945
+Product: Puré de tomate Bulnez tetra 520 g.
+  Price: ARS 759
+Product: Puré de tomate Carrefour Classic tetra 520 grs
+  Price: ARS None
+Product: Pulpa de tomate Salsati 520 g.
+  Price: ARS 1139
+Product: Pulpa de tomate Arcor 520 g. sin TACC
+  Price: ARS 899
+Product: Puré de tomates Bulnez 520 g.
+  Price: ARS 759
+Product: Puré de tomate Italia Carrefour Extra 520 grs
+  Price: ARS None
+Product: Puré de tomate Pampagourmet orgánico 500 g.
+  Price: ARS 6000
+Product: Puré de tomate amarillo Carrefour Extra italiano 520 grs
+  Price: ARS None
+Product: Puré de tomate Rina Matarazzo Passata 500 grs
+  Price: ARS 5300
+Product: Puré de tomate Carrefour Classic tetra 1020 grs
+  Price: ARS None
+Product: Salsa de tomate Mutti passata botella 700 g.
+  Price: ARS 12895
+Product: Huevo blanco El Mercado carton 30 uni
+  Price: ARS 7641
+Product: Huevos blancos El Mercado 6 uni
+  Price: ARS None
+Product: Huevos color El Mercado 30 uni
+  Price: ARS 8361
+Product: Huevos blanco El Mercado plástico 12 uni
+  Price: ARS 3951
+Product: Huevos color El Mercado extra 6 uni
+  Price: ARS None
+Product: Huevos libres de jaula Huella Natural 6 uni
+  Price: ARS 3090
+Product: Huevos blancos Avicoper 30 u.
+  Price: ARS 9100
+Product: Huevos blanco El Mercado plástico 6 uni
+  Price: ARS 2241
+Product: Huevos color Avicoper 6 u.
+  Price: ARS 2400
+Product: Huevo de chocolate Kinder Sopresa joy 2 u.
+  Price: ARS 4660
+Product: Huevos de codorniz cabana Santa Silvia x 12 uni
+  Price: ARS 3600
+Product: Huevo sorpresa con dinosaurios (Modelos Surtidos)
+  Price: ARS 7990
+Product: Mayonesa Clásica Hellmanns sin tacc doypack 475 g.
+  Price: ARS 2019
+Product: Mayonesa clásica Hellmanns sin tacc doypack 950 g.
+  Price: ARS 5395
+Product: Fideos cinta nido 308 nº 2 al huevo 500 g.
+  Price: ARS 2729
+Product: Fideos nido huevo Carrefour Classic 500 g.
+  Price: ARS None
+Product: Jugo Pura frutta kids de manzana tetra 250 ml.
+  Price: ARS 1639
+Product: Jugo Pura frutta kids multifruta tetra 250 ml.
+  Price: ARS 1639
+Product: Jugo en Polvo Clight Naranja Durazno 7,5 grs
+  Price: ARS 469
+Product: Naranja de jugo x kg.
+  Price: ARS None
+Product: Ades soja + jugo de manzana 1 lt
+  Price: ARS 2900
+Product: Ades soja + jugo de frutas tropicales 1 lt
+  Price: ARS 2900
+Product: Ades soja + jugo de naranja 200 ml
+  Price: ARS 1300
+Product: Arvejas secas remojadas Carrefour classic en lata 300 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Inalpa lata 300 g.
+  Price: ARS 659
+Product: Arvejas secas remojadas Doña Pupa tetra 340 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Arcor 300 g.
+  Price: ARS 1220
+Product: Arvejas congeladas Carrefour Classic 300 g.
+  Price: ARS None
+Product: Arvejas congeladas Granja del sol 300 g.
+  Price: ARS 3625
+Product: Arvejas secas Carrefour Classic remojadas 340 grs
+  Price: ARS None
+Product: Arvejas y choclo Carrefour Classic en lata 300 grs
+  Price: ARS None
+Product: Arvejas congeladas Lucchetti en bolsa 300 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Carrefour classic sin sal 300 g.
+  Price: ARS None
+Product: Arvejas secas enteras Bulnez 400 grs
+  Price: ARS 849
+Product: Arvejas secas Carrefour Classic en bolsa 400 g.
+  Price: ARS None
+Product: Arvejas y zanahoria Carrefour Classic 300 grs
+  Price: ARS None
+Product: Arvejas verdes Carrefour Extra en lata 400 grs
+  Price: ARS None
+Product: Arvejas Green life 350 g.
+  Price: ARS 4479
+Product: Arvejas secas partidas 500 g.
+  Price: ARS 1645
+Product: Arvejas secas remojadas Carrefour classic en lata 300 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Inalpa lata 300 g.
+  Price: ARS 659
+Product: Arvejas secas remojadas Doña Pupa tetra 340 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Arcor 300 g.
+  Price: ARS 1220
+Product: Arvejas congeladas Carrefour Classic 300 g.
+  Price: ARS None
+Product: Arvejas congeladas Granja del sol 300 g.
+  Price: ARS 3625
+Product: Arvejas secas Carrefour Classic remojadas 340 grs
+  Price: ARS None
+Product: Arvejas y choclo Carrefour Classic en lata 300 grs
+  Price: ARS None
+Product: Arvejas congeladas Lucchetti en bolsa 300 g.
+  Price: ARS None
+Product: Arvejas secas remojadas Carrefour classic sin sal 300 g.
+  Price: ARS None
+Product: Arvejas secas enteras Bulnez 400 grs
+  Price: ARS 849
+Product: Arvejas secas Carrefour Classic en bolsa 400 g.
+  Price: ARS None
+Product: Arvejas y zanahoria Carrefour Classic 300 grs
+  Price: ARS None
+Product: Arvejas verdes Carrefour Extra en lata 400 grs
+  Price: ARS None
+Product: Arvejas Green life 350 g.
+  Price: ARS 4479
+Product: Arvejas secas partidas 500 g.
+  Price: ARS 1645
+Product: Galletitas Oreo Rellenas con crema sabor original 354 g.
+  Price: ARS 5649
+Product: Galletitas Pepitos con chips de chocolate 357 g. Pack x3 de 119 g.
+  Price: ARS 5189
+Product: Galletitas Chocolina de chocolate 250 g.
+  Price: ARS 2219
+Product: Galletitas pepas Carrefour classic 300 g.
+  Price: ARS None
+Product: Obleas Ópera clásicas 4 u. x 55 g.
+  Price: ARS 2519
+Product: Galletitas surtidas Bagley en bolsa 400 g.
+  Price: ARS 3075
+Product: Galletitas chocolate rellena coco Rumba x3 110 g.
+  Price: ARS 3600
+Product: Galletitas Maná de vainilla livianas fp 3x 136 g.
+  Price: ARS 2770
+Product: Galletitas crackers Traviata Rex x3 96 grs
+  Price: ARS 2285
+Product: Galletitas de chocolate Macucas 110 g.
+  Price: ARS 1100
+Product: Galletitas frambuesa rell fruti Sonrisas 3 108 g
+  Price: ARS 3959
+Product: Galletitas dulces Variedad Terrabusi mix tamaño familiar 390 g.
+  Price: ARS 3439
+Product: Galletitas surtido Diversión en bolsa 400 g.
+  Price: ARS 2659
+Product: Galletitas pepas Carrefour 500 g.
+  Price: ARS None
+Product: Galletitas dulces Melba rellenas con crema 120 g.
+  Price: ARS 1310
+Product: Galletitas Pepitos con chips de chocolate 119 g.
+  Price: ARS 1940
+Product: Galletitas Oreo Rellenas con crema sabor original 354 g.
+  Price: ARS 5649
+Product: Galletitas Pepitos con chips de chocolate 357 g. Pack x3 de 119 g.
+  Price: ARS 5189
+Product: Galletitas Chocolina de chocolate 250 g.
+  Price: ARS 2219
+Product: Galletitas pepas Carrefour classic 300 g.
+  Price: ARS None
+Product: Obleas Ópera clásicas 4 u. x 55 g.
+  Price: ARS 2519
+Product: Galletitas surtidas Bagley en bolsa 400 g.
+  Price: ARS 3075
+Product: Galletitas chocolate rellena coco Rumba x3 110 g.
+  Price: ARS 3600
+Product: Galletitas Maná de vainilla livianas fp 3x 136 g.
+  Price: ARS 2770
+Product: Galletitas crackers Traviata Rex x3 96 grs
+  Price: ARS 2285
+Product: Galletitas de chocolate Macucas 110 g.
+  Price: ARS 1100
+Product: Galletitas frambuesa rell fruti Sonrisas 3 108 g
+  Price: ARS 3959
+Product: Galletitas dulces Variedad Terrabusi mix tamaño familiar 390 g.
+  Price: ARS 3439
+Product: Galletitas surtido Diversión en bolsa 400 g.
+  Price: ARS 2659
+Product: Galletitas pepas Carrefour 500 g.
+  Price: ARS None
+Product: Galletitas dulces Melba rellenas con crema 120 g.
+  Price: ARS 1310
+Product: Galletitas Pepitos con chips de chocolate 119 g.
+  Price: ARS 1940
+Product: Pollo entero congelado x kg.
+  Price: ARS 3690
+Product: Yogur Griego natural sin endulzar Yogurísimo 300 grs
+  Price: ARS 4065
+Product: Yogur Griego natural sin endulzar Yogurísimo 190 grs
+  Price: ARS 2575
+Product: Yogur batido Ser PRO+ con proteínas sabor natural 175 grs
+  Price: ARS 2475
+Product: Yogur batido Ser PRO+ con proteínas sabor frutos rojos 175 grs
+  Price: ARS 2475
+Product: Yogur cremoso Milkaut sabor natural en pote 180 g.
+  Price: ARS 2075
+Product: Yogur Griego sabor vainilla Yogurísimo 140 grs
+  Price: ARS 1725
+Product: Yogur firme vainilla La Serenísima Clásico 120 grs
+  Price: ARS 1099
+Product: Yogur firme frutilla La Serenísima clásico 120 g.
+  Price: ARS 1099
+Product: Yogur Griego sabor frutilla Yogurísimo 140 grs
+  Price: ARS 1725
+Product: Yogur bebible Ser PRO+ con proteínas sabor frutillas y arándanos 190 grs
+  Price: ARS 2790
+Product: Yogur natural sin azúcar Tregar en pote 280 g.
+  Price: ARS 3389
+Product: Yogur Griego natural endulzado Yogurísimo 300 grs
+  Price: ARS 4065
+Product: Yogur entero natural Tregar sin azúcar en pote 140 g.
+  Price: ARS 1790
+Product: Yogur bebible descremado vainilla La Serenísima clásico 900 g.
+  Price: ARS 4140
+Product: Yogur bebible Ser PRO+ con proteínas sabor vainilla 190 grs
+  Price: ARS 2790
+Product: Yogur batido descremado frutilla La Serenísima clásico 120 grs
+  Price: ARS 1099
+Product: Milanesa bola de lomo Novillo x kg.
+  Price: ARS 12880
+Product: Milanesa de bola de lomo Novillito x kg.
+  Price: ARS 8050
+Product: Banana seleccion x kg.
+  Price: ARS None
+Product: Plátano x kg.
+  Price: ARS None
+Product: Jugo en polvo Tang naranja banana 15 g.
+  Price: ARS 459
+Product: Nestlé Bananita Dolca 30 grs
+  Price: ARS 918
+Product: Yogur bebible banana Yogurisimo 900 g.
+  Price: ARS 5650
+Product: Granola proteica Integra de banana y chocolate 250 grs
+  Price: ARS 8500
+Product: Jugo en polvo Arcor de naranja banana 15 grs
+  Price: ARS 345
+Product: Budín Banana Artesano 350 grs
+  Price: ARS 6815
+Product: Obleas Carrefour Classic de banana split 100 grs
+  Price: ARS None
+Product: Barra de cereal Integra de banana 40 g.
+  Price: ARS 1599
+Product: Galletitas de banana Smookies Baby 150 grs
+  Price: ARS 4300
+Product: Nestum sabor Banana 225 grs
+  Price: ARS 3402
+Product: Barra de cereal Frutty de banana con dulce de leche 24 grs
+  Price: ARS 900
+Product: Granola Kelloggs de banana y manzana 200 grs
+  Price: ARS 4285
+Product: Chip de banana 100 g.
+  Price: ARS 3199
+Product: Barrita de cereal Frutty de manzana roja y banana 30 grs
+  Price: ARS 1390
+Product: Polenta instantánea Presto Pronta bolsa 730 g.
+  Price: ARS 2189
+Product: Polenta instantanea Prestopronta en bolsa 490 g.
+  Price: ARS 1499
+Product: Polenta instantánea Carrefour Classic 500 grs
+  Price: ARS None
+Product: Polenta instantanea sin tacc Bulnez en bolsa 500 g.
+  Price: ARS 659
+Product: Polenta instantanea Molinos Ala 500 grs
+  Price: ARS 800
+Product: Polenta Presto Pronta panceta y queso sin TACC 250 g.
+  Price: ARS 1455
+Product: Polenta Carrefour Classic bolsa 1 kg.
+  Price: ARS None
+Product: Polenta instantanea Molinos Ala 730 grs
+  Price: ARS 1290
+Product: Polenta Don Bernabeu 1 kg
+  Price: ARS 1190
+Product: Polenta org nica Dicomere paquete 450 g.
+  Price: ARS 1892
+Product: Polenta instantánea Don Bernabeu 500 g.
+  Price: ARS 790
+Product: Polenta instantanea egran bolsa x 500 grs
+  Price: ARS 999
+Product: Gaseosa cola Coca Cola Zero 2,25 lts
+  Price: ARS 5250
+Product: Gaseosa cola Coca Cola sabor original 2,25 lts
+  Price: ARS 5250
+Product: Gaseosa cola Pepsi Black pet 2 lts
+  Price: ARS 3150
+Product: Gaseosa cola regular Pepsi pet N 2 lts.
+  Price: ARS 2940
+Product: Gaseosa lima limón 7 Up sin azúcar 1,5 lts
+  Price: ARS 2775
+Product: Gaseosa lima limón Sprite 2,25 lts
+  Price: ARS 5250
+Product: Gaseosa lima limón 7 Up sin azúcar 2.25 lts
+  Price: ARS 3750
+Product: Gaseosa cola Pepsi Black pet 1,5 lts
+  Price: ARS 2590
+Product: Gaseosa tónica Paso de los Toros 1,5 lts
+  Price: ARS 2775
+Product: Gaseosa naranja Mirinda 2,25 lts
+  Price: ARS None
+Product: Gaseosa lima limón Sprite Zero 2,25 lts
+  Price: ARS 5250
+Product: Gaseosa pomelo Schweppes Zero 2,25 lts
+  Price: ARS 5250
+Product: Gaseosa cola Coca Cola Zero 1,25 lts
+  Price: ARS 2915
+Product: Gaseosa pomelo Cunnignton suave sin tacc 2,25 lts
+  Price: ARS 2450
+Product: Gaseosa cola Cunnington suave sin tacc 2,25 lts
+  Price: ARS 2450
+Product: Gaseosa lima limón 7 Up regular 1,5 lts
+  Price: ARS 2775
+Product: Azúcar Ledesma molida superior bolsa 1 kg.
+  Price: ARS 1419
+Product: Azúcar comun La perla tipo A 1 kg.
+  Price: ARS 1200
+Product: Azúcar Hileret light 500 g.
+  Price: ARS 2479
+Product: Azúcar mascabo Ledesma 800 g.
+  Price: ARS 2350
+Product: Azúcar común Bulnez 1 kg
+  Price: ARS 1090
+Product: Azúcar Hileret light 250 g.
+  Price: ARS 1489
+Product: Azúcar impalpable Dos Anclas bolsa 300 g.
+  Price: ARS 2469
+Product: Azúcar Ledesma light 500 g.
+  Price: ARS 2495
+Product: Azúcar orgánica Dicomere paquete 1000 g.
+  Price: ARS 5115
+Product: Azúcar rubia orgánica Carrefour Orgánico 1 kg
+  Price: ARS None
+Product: Azúcar mascabo Beepure zip pack 700 g.
+  Price: ARS 7625
+Product: Pan sin tacc Schar frances 100 g.
+  Price: ARS 6200
+Product: Tostadora Mandine para pan francés MT8616- negro
+  Price: ARS 37000
+Product: Pretal Apolo floral Porotos talle M
+  Price: ARS 29990
+Product: Pretal Rocky Porotos color negro talle M
+  Price: ARS 29990
+Product: Pretal Apolo floral Porotos talle L
+  Price: ARS 31990
+Product: Pretal Rocky Porotos color negro talle L
+  Price: ARS 31990
+Product: Pretal Rocky Porotos color negro talle XS
+  Price: ARS 28990
+Product: Pretal Rocky Porotos color negro talle S
+  Price: ARS 28990
+Product: Pretal Apolo floral Porotos talle S
+  Price: ARS 28990
+Product: Pretal Apolo floral Porotos talle XS
+  Price: ARS 28990
+Product: Collar Rocky Porotos color negro talle M
+  Price: ARS 19990
+Product: Collar floral Porotos talle M
+  Price: ARS 19990
+Product: Correa floral Porotos talle L
+  Price: ARS 33990
+Product: Correa Rocky Porotos color negro talle L
+  Price: ARS 33990
+Product: Cinturón Rocky Porotos color negro talle L
+  Price: ARS 25990
+Product: Cinturón floral Porotos talle L
+  Price: ARS 25990
+Product: Correa floral Porotos talle S
+  Price: ARS 31990
+Product: Correa Rocky Porotos color negro talle S
+  Price: ARS 31990
+Product: Harina de trigo Morixe 0000 1 kg.
+  Price: ARS 1250
+Product: Harina de trigo Morixe 000 1 kg.
+  Price: ARS 979
+Product: Harina de trigo Pureza 0000 1 kg.
+  Price: ARS 1335
+Product: Harina de Trigo 000 Caserita x 1 kg
+  Price: ARS 899
+Product: Harina Morixe para pizza 1 kg.
+  Price: ARS 1705
+Product: Harina de trigo Tassara tipo 000 1 kg.
+  Price: ARS 635
+Product: Harina fina integral Tassara 1 kg.
+  Price: ARS 1260
+Product: Harina de trigo Morixe leudante 1 kg.
+  Price: ARS 1560
+Product: Harina de trigo Bulnez 000 1 kg
+  Price: ARS 789
+Product: Harina de trigo 000 ultra refinada Cañuelas 1 kg.
+  Price: ARS 1025
+Product: Harina de trigo 0000 Bulnez 1 kg.
+  Price: ARS 959
+Product: Harina de trigo Pureza con levadura pan casero 1 kg.
+  Price: ARS 1980
+Product: Harina de trigo Tassara tipo 0000 x 1 kg
+  Price: ARS 1155
+Product: Harina de trigo 00 Chacabuco napolitana 1 kg
+  Price: ARS 2299
+Product: Harina de trigo integral Morixe 1 kg.
+  Price: ARS 1629
+Product: Harina de trigo 0000 Favorita fortificada 1 kg.
+  Price: ARS 1429
+Product: Harina de trigo Tassara tipo 0000 x 1 kg
+  Price: ARS 1155
+Product: Harina de trigo Morixe 0000 1 kg.
+  Price: ARS 1250
+Product: Harina de trigo Morixe 000 1 kg.
+  Price: ARS 979
+Product: Harina de trigo Pureza 0000 1 kg.
+  Price: ARS 1335
+Product: Harina de Trigo 000 Caserita x 1 kg
+  Price: ARS 899
+Product: Harina Morixe para pizza 1 kg.
+  Price: ARS 1705
+Product: Harina de trigo Tassara tipo 000 1 kg.
+  Price: ARS 635
+Product: Harina fina integral Tassara 1 kg.
+  Price: ARS 1260
+Product: Harina de trigo Morixe leudante 1 kg.
+  Price: ARS 1560
+Product: Harina de trigo Bulnez 000 1 kg
+  Price: ARS 789
+Product: Harina de trigo 000 ultra refinada Cañuelas 1 kg.
+  Price: ARS 1025
+Product: Harina de trigo 0000 Bulnez 1 kg.
+  Price: ARS 959
+Product: Harina de trigo Pureza con levadura pan casero 1 kg.
+  Price: ARS 1980
+Product: Harina de trigo 00 Chacabuco napolitana 1 kg
+  Price: ARS 2299
+Product: Harina de trigo integral Morixe 1 kg.
+  Price: ARS 1629
+Product: Harina de trigo 0000 Favorita fortificada 1 kg.
+  Price: ARS 1429
+Product: Acelga x paquete
+  Price: ARS 1690
+Product: Acelga congelada Green life en bolsa 550 g.
+  Price: ARS 4605
+Product: Acelga congelada Carrefour Classic fp 400 grs
+  Price: ARS None
+Product: acelga Lucchetti en bolsa 450 g.
+  Price: ARS None
+Product: Acelga congelada Granja de sol en bolsa 500 g.
+  Price: ARS 4789
+Product: Acelga lavada y cortada Sueño Verde 400 g.
+  Price: ARS 4790
+Product: Semillas acelga verde Parque
+  Price: ARS 1199
+Product: Buñuelos de acelga Amoedo 300 grs
+  Price: ARS 7750
+Product: Tarta integral Amoedo de calabaza y acelga 260 grs
+  Price: ARS 7750
+Product: Hojas de espinaca Bonduelle lata 380 g.
+  Price: ARS 7590
+Product: Té de manzanilla silvestre Taragui saquito sobre 20 uni
+  Price: ARS 1359
+Product: Té en saquitos Carrefour Classic sin TACC 50 uni
+  Price: ARS None
+Product: Té en saquitos Green Hills clásica 25 u.
+  Price: ARS 1539
+Product: Té verde en saquitos ensobrados Taragui 20 u.
+  Price: ARS 1669
+Product: Té en saquitos Green Hills clásica 100 u.
+  Price: ARS 5479
+Product: Té de hierbas en saquitos Cachamai digestivo amarillo 20 u.
+  Price: ARS 1450
+Product: Té verde en saquitos Taragüi 40 u.
+  Price: ARS 3259
+Product: Té La Virginia en saquitos x 25 uni
+  Price: ARS 889
+Product: Té frutal en saquitos Taragüi Placeres frutas rojas 20 u.
+  Price: ARS 2269
+Product: Té de manzanillas La Virginia con anis saquitos x 25 uni
+  Price: ARS 1790
+Product: Té en saquitos Carrefour Classic sin TACC x 25 un.
+  Price: ARS None
+Product: Té de hierbas en saquitos Cachamai digestivo rosa 20 u.
+  Price: ARS 1450
+Product: Té verde en saquitos Cachamai 20 u.
+  Price: ARS 1100
+Product: Té Taragui silvestre ensueños en saquitos 20 uni
+  Price: ARS 1785
+Product: Té de boldo en saquitos Carrefour 25 u.
+  Price: ARS None
+Product: Té La Virginia con limón saquitos en sobres x 20 uni
+  Price: ARS 2059
+Product: Queso port salut La Pauilna tradicional x kg
+  Price: ARS None
+Product: Queso port salut light La Serenísima sin lactosa x kg.
+  Price: ARS 10275
+Product: Queso por salut light Tremplay trozado x kg.
+  Price: ARS 5500
+Product: Queso port salut Silvia fraccionado reducido en grasa x kg.
+  Price: ARS None
+Product: Queso port salut Tremblay trozado x kg.
+  Price: ARS 5360
+Product: Port salut light horma
+  Price: ARS 3298
+Product: Queso port salut Punta del Agua horma x kg.
+  Price: ARS 1137
+Product: Queso port salut light Cremac fracc x kg.
+  Price: ARS 7645
+Product: Queso port salut La Paulina x kg
+  Price: ARS None
+Product: Queso por salut Punta Del Agua light x kg.
+  Price: ARS 1593
+Product: Queso por salut Carrefour Classic reducido en grasas sin tacc x kg
+  Price: ARS 4950
+Product: Queso port salut La paulina fraccionado origen x kg.
+  Price: ARS 8050
+Product: Queso port salut ligth Puyehue fraccionado x kg.
+  Price: ARS 8350
+Product: Queso Port Salut Punta del Agua porcionado x kg.
+  Price: ARS 7670
+Product: La Paulina queso untable por salut equilibrio 190 grs
+  Price: ARS 2799
+Product: Queso por salut tradicional Carrefour Classic sin gluten x kg
+  Price: ARS 7355
+Product: Mermelada BC La Campagnola durazno 390 g.
+  Price: ARS 3529
+Product: Mermelada Arcor de durazno 454 g.
+  Price: ARS 2979
+Product: Mermelada BC La Campagnola frutilla 390 g.
+  Price: ARS 4659
+Product: Mermelada BC La Campagnola ciruela 390 g.
+  Price: ARS 3739
+Product: Mermelada BC La Campagnola arándano 390 g.
+  Price: ARS 4920
+Product: Mermelada light Carrefour Classic durazno 390 grs
+  Price: ARS None
+Product: Mermelada La Campagnola de durazno 454 g.
+  Price: ARS 3619
+Product: Mermelada de frutilla La Campagnola 454 g.
+  Price: ARS 4219
+Product: Mermelada BC La Campagnola de naranja 390 g.
+  Price: ARS 3739
+Product: Mermelada de frutilla Arcor 454 g.
+  Price: ARS 3990
+Product: Mermelada Carrefour Classic frutilla light 390 g.
+  Price: ARS None
+Product: Mermelada frutos del bosque BC La Campagnola 390 grs
+  Price: ARS 4919
+Product: Mermelada Carrefour Classic durazno 454 g.
+  Price: ARS None
+Product: Mermelada Arcor durazno light 390 g.
+  Price: ARS 3249
+Product: Mermelada de ciruela light Carrefour Classic 390 grs
+  Price: ARS None
+Product: Mermelada de ciruela La Campagnola 454 g.
+  Price: ARS 3619
+Product: Mermelada BC La Campagnola durazno 390 g.
+  Price: ARS 3529
+Product: Mermelada Arcor de durazno 454 g.
+  Price: ARS 2979
+Product: Mermelada BC La Campagnola frutilla 390 g.
+  Price: ARS 4659
+Product: Mermelada BC La Campagnola ciruela 390 g.
+  Price: ARS 3739
+Product: Mermelada BC La Campagnola arándano 390 g.
+  Price: ARS 4920
+Product: Mermelada light Carrefour Classic durazno 390 grs
+  Price: ARS None
+Product: Mermelada La Campagnola de durazno 454 g.
+  Price: ARS 3619
+Product: Mermelada de frutilla La Campagnola 454 g.
+  Price: ARS 4219
+Product: Mermelada BC La Campagnola de naranja 390 g.
+  Price: ARS 3739
+Product: Mermelada de frutilla Arcor 454 g.
+  Price: ARS 3990
+Product: Mermelada Carrefour Classic frutilla light 390 g.
+  Price: ARS None
+Product: Mermelada frutos del bosque BC La Campagnola 390 grs
+  Price: ARS 4919
+Product: Mermelada Carrefour Classic durazno 454 g.
+  Price: ARS None
+Product: Mermelada Arcor durazno light 390 g.
+  Price: ARS 3249
+Product: Mermelada de ciruela light Carrefour Classic 390 grs
+  Price: ARS None
+Product: Mermelada de ciruela La Campagnola 454 g.
+  Price: ARS 3619
+Product: La Paulina queso reggianito rallado 150 grs
+  Price: ARS 5529
+Product: Queso rallado La Serenísima reggianito flow pack 175 g.
+  Price: ARS 7145
+Product: La Paulina queso reggianito rallado 450 grs
+  Price: ARS 14349
+Product: La Paulina queso reggianito rallado 40 grs
+  Price: ARS 1779
+Product: Queso rallado Tregar 120 g.
+  Price: ARS 5099
+Product: Queso rallado reggianito La Serenísima sobre 35 g.
+  Price: ARS 1579
+Product: La Paulina queso en hebras italiano 125 grs
+  Price: ARS 3819
+Product: Queso rallado Ilolay 120 g.
+  Price: ARS 5545
+Product: La Paulina queso en hebras italiano equilibrio 125 grs
+  Price: ARS 3779
+Product: Queso en hebras Finlandia Chef 4 quesos light 130 g.
+  Price: ARS 4115
+Product: Queso rallado La Serenísima reggianito flow pack 70 g.
+  Price: ARS 3149
+Product: Queso rallado reggianito La Serenísima bolsa 130 g.
+  Price: ARS 5625
+Product: Queso rallado Ilolay 1 u. x 40 g.
+  Price: ARS 1949
+Product: Queso rallado Milkaut 40 g.
+  Price: ARS 2079
+Product: Queso en hebras Finlandia Chef 4 quesos 130 g.
+  Price: ARS 4115
+Product: La Paulina queso en hebras cuatro quesos 80 grs
+  Price: ARS 2469
+Product: Cebolla x kg.
+  Price: ARS None
+Product: Cebolla de verdeo x 1 atado
+  Price: ARS 1699
+Product: Cebolla morada x kg.
+  Price: ARS None
+Product: Cebolla Sanes en red 4 uni
+  Price: ARS 1299
+Product: Cebolla blanca x kg.
+  Price: ARS None
+Product: Cebolla en escamas 50 g.
+  Price: ARS 1150
+Product: Cebolla deshidratada Alicante 50 g.
+  Price: ARS 2079
+Product: Cebolla deshidratada Dos Anclas 75 g.
+  Price: ARS 3050
+Product: Cebolla de verdeo 200 g.
+  Price: ARS 4190
+Product: Cebolla de verdeo Song 200 g.
+  Price: ARS 4790
+Product: Cebolla 1854 en escamas pet 60 g.
+  Price: ARS 3400
+Product: Aritos de arroz Dos Hermanos crema y cebolla 80 g.
+  Price: ARS 1549
+Product: Papas fritas Bulnez sabor queso y cebolla en tubo 100 grs
+  Price: ARS 2390
+Product: Condimento sabor al horno Knorr cebolla y ajo 21 g.
+  Price: ARS 3049
+Product: Papas fritas Pringles de crema y cebolla 109 g.
+  Price: ARS 5355
+Product: Galletitas Carrefour cintitas cebolla 125 g.
+  Price: ARS None
+Product: Jugo en Polvo Clight Naranja Dulce 7,5 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Manzana Deliciosa 7 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Limonada 8 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Limonada Arandanos 7,5 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Pomelo Rosado 8 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Naranja Durazno 7,5 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Limonada Maracuyá 7,5 grs
+  Price: ARS 469
+Product: Jugo en polvo Tang naranja dulce 15 g.
+  Price: ARS 459
+Product: Jugo en polvo Clight limonada rosa 8 grs
+  Price: ARS 469
+Product: Jugo en polvo Clight ananá 7grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Naranja Mango 7grs
+  Price: ARS 469
+Product: Jugo en polvo Tang naranja mango 15 g.
+  Price: ARS 459
+Product: Jugo Clight Pomelada Hibiscus 8 grs
+  Price: ARS 469
+Product: Jugo en Polvo Clight Naranja 8 grs
+  Price: ARS 469
+Product: Jugo en polvo Tang limonada dulce 15 g.
+  Price: ARS 459
+Product: Jugo en polvo Tang multifruta 15 g.
+  Price: ARS 459
+Product: Manteca La Serenísima extra para untar 200 g.
+  Price: ARS 4280
+Product: Manteca Tonadita calidad extra 200 g.
+  Price: ARS 3479
+Product: Manteca La serenisima clásica 100 g.
+  Price: ARS 2420
+Product: Manteca La serenisima light 200 g.
+  Price: ARS 3955
+Product: Manteca SanCor clásica 200 g.
+  Price: ARS 3890
+Product: Manteca Tonadita calidad extra 100 g.
+  Price: ARS 2089
+Product: La Paulina manteca calidad extra 200 grs
+  Price: ARS 4055
+Product: Manteca Primer Premio 200 g.
+  Price: ARS 3249
+Product: Alimento en pan para untar Manty 200 g.
+  Price: ARS 2629
+Product: Manteca extra calidad Ilolay sin sal 200 g.
+  Price: ARS 4400
+Product: Manteca Primer Premio 100 g.
+  Price: ARS 1805
+Product: Manteca SanCor multivitamina 100 g.
+  Price: ARS 2099
+Product: La Paulina manteca calidad extra 100 grs
+  Price: ARS 2129
+Product: Manteca Tonadita sin sal 200 g.
+  Price: ARS 3895
+Product: Manteca extra sal Conaprole 200 g.
+  Price: ARS 4199
+Product: Manteca Ghee cows clarificada sin TACC 300 g.
+  Price: ARS 15029
+Product: Dulce de leche clásico La Serenísima 400 g.
+  Price: ARS 3349
+Product: Dulce de leche La serenisima colonial 400 g.
+  Price: ARS 4200
+Product: Dulce de leche Ilolay clásico 400 g.
+  Price: ARS 3285
+Product: Dulce de leche repostero La Serenísima 400 g.
+  Price: ARS 3805
+Product: Dulce de leche familiar Carrefour classic en pote 400 g.
+  Price: ARS 2421
+Product: Dulce de leche La serenisima colonial 250 g.
+  Price: ARS 2750
+Product: Dulce de leche colonial La Serenísima pote 1 kg.
+  Price: ARS 9165
+Product: Dulce de leche de campo Milkaut familiar 395 g.
+  Price: ARS 3239
+Product: Dulce de leche Bulnez repostero 400 grs
+  Price: ARS 2590
+Product: Dulce de leche Milkaut familiar en pote 400 g.
+  Price: ARS 4065
+Product: Dulce de leche repostero Milkaut 1 kg.
+  Price: ARS 8315
+Product: Dulce de leche clásico La Serenísima en pote 1 kg
+  Price: ARS 8249
+Product: Dulce de leche Milkaut 1 kg.
+  Price: ARS 7869
+Product: Dulce de leche light Carrefour Classic en pote 400 grs
+  Price: ARS None
+Product: Dulce de leche repostero Milkaut en pote 400 g.
+  Price: ARS 4489
+Product: Dulce de leche repostero Carrefour classic en pote 400 g.
+  Price: ARS 2691
+Product: Dulce de leche clásico La Serenísima 400 g.
+  Price: ARS 3349
+Product: Dulce de leche La serenisima colonial 400 g.
+  Price: ARS 4200
+Product: Dulce de leche Ilolay clásico 400 g.
+  Price: ARS 3285
+Product: Dulce de leche repostero La Serenísima 400 g.
+  Price: ARS 3805
+Product: Dulce de leche familiar Carrefour classic en pote 400 g.
+  Price: ARS 2421
+Product: Dulce de leche La serenisima colonial 250 g.
+  Price: ARS 2750
+Product: Dulce de leche colonial La Serenísima pote 1 kg.
+  Price: ARS 9165
+Product: Dulce de leche de campo Milkaut familiar 395 g.
+  Price: ARS 3239
+Product: Dulce de leche Bulnez repostero 400 grs
+  Price: ARS 2590
+Product: Dulce de leche Milkaut familiar en pote 400 g.
+  Price: ARS 4065
+Product: Dulce de leche repostero Milkaut 1 kg.
+  Price: ARS 8315
+Product: Dulce de leche clásico La Serenísima en pote 1 kg
+  Price: ARS 8249
+Product: Dulce de leche Milkaut 1 kg.
+  Price: ARS 7869
+Product: Dulce de leche light Carrefour Classic en pote 400 grs
+  Price: ARS None
+Product: Dulce de leche repostero Milkaut en pote 400 g.
+  Price: ARS 4489
+Product: Dulce de leche repostero Carrefour classic en pote 400 g.
+  Price: ARS 2691
+Product: Sal fina Celusal paquete 500 g.
+  Price: ARS 1409
+Product: Sal fina Bulnez en bolsa 500 g.
+  Price: ARS 999
+Product: Sal fina Dos Anclas en paquete 500 grs
+  Price: ARS 1375
+Product: Sal fina Dos Estrellas 500 g.
+  Price: ARS 779
+Product: Sal fina Celusal 500 g.
+  Price: ARS 1685
+Product: Sal fina Dos Anclas 500 g.
+  Price: ARS 1549
+Product: Sal fina Carrefour Classic en bolsa 500 grs
+  Price: ARS None
+Product: Sal fina Celusal 100 g.
+  Price: ARS 1849
+Product: Sal fina light Genser salero bajo sodio 300 g.
+  Price: ARS 5495
+Product: Sal fina light Dos Anclas caja 500 g.
+  Price: ARS 4919
+Product: Sal fina Celusal salero 250 g.
+  Price: ARS 3199
+Product: Sal fina Celusal salero 500 g.
+  Price: ARS 4105
+Product: Sal fina Dos Anclas salero 500 g.
+  Price: ARS 3340
+Product: Sal fina marina Gellsingh pote 160 g.
+  Price: ARS 1619
+Product: Sal fina Carrefour Classic salero 500 grs
+  Price: ARS None
+Product: Sal fina Dos Anclas salero 500 g.
+  Price: ARS 3340
+Product: Aceite mezcla Natura blend 1.5 l.
+  Price: ARS 9755
+Product: Aceite mezcla Natura blend 900 cc.
+  Price: ARS 5985
+Product: Aceite mezcla Cocinero girasol oliva pet 1.5 l.
+  Price: ARS 9615
+Product: Aceite mezcla Carrefour Classic 250 ml
+  Price: ARS 3231
+Product: Aceite mezcla Carrefour Classic 500 ml
+  Price: ARS None
+Product: Aceite mezcla Carrefour Classic 2 lts
+  Price: ARS 19521
+Product: Aceite mezcla Natura blend 1.5 l.
+  Price: ARS 9755
+Product: Aceite mezcla Natura blend 900 cc.
+  Price: ARS 5985
+Product: Aceite mezcla Cocinero girasol oliva pet 1.5 l.
+  Price: ARS 9615
+Product: Aceite mezcla Carrefour Classic 250 ml
+  Price: ARS 3231
+Product: Aceite mezcla Carrefour Classic 500 ml
+  Price: ARS None
+Product: Aceite mezcla Carrefour Classic 2 lts
+  Price: ARS 19521
+Product: Jugo en polvo Tang mandarina 15 grs
+  Price: ARS 459
+Product: Jugo en Polvo Clight Mandarina 8 grs
+  Price: ARS 469
+Product: Chicles Topline Mandarina sin azúcar 7 u.
+  Price: ARS 1169
+Product: Té La Virginia mandarina naranja pomelo x 20 uni
+  Price: ARS 2379
+Product: Jugo Cepita del Valle Ananá Mandarina 995 ml
+  Price: ARS 2700
+Product: Té verde Cachamai sabor mandarina 20 uni
+  Price: ARS 1900
+Product: Libro lyna y mandarina
+  Price: ARS 19300
+Product: Pintura en aerosol Montana 94 rv105 mandarina mate 400 cc
+  Price: ARS None
+Product: Libro Las mil aventuras de Mandarina
+  Price: ARS 21300
+Product: Fideos tallarin N5 Lucchetti 500 g.
+  Price: ARS 1499
+Product: Fideos spaghetti N3 Matarazzo 500 g.
+  Price: ARS 1799
+Product: Fideos tirabuzon N28 Lucchetti 500 g.
+  Price: ARS 1499
+Product: Fideos tirabuzones N28 Matarazzo 500 g.
+  Price: ARS 1759
+Product: Fideos tallarines Don Vicente en bolsa 500 g.
+  Price: ARS 3229
+Product: Fideos mostacholes N52 Matarazzo rayado 500 g.
+  Price: ARS 1799
+Product: Fideos mostacholes N52 Lucchetti rayado 500 g.
+  Price: ARS 1499
+Product: Fideos spaghetti N7 Lucchetti 500 g.
+  Price: ARS 1439
+Product: Fideos tirabuzón Terrabusi 3 vegetales 500 g.
+  Price: ARS 1349
+Product: Fideos coditos Lucchetti 500 g.
+  Price: ARS 1499
+Product: Fideo spaghetti Bulnez en paquete 500 g.
+  Price: ARS 799
+Product: Fideo tirabuzones Bulnez en paquete 500 g.
+  Price: ARS 799
+Product: Fideos integrales tirabuzon Matarazzo 500 g.
+  Price: ARS 2100
+Product: Fideos tallarines N5 Matarazzo 500 g.
+  Price: ARS 1799
+Product: Fideos cinta caserito Don vicente en bolsa 500 g.
+  Price: ARS 3300
+Product: Fideos tirabuzones Favorita fortificado 500 g.
+  Price: ARS 675
+Product: Leche UAT parcialmente descremada Carrefour classic brik 1 lt.
+  Price: ARS None
+Product: Leche UAT entera Carrefour classic brik 1 lt.
+  Price: ARS None
+Product: Leche descremada La Serenísima UAT proteinas 1 l.
+  Price: ARS 2675
+Product: Leche descremada larga vida La Serenísima cero lactosa 1 l.
+  Price: ARS 2675
+Product: Leche parcialmente descremada UAT Carrefour classic tetra 1 lt.
+  Price: ARS None
+Product: Leche entera larga vida Las tres niñas 1 l.
+  Price: ARS 2385
+Product: Leche entera UAT Carrefour classic tetra 1 lt.
+  Price: ARS None
+Product: Leche descremada larga vida Las tres niñas 1 l.
+  Price: ARS 2380
+Product: Leche La Serenísima UAT parc descremada liviana 1% pet 1 lt
+  Price: ARS 2615
+Product: Leche reducida en lactosa UAT Carrefour classic 1 lt.
+  Price: ARS 1881
+Product: Leche entera La Serenísima uat fortificada 3% tetra 200 cc.
+  Price: ARS 1150
+Product: Leche La Serenísima UAT descremada 0% pet 1lt
+  Price: ARS 2615
+Product: Leche descremada larga vida Las Tres Niñas 1 l.
+  Price: ARS 2385
+Product: Leche descremada larga vida La Serenísima 2 % 1 l.
+  Price: ARS 2615
+Product: Leche chocolatada UAT Milkaut tetra 1 lt.
+  Price: ARS 4475
+Product: Leche liviana UAT Las tres niñas 2 fortificada 1 lt.
+  Price: ARS 2385
