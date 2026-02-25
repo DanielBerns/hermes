@@ -8,9 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from .helpers import random_sleep
+from hermes.scrape.helpers import random_sleep
 
-class Carrefour:
+class CarrefourExtract:
     def __init__(
         self,
         searches_txt: str,
@@ -58,7 +58,6 @@ class Carrefour:
 
         # Get the main window handle
         original_window = driver.current_window_handle
-
         # Handle the popup (e.g., click a button)
         # onetrust-accept-btn-handler
         # //*[@id="onetrust-accept-btn-handler"]
@@ -100,6 +99,3 @@ class Carrefour:
             random_sleep(30, 1, 60) # Random wait to simulate human interaction
 
         driver.quit()
-
-
-

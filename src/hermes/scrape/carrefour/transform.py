@@ -2,30 +2,27 @@ import json
 import logging
 from pathlib import Path
 from typing import List, Dict, Any
-from hermes.scrape.components.models import ProductItem, ScrapedResult
-
-import pdb
+from hermes.scrape.carrefour.models import ProductItem, ScrapedResult
 
 # Configure the module logger
 logger = logging.getLogger(__name__)
 
-class CarrefourExtractor:
-    def __init__(self, target_folder: Union[str, Path]):
-        self.target_folder = Path(target_folder)
-        if not self.target_folder.is_dir():
-            logger.error(f"Initialization failed: '{self.target_folder}' is not a valid directory.")
-            raise NotADirectoryError(f"Directory not found: {self.target_folder}")
-        logger.info(f"Extractor initialized for directory: {self.target_folder}")
+class CarrefourTransform:
+    def __init__(self, target_dir: Union[str, Path]):
+        self.target_dir = Path(target_dir)
+        if not self.target_dir.is_dir():
+            logger.error(f"Initialization failed: '{self.target_dir}' is not a valid directory.")
+            raise NotADirectoryError(f"Directory not found: {self.target_dir}")
+        logger.info(f"Extractor initialized for directory: {self.target_dir}")
 
     def process_folder(self) -> List[ScrapedResult]:
         """Iterates over all HTML files in the folder and extracts data."""
-        logger.info(f"Scanning '{self.target_folder}' for HTML files...")
-        html_files = list(self.target_folder.rglob("*.html"))
+        logger.info(f"Scanning '{self.target_dir}' for HTML files...")
+        html_files = list(self.target_dir.rglob("*.html"))
         logger.info(f"Found {len(html_files)} HTML files to process.")
 
         all_results = []
         for file_path in html_files:
-            # pdb.set_trace()
             logger.debug(f"Starting extraction for file: {file_path.name}")
             file_results = self._extract_from_file(file_path)
             all_results.extend(file_results)
