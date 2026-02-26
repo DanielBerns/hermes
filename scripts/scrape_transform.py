@@ -30,11 +30,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Specify your target directory here
-    target_dir = Path("~", "Info", "webdeprecios", args.timestamp).expanduser()
-
-    # Create the directory for testing purposes if it doesn't exist
-    target_dir.mkdir(exist_ok=True)
+    webdeprecios_home = Path.home() /  "Info" / "webdeprecios"
+    target_dir = webdeprecios_home / args.timestamp
+    if target_dir.exists() == False:
+        logger.error("unexpected error: {target_dir} doesn't exists")
+        sys.exit(1)
+    results_txt = webdeprecios_home / "results.txt"
 
     try:
         transformer = CarrefourTransform(target_dir=target_dir)

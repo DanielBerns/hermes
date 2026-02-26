@@ -13,16 +13,16 @@ from hermes.scrape.helpers import random_sleep
 class CarrefourExtract:
     def __init__(
         self,
-        searches_txt: str,
         target: Path,
-        timestamp: str
+        timestamp: str,
+        searches_txt: str
     ) -> None:
         self._online_shop = "https://www.carrefour.com.ar/"
         with open(searches_txt, "r") as f:
              searches: List[str] = [line[:-1] for line in f]
              shuffle(searches) # simulate human interaction
         self._searches: List[str] = searches
-        store = Path(target, timestamp, "carrefour")
+        store = target / timestamp / "carrefour"
         store.mkdir(mode=0o700, parents=True, exist_ok=True)
         self._store: Path = store
         self._number: int = 0
