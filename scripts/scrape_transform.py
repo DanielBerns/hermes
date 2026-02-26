@@ -43,8 +43,8 @@ def main():
 
         logger.info(f"Extraction complete. Yielded {len(results)} valid product records.")
 
-        #
         with open(results_txt, "w") as results_txt:
+            results_txt.write(f"Carrefour - {args.timestamp}\n\n")
             for res in results:
                 results_txt.write(f"\nProduct: {res.product.name}\n")
                 if res.product.offers:
