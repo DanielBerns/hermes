@@ -15,7 +15,7 @@ def main() -> None:
     timestamp = get_timestamp()
     extractor = CarrefourExtract(webdeprecios_home, timestamp, searches_txt)
 
-    path_to_driver = str(Path.home() / 'Software' / 'geckodriver').expanduser())
+    path_to_driver = str(Path.home() / 'Software' / 'geckodriver')
     path_to_browser = str(Path('/', 'usr', 'bin','firefox'))
     extractor.execute(path_to_driver, path_to_browser)
 
