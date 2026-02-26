@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sys
 from pathlib import Path
@@ -19,19 +20,29 @@ def main():
     setup_logging()
     logger = logging.getLogger(__name__)
 
+    parser = argparse.ArgumentParser(description="Transform supermarket prices in html pages in 'ready to load in database' data.")
+
+    parser.add_argument(
+        "timestamp",
+        type=str,
+        help="timestamp of the data to be processed"
+    )
+
+    args = parser.parse_args()
+
     # Specify your target directory here
-    target_dir = Path("~", "Info", "webdeprecios", "20260221181203").expanduser()
+    target_dir = Path("~", "Info", "webdeprecios", args.timestamp).expanduser()
 
     # Create the directory for testing purposes if it doesn't exist
     target_dir.mkdir(exist_ok=True)
 
     try:
-        extractor = CarrefourTransform(target_dir=target_dir)
-        results = extractor.execute()
+        transformer = CarrefourTransform(target_dir=target_dir)
+        results = transformer.execute()
 
         logger.info(f"Extraction complete. Yielded {len(results)} valid product records.")
 
-        # Example of interacting with the clean data
+        #
         with open("./results.txt", "w") as results_txt:
             for res in results:
                 results_txt.write(f"\nProduct: {res.product.name}\n")
