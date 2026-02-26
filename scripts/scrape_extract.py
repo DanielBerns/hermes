@@ -3,14 +3,13 @@ from pathlib import Path
 from hermes.scrape.carrefour.extract import CarrefourExtract
 from hermes.core.helpers import get_timestamp
 
-DEFAULT_SEARCHES_TXT =
 def main() -> None:
     webdeprecios_home = Path.home() /  "Info" / "webdeprecios"
     searches_txt = webdeprecios_home / "searches.txt"
     if searches_txt.exists():
         pass
     else:
-        default_searches_txt = Path(__file__).parents[0] / "assets" / "searches.txt"
+        default_searches_txt = Path(__file__).parents[1] / "src" / "hermes" / "assets" / "searches.txt"
         shutil.copy(default_searches_txt, searches_txt)
     timestamp = get_timestamp()
     extractor = CarrefourExtract(webdeprecios_home, timestamp, searches_txt)
