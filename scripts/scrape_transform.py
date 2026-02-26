@@ -35,7 +35,7 @@ def main():
     if target_dir.exists() == False:
         logger.error("unexpected error: {target_dir} doesn't exists")
         sys.exit(1)
-    results_txt = webdeprecios_home / "results.txt"
+    results_txt = webdeprecios_home / f"{args.timestamp}_results.txt"
 
     try:
         transformer = CarrefourTransform(target_dir=target_dir)
@@ -44,7 +44,7 @@ def main():
         logger.info(f"Extraction complete. Yielded {len(results)} valid product records.")
 
         #
-        with open("./results.txt", "w") as results_txt:
+        with open(results_txt, "w") as results_txt:
             for res in results:
                 results_txt.write(f"\nProduct: {res.product.name}\n")
                 if res.product.offers:
