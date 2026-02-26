@@ -1,3 +1,5 @@
+# https://www.twz.com/news-features/the-massive-questions-surrounding-a-major-american-air-war-against-iran
+
 import json
 import logging
 from pathlib import Path
@@ -15,7 +17,7 @@ class CarrefourTransform:
             raise NotADirectoryError(f"Directory not found: {self.target_dir}")
         logger.info(f"Extractor initialized for directory: {self.target_dir}")
 
-    def process_folder(self) -> List[ScrapedResult]:
+    def execute(self) -> List[ScrapedResult]:
         """Iterates over all HTML files in the folder and extracts data."""
         logger.info(f"Scanning '{self.target_dir}' for HTML files...")
         html_files = list(self.target_dir.rglob("*.html"))
@@ -91,7 +93,6 @@ class CarrefourTransform:
         for element in item_list:
             position = element.get('position', 'unknown')
             item_data = element.get('item')
-            pdb.set_trace()
 
             if isinstance(item_data, dict):
                 try:

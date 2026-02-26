@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from .models import ScrapedResult
 from .db_models import Brand, Product, Offer
 
-def ingest_scraped_result(session: Session, result: ScrapedResult) -> Product:
+def load_scraped_result(session: Session, result: ScrapedResult) -> Product:
     """
     Takes a validated Pydantic ScrapedResult and loads it into the database.
     """
