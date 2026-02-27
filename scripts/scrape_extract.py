@@ -16,7 +16,7 @@ def main() -> None:
 
     path_to_driver = str(Path.home() / 'Software' / 'geckodriver')
     path_to_browser = str(Path('/', 'usr', 'bin','firefox'))
-    extractor.execute(path_to_driver, path_to_browser)
+    extractor.execute(path_to_driver, path_to_browser, headless=True)
 
 if __name__ == "__main__":
     main()
