@@ -1,65 +1,121 @@
-from sqlalchemy.orm import Session
-from .models import ScrapedResult
-from .db_models import Brand, Product, Offer
+from typing import Any
+from pathlib import Path
+import re
+from datetime import datetime
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-def load_scraped_result(session: Session, result: ScrapedResult) -> Product:
-    """
-    Takes a validated Pydantic ScrapedResult and loads it into the database.
-    """
-    p_data = result.product
+Base = declarative_base()
 
-    # 1. Handle the Brand (Upsert logic)
-    db_brand = None
-    brand_name = None
+# --- Database Models ---
 
-    # Brand can be a Pydantic model, a string, or None based on the extractor
-    if hasattr(p_data.brand, 'name') and p_data.brand.name:
-        brand_name = p_data.brand.name
-    elif isinstance(p_data.brand, str):
-        brand_name = p_data.brand
+class Product(Base):
+    __tablename__ = 'products'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, nullable=False)
 
-    if brand_name:
-        db_brand = session.query(Brand).filter_by(name=brand_name).first()
-        if not db_brand:
-            db_brand = Brand(name=brand_name)
-            session.add(db_brand)
-            session.flush() # Get the ID without committing
+    # Relationship to historical price records
+    prices = relationship("PriceReport", back_populates="product", cascade="all, delete-orphan")
 
-    # 2. Handle the Product (Upsert logic using SKU or source_id)
-    # Prefer SKU for matching, fallback to the @id (source_id)
-    db_product = None
-    if p_data.sku:
-        db_product = session.query(Product).filter_by(sku=p_data.sku).first()
-    if not db_product and p_data.item_id:
-        db_product = session.query(Product).filter_by(source_id=p_data.item_id).first()
+class PriceReport(Base):
+    __tablename__ = 'price_reports'
+    id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
+    sku = Column(String, nullable=True)
+    price = Column(Float, nullable=True)
+    store = Column(String, nullable=True)
+    scraped_at = Column(DateTime, default=datetime.utcnow)
 
-    if not db_product:
-        db_product = Product(
-            source_id=p_data.item_id,
-            name=p_data.name,
-            brand_id=db_brand.id if db_brand else None,
-            image_url=str(p_data.image) if p_data.image else None,
-            description=p_data.description,
-            mpn=p_data.mpn,
-            sku=p_data.sku,
-            gtin=p_data.gtin
-        )
-        session.add(db_product)
-        session.flush()
+    product = relationship("Product", back_populates="prices")
 
-    # 3. Handle the Offer (Always insert a new record for time-series tracking)
-    if p_data.offers:
-        new_offer = Offer(
-            product_id=db_product.id,
-            price=p_data.offers.price,
-            price_currency=p_data.offers.priceCurrency,
-            low_price=p_data.offers.lowPrice,
-            high_price=p_data.offers.highPrice,
-            availability=p_data.offers.availability,
-            item_condition=p_data.offers.itemCondition,
-            price_valid_until=p_data.offers.priceValidUntil,
-            offer_count=p_data.offers.offerCount
-        )
-        session.add(new_offer)
+# --- Parsing Logic ---
 
-    return db_product
+def extract_timestamp_from_filename(file_path: Path) -> datetime:
+    """Extracts the datetime object from a filename like YYYYMMDDhhmmss_results.txt"""
+    filename = file_path.name
+    match = re.search(r'(\d{14})', filename)
+    if match:
+        return datetime.strptime(match.group(1), '%Y%m%d%H%M%S')
+    return datetime.now()
+
+def parse_scraping_file(file_path: Path) -> dict[str, Any]:
+    """Reads the text file and yields dictionaries of parsed product data."""
+    timestamp = extract_timestamp_from_filename(file_path)
+    current_product = None
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            # Clean out the dynamically injected tags
+            line = re.sub(r'\\s*', '', line).strip()
+
+            if line.startswith('Product:'):
+                current_product = line.replace('Product:', '').strip()
+
+            elif 'Price: ARS' in line and current_product:
+                # Expected format: SKU Price: ARS 999 - url - url - STORE
+                # Or: None Price: ARS None - None - None
+                parts = line.split('-')
+                price_segment = parts[0].strip()
+
+                # Match the SKU and Price using regex
+                match = re.match(r'(\w+)\s+Price:\s+ARS\s+([\d\.]+|None)', price_segment)
+
+                if match:
+                    sku_str = match.group(1)
+                    price_str = match.group(2)
+
+                    sku = None if sku_str == 'None' else sku_str
+                    price = None if price_str == 'None' else float(price_str)
+
+                    # Extract store from the last segment if available
+                    store = parts[-1].strip() if len(parts) > 1 else None
+                    store = None if store == 'None' else store
+
+                    yield {
+                        'name': current_product,
+                        'sku': sku,
+                        'price': price,
+                        'store': store,
+                        'scraped_at': timestamp
+                    }
+
+# --- Database Operations ---
+
+def update_database(db_url, data_generator):
+    """Upserts products and inserts price reports."""
+    engine = create_engine(db_url)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    records_added = 0
+
+    try:
+        for item in data_generator:
+            # Get or Create the Product
+            product = session.query(Product).filter_by(name=item['name']).first()
+            if not product:
+                product = Product(name=item['name'])
+                session.add(product)
+                session.flush() # Flush to get the product.id
+
+            # Insert the Price Report
+            price_report = PriceReport(
+                product_id=product.id,
+                sku=item['sku'],
+                price=item['price'],
+                store=item['store'],
+                scraped_at=item['scraped_at']
+            )
+            session.add(price_report)
+            records_added += 1
+
+        session.commit()
+        print(f"Successfully added {records_added} price records to the database.")
+
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred: {e}")
+    finally:
+        session.close()
+
