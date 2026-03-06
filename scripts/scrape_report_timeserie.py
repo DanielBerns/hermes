@@ -16,4 +16,4 @@ if __name__ == "__main__":
     timestamp = get_timestamp()
     target = webdeprecios_home / f"price_timeseries_{timestamp}.md"
 
-    generate_timeseries_report(args.db, target)
+    generate_timeseries_report(db_uri, target)
