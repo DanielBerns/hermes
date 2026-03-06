@@ -5,7 +5,12 @@ from hermes.scrape.carrefour.load import parse_scraping_file, update_database
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parse scraped product data and load it into an SQLite database.")
-    parser.add_argument("filepath", help="Path to the results text file.")
+    parser.add_argument(
+        "timestamp",
+        type=str,
+        help="timestamp of the data to be processed"
+    )
+
     parser.add_argument("--db", default="supermarket_prices.db", help="database filename (default: supermarket_prices.db)")
 
     args = parser.parse_args()
@@ -15,7 +20,8 @@ if __name__ == "__main__":
     db_uri = f"sqlite:///{db_file_path}"
 
     print(db_uri)
-    file_path = Path(args.filepath)
+
+    file_path = webdeprecios_home / f"{timestamp}_results.txt"
     if not file_path.exists():
         print(f"Error: File '{file_path}' not found.")
     else:
