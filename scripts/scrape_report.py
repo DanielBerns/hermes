@@ -5,7 +5,6 @@ from hermes.core.helpers import get_timestamp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a Markdown price report from the SQLite database.")
-    parser.add_argument("--output", default="latest_prices.md", help="Output markdown filename (default: latest_prices.md)")
     parser.add_argument("--db", default="supermarket_prices.db", help="database filename (default: supermarket_prices.db)")
 
     args = parser.parse_args()
