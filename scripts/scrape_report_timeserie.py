@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from hermes.scrape.carrefour.report_timeserie import generate_timeseries_report
 
 if __name__ == "__main__":
