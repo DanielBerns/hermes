@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from hermes.core.helpers import get_timestamp
 from hermes.scrape.carrefour.report_timeserie import generate_timeseries_report
 
 if __name__ == "__main__":
