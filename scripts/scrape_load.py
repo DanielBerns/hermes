@@ -16,7 +16,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     webdeprecios_home = Path.home() /  "Info" / "webdeprecios"
-    db_file_path = Path(webdeprecios_home, args.db)
+    db_file_path = webdeprecios_home / args.db
     db_uri = f"sqlite:///{db_file_path}"
 
     print(db_uri)
