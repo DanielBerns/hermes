@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from parser import Product, PriceReport, Base # Ensure your previous script is named parser.py
+from extract import Product, PriceReport, Base # Ensure your previous script is named parser.py
 
 def generate_timeseries_report(db_url, output_filepath):
     """Queries the database and writes a Markdown time-series report per product."""
