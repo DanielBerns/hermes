@@ -1,5 +1,5 @@
 import argparse
-from hermes.scrape.report_timeserie import generate_timeseries_report
+from hermes.scrape.carrefour.report_timeserie import generate_timeseries_report
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a Markdown time-series report from the SQLite database.")
