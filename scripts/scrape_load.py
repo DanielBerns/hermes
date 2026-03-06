@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     print(db_uri)
 
-    file_path = webdeprecios_home / f"{timestamp}_results.txt"
+    file_path = webdeprecios_home / f"{args.timestamp}_results.txt"
     if not file_path.exists():
         print(f"Error: File '{file_path}' not found.")
     else:
