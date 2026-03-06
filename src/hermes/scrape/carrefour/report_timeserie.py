@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from hermes.scrape.carrefour.scrape_extract import Product, PriceReport, Base # Ensure your previous script is named parser.py
+from hermes.scrape.carrefour.load import Product, PriceReport, Base
 
 def generate_timeseries_report(db_url, output_filepath):
     """Queries the database and writes a Markdown time-series report per product."""
