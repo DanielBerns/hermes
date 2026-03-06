@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from hermes.scrape.carrefour.report import generate_markdown_report
+from hermes.core.helpers import get_timestamp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a Markdown price report from the SQLite database.")
@@ -12,7 +13,9 @@ if __name__ == "__main__":
     webdeprecios_home = Path.home() /  "Info" / "webdeprecios"
     db_file_path = Path(webdeprecios_home, args.db)
     db_uri = f"sqlite:///{db_file_path}"
-    target = Path(webdeprecios_home, args.output)
+
+    timestamp = get_timestamp()
+    target = webdeprecios_home / f"latest_prices_{timestamp}.md"
 
     print(db_uri)
 
