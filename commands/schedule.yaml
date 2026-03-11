@@ -1,0 +1,10 @@
+global:
+  uv_path: "~/.local/bin/uv" # Adjust this if your uv binary is located elsewhere
+  base_dir: "~/Commands"
+  log_file: "~/Commands/schedule.log"
+
+jobs:
+  - script: "run_scrape_pipeline.sh"
+    cron: "* 14 * * *"  # Runs every day at 14:00hs
+    project_id: "hermes"
+    instance_id: "fce"
