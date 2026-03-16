@@ -37,12 +37,12 @@ def send_pipeline_message(config_path: str, message: str, tags: list[str]) -> No
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Carrefour ETL Pipeline")
-    parser.add_argument("--config", dest="config_path", required=True, help="Path to MessageBoardClient config.yaml")
+    parser.add_argument("-s", "--secrets", dest="secrets", required=True, help="Path to MessageBoardClient config.yaml")
     args = parser.parse_args()
 
     logger = setup_logging()
     logger.info("Starting Carrefour ETL Pipeline...")
-    send_pipeline_message(args.config_path, "Starting Carrefour ETL Pipeline...", ["etl", "carrefour", "info", "start"])
+    send_pipeline_message(args.secrets, "Starting Carrefour ETL Pipeline...", ["etl", "carrefour", "info", "start"])
 
     # --- 0. Configuration & Path Setup ---
     webdeprecios_home = Path.home() / "Info" / "webdeprecios"
@@ -57,7 +57,7 @@ def main() -> None:
             logger.info(f"Copied default searches.txt to {searches_txt}")
         else:
             logger.error(f"Cannot find default searches.txt at {default_searches_txt}")
-            send_pipeline_message(args.config_path, f"Cannot find default searches.txt at {default_searches_txt}", ["etl", "carrefour", "error"])
+            send_pipeline_message(args.secrets, f"Cannot find default searches.txt at {default_searches_txt}", ["etl", "carrefour", "error"])
             sys.exit(1)
 
     # Database configuration
@@ -81,14 +81,14 @@ def main() -> None:
         logger.info("Extraction complete.")
     except Exception as e:
         logger.critical(f"Extraction failed: {e}", exc_info=True)
-        send_pipeline_message(args.config_path, f"Extraction failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Extraction failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 2. TRANSFORM ---
     logger.info("--- [2/4] Starting Transformation ---")
     if not target_dir.exists():
         logger.error(f"Transformation failed: extraction target directory '{target_dir}' does not exist.")
-        send_pipeline_message(args.config_path, f"Transformation failed: extraction target directory '{target_dir}' does not exist.", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Transformation failed: extraction target directory '{target_dir}' does not exist.", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     try:
@@ -120,14 +120,14 @@ def main() -> None:
         logger.info(f"Saved transformed data to '{results_txt}'.")
     except Exception as e:
         logger.critical(f"Transformation failed: {e}", exc_info=True)
-        send_pipeline_message(args.config_path, f"Transformation failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Transformation failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 3. LOAD ---
     logger.info("--- [3/4] Starting Load ---")
     if not results_txt.exists():
         logger.error(f"Load failed: transformed results file '{results_txt}' not found.")
-        send_pipeline_message(args.config_path, f"Load failed: transformed results file '{results_txt}' not found.", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Load failed: transformed results file '{results_txt}' not found.", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     try:
@@ -137,7 +137,7 @@ def main() -> None:
         logger.info("Database load complete.")
     except Exception as e:
         logger.critical(f"Database Load failed: {e}", exc_info=True)
-        send_pipeline_message(args.config_path, f"Database Load failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Database Load failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 4. REPORT ---
@@ -147,11 +147,11 @@ def main() -> None:
         logger.info(f"Time-series report generated successfully at '{report_target}'.")
     except Exception as e:
         logger.critical(f"Report generation failed: {e}", exc_info=True)
-        send_pipeline_message(args.config_path, f"Report generation failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Report generation failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     logger.info("--- ETL Pipeline Completed Successfully ---")
-    send_pipeline_message(args.config_path, "ETL Pipeline Completed Successfully", ["etl", "carrefour", "success", "end"])
+    send_pipeline_message(args.secrets, "ETL Pipeline Completed Successfully", ["etl", "carrefour", "success", "end"])
 
 if __name__ == "__main__":
     main()
