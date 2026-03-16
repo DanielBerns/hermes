@@ -1,7 +1,11 @@
+import argparse
+import asyncio
 import logging
 import shutil
 import sys
 from pathlib import Path
+
+from message_board_client.core import MessageBoardClient
 
 # --- Hermes Imports ---
 from hermes.core.helpers import get_timestamp
@@ -21,9 +25,24 @@ def setup_logging() -> logging.Logger:
     )
     return logging.getLogger(__name__)
 
+def send_pipeline_message(config_path: str, message: str, tags: list[str]) -> None:
+    """Helper to send an async public message synchronously."""
+    async def _send():
+        async with MessageBoardClient(config_path) as client:
+            await client.send_public_message(tags, message)
+    try:
+        asyncio.run(_send())
+    except Exception as e:
+        logging.getLogger(__name__).error(f"Failed to send public message via MessageBoardClient: {e}")
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Carrefour ETL Pipeline")
+    parser.add_argument("--config", dest="config_path", required=True, help="Path to MessageBoardClient config.yaml")
+    args = parser.parse_args()
+
     logger = setup_logging()
     logger.info("Starting Carrefour ETL Pipeline...")
+    send_pipeline_message(args.config_path, "Starting Carrefour ETL Pipeline...", ["etl", "carrefour", "info", "start"])
 
     # --- 0. Configuration & Path Setup ---
     webdeprecios_home = Path.home() / "Info" / "webdeprecios"
@@ -38,6 +57,7 @@ def main() -> None:
             logger.info(f"Copied default searches.txt to {searches_txt}")
         else:
             logger.error(f"Cannot find default searches.txt at {default_searches_txt}")
+            send_pipeline_message(args.config_path, f"Cannot find default searches.txt at {default_searches_txt}", ["etl", "carrefour", "error"])
             sys.exit(1)
 
     # Database configuration
@@ -61,12 +81,14 @@ def main() -> None:
         logger.info("Extraction complete.")
     except Exception as e:
         logger.critical(f"Extraction failed: {e}", exc_info=True)
+        send_pipeline_message(args.config_path, f"Extraction failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 2. TRANSFORM ---
     logger.info("--- [2/4] Starting Transformation ---")
     if not target_dir.exists():
         logger.error(f"Transformation failed: extraction target directory '{target_dir}' does not exist.")
+        send_pipeline_message(args.config_path, f"Transformation failed: extraction target directory '{target_dir}' does not exist.", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     try:
@@ -98,12 +120,14 @@ def main() -> None:
         logger.info(f"Saved transformed data to '{results_txt}'.")
     except Exception as e:
         logger.critical(f"Transformation failed: {e}", exc_info=True)
+        send_pipeline_message(args.config_path, f"Transformation failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 3. LOAD ---
     logger.info("--- [3/4] Starting Load ---")
     if not results_txt.exists():
         logger.error(f"Load failed: transformed results file '{results_txt}' not found.")
+        send_pipeline_message(args.config_path, f"Load failed: transformed results file '{results_txt}' not found.", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     try:
@@ -113,6 +137,7 @@ def main() -> None:
         logger.info("Database load complete.")
     except Exception as e:
         logger.critical(f"Database Load failed: {e}", exc_info=True)
+        send_pipeline_message(args.config_path, f"Database Load failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     # --- 4. REPORT ---
@@ -122,9 +147,11 @@ def main() -> None:
         logger.info(f"Time-series report generated successfully at '{report_target}'.")
     except Exception as e:
         logger.critical(f"Report generation failed: {e}", exc_info=True)
+        send_pipeline_message(args.config_path, f"Report generation failed: {e}", ["etl", "carrefour", "error"])
         sys.exit(1)
 
     logger.info("--- ETL Pipeline Completed Successfully ---")
+    send_pipeline_message(args.config_path, "ETL Pipeline Completed Successfully", ["etl", "carrefour", "success", "end"])
 
 if __name__ == "__main__":
     main()
