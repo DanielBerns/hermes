@@ -1,0 +1,9 @@
+server_url: "http://localhost:5000"
+admin:
+  username: "nimda"
+  password: "nimda19371621"
+users:
+  - username: "alpha"
+    password: "bravo40761621"
+  - username: "bravo"
+    password: "ccharlie11235813"

@@ -1,10 +1,14 @@
+import argparse
+import yaml
 import json
 import logging
+import sys
 from pathlib import Path
 from typing import Any, Dict
 
-# Ensure the hermes package is in your python path
-from hermes.message_board.agent import MessageBoardAgent, ReceivePublicMessages
+import asyncio
+
+from message_board_client.core import MessageBoardClient
 
 logger = logging.getLogger(__name__)
 
@@ -29,49 +33,35 @@ def perform_action(data: Dict[str, Any]) -> None:
     else:
         logger.info(f"ACTION: Received generic data: {data}")
 
-def main():
+async def async_main():
     # --- Configuration ---
     # Path to the directory containing your secrets file (e.g., ./secrets/my_agent.json)
     # The JSON file must contain: {"base_url": "...", "username": "...", "password": "..."}
-    secrets_dir = Path("./secrets")
-    agent_identifier = "my_agent"
+
+    parser = argparse.ArgumentParser(description="Execute some actions following orders.")
+    parser.add_argument(
+        "-s", "--secrets",
+        type=str,
+        required=True,
+        help="Path to user secrets"
+    )
+
+    args = parser.parse_args()
+
+    secrets_file = Path(args.secrets)
 
     # Tags to filter messages by (optional)
     tags_to_watch = ["system_events", "json_data"]
 
     try:
-        # 1. Initialize the Agent
-        # This loads credentials from the secrets file associated with the identifier
-        agent = MessageBoardAgent(secrets_dir, agent_identifier)
+        # 1. Initialize the Client
+        async with MessageBoardClient(str(secrets_file)) as client:
+            # 2. Retrieve messages
+            messages = await client.get_public_messages(tags=tags_to_watch)
 
-        # 2. Create the operation to retrieve messages
-        # We use ReceivePublicMessages to fetch messages visible to everyone or specific tags
-        receive_op = ReceivePublicMessages(tags=tags_to_watch)
-
-        # 3. Add the operation to the agent
-        agent.add(receive_op)
-
-        # 4. Run the agent
-        # This handles authentication and executes the added operations
-        logger.info(f"Agent '{agent_identifier}' connecting to server...")
-        agent.run()
-
-        # 5. Process the response
-        response = receive_op.response
-
-        # The structure of 'response' depends on your specific MessageBoard server implementation.
-        # Here we assume a standard list of message dictionaries or a dict with a 'messages' key.
-        messages = []
-        if isinstance(response, list):
-            messages = response
-        elif isinstance(response, dict):
-            messages = response.get("messages", [])
-            if not messages and "content" in response: # Handle single message response edge case
-                 messages = [response]
-
-        if not messages:
-            logger.info("No new messages retrieved.")
-            return
+            if not messages:
+                logger.info("No new messages retrieved.")
+                return
 
         logger.info(f"Processing {len(messages)} messages...")
 
@@ -98,23 +88,8 @@ def main():
     except Exception as e:
         logger.critical(f"Agent failed: {e}")
 
-if __name__ == "__main__":
-    main()
-
-
-
-
-from pathlib import Path
-
-from hermes.core.action import execute
-from hermes.message_board.actor import MessageBoardActor
-
-
 def main() -> None:
-    filename = Path(__file__)
-    script, project_identifier = filename.stem, filename.parents[1].stem
-    action = MessageBoardActor()
-    execute(script, project_identifier, action)
+    asyncio.run(async_main())
 
 if __name__ == "__main__":
     main()
