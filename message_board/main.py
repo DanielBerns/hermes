@@ -45,19 +45,35 @@ async def async_main():
         required=True,
         help="Path to user secrets"
     )
+    parser.add_argument(
+        "-t", "--tags-file",
+        type=str,
+        required=False,
+        help="Path to a text file containing tags to watch (one per line)"
+    )
 
     args = parser.parse_args()
 
     secrets_file = Path(args.secrets)
 
     # Tags to filter messages by (optional)
-    tags_to_watch = ["system_events", "json_data"]
+    tags_to_watch = None
+    if args.tags_file:
+        try:
+            with open(args.tags_file, "r") as f:
+                tags_to_watch = [line.strip() for line in f if line.strip()]
+        except Exception as e:
+            logger.error(f"Failed to read tags file {args.tags_file}: {e}")
+            sys.exit(1)
 
     try:
         # 1. Initialize the Client
         async with MessageBoardClient(str(secrets_file)) as client:
             # 2. Retrieve messages
-            messages = await client.get_public_messages(tags=tags_to_watch)
+            if tags_to_watch:
+                messages = await client.get_public_messages(tags=tags_to_watch)
+            else:
+                messages = await client.get_public_messages()
 
             if not messages:
                 logger.info("No new messages retrieved.")

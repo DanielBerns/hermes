@@ -1,4 +1,4 @@
-server_url: "http://localhost:5000"
+server_url: "https://danielwaltherberns.pythonanywhere.com/"
 admin:
   username: "nimda"
   password: "nimda19371621"

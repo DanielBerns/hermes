@@ -74,27 +74,41 @@ def main() -> None:
     # --- 1. EXTRACT ---
     logger.info(f"--- [1/4] Starting Extraction: Session {timestamp} ---")
     try:
+        send_pipeline_message(args.secrets, f"Extraction: {e}", ["etl", "carrefour", "extract:start"])
         extractor = CarrefourExtract(webdeprecios_home, timestamp, str(searches_txt))
         path_to_driver = str(Path.home() / 'Software' / 'geckodriver')
         path_to_browser = str(Path('/', 'usr', 'bin', 'firefox'))
         extractor.execute(path_to_driver, path_to_browser, headless=True)
         logger.info("Extraction complete.")
+        send_pipeline_message(args.secrets, f"Extraction: {e}", ["etl", "carrefour", "extract:done"])
     except Exception as e:
         logger.critical(f"Extraction failed: {e}", exc_info=True)
-        send_pipeline_message(args.secrets, f"Extraction failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Extraction failed: {e}", ["etl", "carrefour", "extract:error"])
         sys.exit(1)
 
     # --- 2. TRANSFORM ---
     logger.info("--- [2/4] Starting Transformation ---")
     if not target_dir.exists():
         logger.error(f"Transformation failed: extraction target directory '{target_dir}' does not exist.")
-        send_pipeline_message(args.secrets, f"Transformation failed: extraction target directory '{target_dir}' does not exist.", ["etl", "carrefour", "error"])
+        send_pipeline_message(
+            args.secrets,
+            f"Transformation failed: extraction target directory '{target_dir}' does not exist.",
+            ["etl", "carrefour", "transform:error"]
+        )
         sys.exit(1)
 
     try:
+        send_pipeline_message(
+            args.secrets,
+            f"Transformation done: extraction target directory '{target_dir}'",
+            ["etl", "carrefour", "transform:start"])
         transformer = CarrefourTransform(target_dir=target_dir)
         results = transformer.execute()
         logger.info(f"Transformation complete. Yielded {len(results)} valid product records.")
+        send_pipeline_message(
+            args.secrets,
+            f"Transformation done: extraction target directory '{target_dir}'",
+            ["etl", "carrefour", "transform:done"])
 
         # Write results to text file matching the expected format for 'load.py'
         with open(results_txt, "w") as f:
@@ -120,31 +134,35 @@ def main() -> None:
         logger.info(f"Saved transformed data to '{results_txt}'.")
     except Exception as e:
         logger.critical(f"Transformation failed: {e}", exc_info=True)
-        send_pipeline_message(args.secrets, f"Transformation failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Transformation failed: {e}", ["etl", "carrefour", "transform:error"])
         sys.exit(1)
 
     # --- 3. LOAD ---
     logger.info("--- [3/4] Starting Load ---")
     if not results_txt.exists():
         logger.error(f"Load failed: transformed results file '{results_txt}' not found.")
-        send_pipeline_message(args.secrets, f"Load failed: transformed results file '{results_txt}' not found.", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Load failed: transformed results file '{results_txt}' not found.", ["etl", "carrefour", "load:error"])
         sys.exit(1)
 
     try:
+        send_pipeline_message(args.secrets, f"Load from '{results_txt}'.", ["etl", "carrefour", "load:start"])
         logger.info(f"Loading '{results_txt}' into database {db_name}...")
         parsed_data_generator = parse_scraping_file(results_txt)
         update_database(db_uri, parsed_data_generator)
         logger.info("Database load complete.")
+        send_pipeline_message(args.secrets, f"Load from '{results_txt}'.", ["etl", "carrefour", "load:done"])
     except Exception as e:
         logger.critical(f"Database Load failed: {e}", exc_info=True)
-        send_pipeline_message(args.secrets, f"Database Load failed: {e}", ["etl", "carrefour", "error"])
+        send_pipeline_message(args.secrets, f"Database Load failed: {e}", ["etl", "carrefour", "load:error"])
         sys.exit(1)
 
     # --- 4. REPORT ---
     logger.info("--- [4/4] Starting Report Generation ---")
     try:
+        send_pipeline_message(args.secrets, f"Report from '{db_uri}'.", ["etl", "carrefour", "report:start"])
         generate_timeseries_report(db_uri, report_target)
         logger.info(f"Time-series report generated successfully at '{report_target}'.")
+        send_pipeline_message(args.secrets, f"Report from '{results_txt}'.", ["etl", "carrefour", "report:done"])
     except Exception as e:
         logger.critical(f"Report generation failed: {e}", exc_info=True)
         send_pipeline_message(args.secrets, f"Report generation failed: {e}", ["etl", "carrefour", "error"])
