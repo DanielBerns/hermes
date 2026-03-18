@@ -97,7 +97,7 @@ async def async_main():
                 perform_action(json_data)
 
             except json.JSONDecodeError:
-                logger.error(f"Failed to parse message ID {msg.get('id', '?')} as JSON. Content: {raw_content[:50]}...")
+                logger.error(f"Failed to parse message ID {msg.get('id', '?')} as JSON. Content: {raw_content}...")
             except Exception as e:
                 logger.error(f"Error processing message ID {msg.get('id', '?')}: {e}")
 
