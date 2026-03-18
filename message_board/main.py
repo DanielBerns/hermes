@@ -12,7 +12,7 @@ from message_board_client.core import MessageBoardClient
 
 logger = logging.getLogger(__name__)
 
-def perform_action(data: Dict[str, Any]) -> None:
+def perform_action(tags: List[str] | None, content: str) -> None:
     """
     Decides what action to take based on the parsed JSON content.
     """
@@ -83,21 +83,19 @@ async def async_main():
 
         # 6. Iterate, Parse, and Act
         for msg in messages:
-            # Assuming the server returns a dictionary with a 'content' field
-            raw_content = msg.get("content", "")
+            # Assuming the server returns a dictionary with 'tags' and 'content' field
+            tags = msg.get("tags", None)
+            content = msg.get("content", "")
 
             if not raw_content:
                 continue
 
             try:
-                # Parse the content as JSON
-                json_data = json.loads(raw_content)
-
                 # Execute action based on the parsed data
-                perform_action(json_data)
+                perform_action(tags, content)
 
             except json.JSONDecodeError:
-                logger.error(f"Failed to parse message ID {msg.get('id', '?')} as JSON. Content: {raw_content}...")
+                logger.error(f"Failed to parse message ID {msg.get('id', '?')}")
             except Exception as e:
                 logger.error(f"Error processing message ID {msg.get('id', '?')}: {e}")
 

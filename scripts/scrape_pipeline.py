@@ -23,7 +23,7 @@ def setup_logging() -> logging.Logger:
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[logging.StreamHandler(sys.stdout)]
     )
-    return logging.getLogger(__name__)
+    return logging.getLogger()
 
 def send_pipeline_message(config_path: str, message: str, tags: list[str]) -> None:
     """Helper to send an async public message synchronously."""
@@ -80,10 +80,10 @@ def main() -> None:
         path_to_browser = str(Path('/', 'usr', 'bin', 'firefox'))
         extractor.execute(path_to_driver, path_to_browser, headless=True)
         logger.info("Extraction complete.")
-        send_pipeline_message(args.secrets, f"Extraction: {e}", ["etl", "carrefour", "extract:done"])
+        send_pipeline_message(args.secrets, f"Extraction complete", ["etl", "carrefour", "extract:done"])
     except Exception as e:
         logger.critical(f"Extraction failed: {e}", exc_info=True)
-        send_pipeline_message(args.secrets, f"Extraction failed: {e}", ["etl", "carrefour", "extract:error"])
+        send_pipeline_message(args.secrets, f"Extraction failed", ["etl", "carrefour", "extract:error"])
         sys.exit(1)
 
     # --- 2. TRANSFORM ---
