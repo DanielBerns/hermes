@@ -74,13 +74,13 @@ def main() -> None:
     # --- 1. EXTRACT ---
     logger.info(f"--- [1/4] Starting Extraction: Session {timestamp} ---")
     try:
-        send_pipeline_message(args.secrets, f"Extraction: {e}", ["etl", "carrefour", "extract:start"])
+        send_pipeline_message(args.secrets, f"Extraction start", ["etl", "carrefour", "extract:start"])
         extractor = CarrefourExtract(webdeprecios_home, timestamp, str(searches_txt))
         path_to_driver = str(Path.home() / 'Software' / 'geckodriver')
         path_to_browser = str(Path('/', 'usr', 'bin', 'firefox'))
         extractor.execute(path_to_driver, path_to_browser, headless=True)
         logger.info("Extraction complete.")
-        send_pipeline_message(args.secrets, f"Extraction complete", ["etl", "carrefour", "extract:done"])
+        send_pipeline_message(args.secrets, f"Extraction done", ["etl", "carrefour", "extract:done"])
     except Exception as e:
         logger.critical(f"Extraction failed: {e}", exc_info=True)
         send_pipeline_message(args.secrets, f"Extraction failed", ["etl", "carrefour", "extract:error"])
