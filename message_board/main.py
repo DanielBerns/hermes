@@ -1,3 +1,5 @@
+import pdb
+
 import argparse
 import yaml
 import json
@@ -14,24 +16,12 @@ logger = logging.getLogger(__name__)
 
 def perform_action(tags: List[str] | None, content: str) -> None:
     """
-    Decides what action to take based on the parsed JSON content.
+    Decides what action to take based on the parsed content.
     """
-    action_type = data.get("type", "unknown")
-
-    if action_type == "database_update":
-        # Example Action 1: Update a record
-        record_id = data.get("id")
-        value = data.get("value")
-        logger.info(f"ACTION: Updating database record {record_id} with value '{value}'")
-
-    elif action_type == "alert":
-        # Example Action 2: Trigger an alert
-        level = data.get("level", "info")
-        msg = data.get("message", "No message")
-        logger.warning(f"ACTION: Triggering {level.upper()} alert: {msg}")
-
-    else:
-        logger.info(f"ACTION: Received generic data: {data}")
+    print(f"> {content}")
+    for tt in tags:
+        print(f"  {tt}")
+    logger.info(f"ACTION: Received generic content: {content}")
 
 async def async_main():
     # --- Configuration ---
@@ -87,7 +77,7 @@ async def async_main():
             tags = msg.get("tags", None)
             content = msg.get("content", "")
 
-            if not raw_content:
+            if not content:
                 continue
 
             try:
