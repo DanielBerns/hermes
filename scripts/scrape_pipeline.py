@@ -1,5 +1,3 @@
-import pdb
-
 import argparse
 import asyncio
 import logging
@@ -38,7 +36,6 @@ def send_pipeline_message(config_path: str, message: str, tags: list[str]) -> No
         logging.getLogger(__name__).error(f"Failed to send public message via MessageBoardClient: {e}")
 
 def main() -> None:
-    pdb.set_trace()
     parser = argparse.ArgumentParser(description="Carrefour ETL Pipeline")
     parser.add_argument("-s", "--secrets", dest="secrets", required=True, help="Path to MessageBoardClient config.yaml")
     args = parser.parse_args()
